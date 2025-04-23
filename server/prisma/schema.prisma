@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// User model (base model for admin, doctor, patient roles)
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+
+  //Relationships
+  patients       Patient[] @relation("DoctorPatients") // Doctor-to-many-patients
+  patientProfile Patient?  @relation("PatientUser") // Patient-to-single-user
+  doctor         Doctor?
+  admin          Admin?
+}
+
+// Patient model (patients are assigned a doctor)
+model Patient {
+  id        String   @id @default(uuid())
+  name      String
+  age       Int
+  gender    String
+  contact   String
+  diagnosis String
+  createdAt DateTime @default(now())
+
+  doctorId Int
+  doctor   User @relation("DoctorPatients", fields: [doctorId], references: [id])
+
+  userId Int  @unique
+  user   User? @relation("PatientUser", fields: [userId], references: [id])
+}
+
+// Doctor model (doctors are users with specific information)
+model Doctor {
+  id             Int    @id @default(autoincrement())
+  userId         Int    @unique
+  specialization String
+  user           User   @relation(fields: [userId], references: [id])
+}
+
+// Admin model (admins are users with specific information)
+model Admin {
+  id          Int    @id @default(autoincrement())
+  userId      Int    @unique
+  permissions String
+  user        User   @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
