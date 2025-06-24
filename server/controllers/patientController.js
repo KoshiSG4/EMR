@@ -3,18 +3,30 @@ const { use } = require('../routes/auth');
 const prisma = new PrismaClient();
 
 exports.createPatient = async (req, res) => {
-	const { name, age, gender, contact, diagnosis, userId } = req.body;
+	const {
+		fullName,
+		dateOfBirth,
+		gender,
+		email,
+		phone,
+		address,
+		emergencyContact,
+		insuranceDetails,
+		userId,
+	} = req.body;
 	const doctorId = req.user.userId;
 
 	try {
 		const patient = await prisma.patient.create({
 			data: {
-				name,
-				age,
+				fullName,
+				dateOfBirth: new Date(dateOfBirth),
 				gender,
-				contact,
-				diagnosis,
-				doctorId,
+				email,
+				phone,
+				address,
+				emergencyContact,
+				insuranceDetails,
 				userId,
 			},
 		});

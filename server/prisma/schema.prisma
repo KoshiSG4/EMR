@@ -25,32 +25,37 @@ model User {
   createdAt DateTime @default(now())
 
   //Relationships
-  patients       Patient[] @relation("DoctorPatients") // Doctor-to-many-patients
-  patientProfile Patient?  @relation("PatientUser") // Patient-to-single-user
+  patients       Patient[]       @relation("DoctorPatients") // Doctor-to-many-patients
+  patientProfile Patient?        @relation("PatientUser") // Patient-to-single-user
   doctor         Doctor?
   admin          Admin?
+  medicalRecords MedicalRecord[] @relation("DoctorMedicalRecords")
 }
 
 // Patient model (patients are assigned a doctor)
 model Patient {
-  id        String   @id @default(uuid())
-  name      String
-  age       Int
-  gender    String
-  contact   String
-  diagnosis String
-  createdAt DateTime @default(now())
+  id               String   @id @default(uuid())
+  fullName         String
+  dateOfBirth      DateTime
+  gender           String
+  email            String
+  phone            String
+  address          String
+  emergencyContact String
+  insuranceDetails String?
 
   doctorId Int
   doctor   User @relation("DoctorPatients", fields: [doctorId], references: [id])
 
-  userId Int  @unique
+  userId Int   @unique
   user   User? @relation("PatientUser", fields: [userId], references: [id])
+
+  records MedicalRecord[]
 }
 
 // Doctor model (doctors are users with specific information)
 model Doctor {
-  id             Int    @id @default(autoincrement())
+  id             String @id @default(uuid())
   userId         Int    @unique
   specialization String
   user           User   @relation(fields: [userId], references: [id])
@@ -58,10 +63,34 @@ model Doctor {
 
 // Admin model (admins are users with specific information)
 model Admin {
-  id          Int    @id @default(autoincrement())
+  id          String @id @default(uuid())
   userId      Int    @unique
   permissions String
   user        User   @relation(fields: [userId], references: [id])
+}
+
+model MedicalRecord {
+  id        String   @id @default(uuid())
+  diagnosis String
+  notes     String?
+  createdAt DateTime @default(now())
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id])
+
+  doctorId Int
+  doctor   User @relation("DoctorMedicalRecords", fields: [doctorId], references: [id])
+
+  prescriptions Prescription[]
+}
+
+model Prescription {
+  id        Int    @id @default(autoincrement())
+  name      String
+  dosage    String
+  frequency String
+
+  medicalRecordId String
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
 }
 
 enum Role {
