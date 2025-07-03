@@ -1,0 +1,10 @@
+{
+  "realm": "EMR",
+  "auth-server-url": "http://localhost:8080/",
+  "ssl-required": "external",
+  "resource": "emr-backend",
+  "credentials": {
+    "secret": "jDZlMyNlpyTfHhyHp0f7pGvhaBo5UGto"
+  },
+  "confidential-port": 0
+}

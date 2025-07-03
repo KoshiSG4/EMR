@@ -1,8 +1,8 @@
-const { PrismaClient } = require('../generated/prisma');
-const { use } = require('../routes/auth');
+import { PrismaClient } from '../generated/prisma/client.js';
+
 const prisma = new PrismaClient();
 
-exports.createPatient = async (req, res) => {
+export const createPatient = async (req, res) => {
 	const {
 		fullName,
 		dateOfBirth,
@@ -37,7 +37,7 @@ exports.createPatient = async (req, res) => {
 	}
 };
 
-exports.getAllPatients = async (req, res) => {
+export const getAllPatients = async (req, res) => {
 	const { role, userId } = req.user;
 
 	try {
@@ -80,7 +80,7 @@ exports.getAllPatients = async (req, res) => {
 	}
 };
 
-exports.getPatientById = async (req, res) => {
+export const getPatientById = async (req, res) => {
 	const { id } = req.params;
 
 	try {
@@ -101,7 +101,7 @@ exports.getPatientById = async (req, res) => {
 	}
 };
 
-exports.getOwnPatientProfile = async (req, res) => {
+export const getOwnPatientProfile = async (req, res) => {
 	try {
 		const patient = await prisma.patient.findUnique({
 			where: {
@@ -140,7 +140,7 @@ exports.getOwnPatientProfile = async (req, res) => {
 	}
 };
 
-exports.updatePatient = async (req, res) => {
+export const updatePatient = async (req, res) => {
 	const { id } = req.params;
 	const { name, age, gender, contact, diagnosis } = req.body;
 	try {
@@ -158,7 +158,7 @@ exports.updatePatient = async (req, res) => {
 	}
 };
 
-exports.deletePatient = async (req, res) => {
+export const deletePatient = async (req, res) => {
 	const { id } = req.params;
 
 	try {

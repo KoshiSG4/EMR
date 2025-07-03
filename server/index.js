@@ -1,10 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth');
-const patientRoutes = require('./routes/patient');
-const doctorRoutes = require('./routes/doctor');
-const adminRoutes = require('./routes/admin');
+import express from 'express';
+import cors from 'cors';
+import session from 'express-session';
+import dotenv from 'dotenv';
+import { keycloak, memoryStore } from './keycloak/keycloak.js';
+import { patientRouter } from './routes/patientRoutes.js';
+import { doctorRouter } from './routes/doctorRoutes.js';
+import { adminRouter } from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -12,10 +13,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/patients', patientRoutes);
-app.use('/api/doctors', doctorRoutes);
-app.use('/api/admins', adminRoutes);
+app.use(
+	session({
+		secret: 'some secret',
+		resave: false,
+		saveUninitialized: true,
+		store: memoryStore,
+	})
+);
+
+app.use(keycloak.middleware());
+app.use('/api/patients', patientRouter);
+app.use('/api/doctors', doctorRouter);
+app.use('/api/admins', adminRouter);
 
 app.get('/', (req, res) => {
 	res.send('EMR Server is running...');

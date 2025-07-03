@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('../generated/prisma');
 const prisma = new PrismaClient();
 
 async function main() {
@@ -16,6 +16,7 @@ async function main() {
 			},
 		},
 	});
+	console.log('admin created');
 
 	// Create Doctor User
 	const doctorUser = await prisma.user.create({
@@ -31,6 +32,7 @@ async function main() {
 			},
 		},
 	});
+	console.log('doctor created');
 
 	// Create Patient User
 	const patientUser = await prisma.user.create({
@@ -55,14 +57,25 @@ async function main() {
 			},
 		},
 	});
+	console.log('patient created');
+
+	//Getting patient id
+	const patientProfile = await prisma.patient.findUnique({
+		where: { userId: patientUser.id },
+	});
+
+	//Getting doctor id
+	const doctorProfile = await prisma.doctor.findUnique({
+		where: { userId: doctorUser.id },
+	});
 
 	// Create Medical Record + Prescription
 	const medicalRecord = await prisma.medicalRecord.create({
 		data: {
 			diagnosis: 'Hypertension',
 			notes: 'Blood pressure slightly elevated.',
-			doctorId: doctorUser.id,
-			patientId: patientUser.patientProfile.id,
+			doctorId: doctorProfile.id,
+			patientId: patientProfile.id,
 			prescriptions: {
 				create: [
 					{
@@ -74,6 +87,7 @@ async function main() {
 			},
 		},
 	});
+	console.log('medical records created');
 
 	console.log('Seed complete!');
 }

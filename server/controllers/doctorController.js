@@ -1,39 +1,9 @@
-const { PrismaClient } = require('../generated/prisma');
-const { use } = require('../routes/auth');
+import { PrismaClient } from '../generated/prisma/client.js';
+import { getLoggedInUser, AuthError } from '../utils/getLoggedInUser.js';
+
 const prisma = new PrismaClient();
 
-exports.createDoctor = async (req, res) => {
-	const { userId, specialization } = req.body;
-
-	try {
-		const user = await prisma.user.findUnique({ where: { id: userId } });
-		if (!user) {
-			return res.status(404).json({ message: 'User not found' });
-		}
-
-		if (user.role !== 'DOCTOR') {
-			return res
-				.status(400)
-				.json({ message: 'User is not assigned the DOCTOR role' });
-		}
-
-		const doctor = await prisma.doctor.create({
-			data: {
-				userId,
-				specialization,
-			},
-		});
-
-		res.status(201).json({ message: 'Doctor profile created', doctor });
-	} catch (error) {
-		res.status(500).json({
-			message: 'Failed to create doctor profile',
-			error: error.message,
-		});
-	}
-};
-
-exports.getAllDoctors = async (req, res) => {
+export const getAllDoctors = async (req, res) => {
 	try {
 		const doctors = await prisma.doctor.findMany({
 			include: {
@@ -47,7 +17,7 @@ exports.getAllDoctors = async (req, res) => {
 	}
 };
 
-exports.getDoctorById = async (req, res) => {
+export const getDoctorById = async (req, res) => {
 	const { id } = req.params;
 
 	try {
@@ -67,7 +37,7 @@ exports.getDoctorById = async (req, res) => {
 	}
 };
 
-exports.getOwnDoctorProfile = async (req, res) => {
+export const getOwnDoctorProfile = async (req, res) => {
 	try {
 		const doctor = await prisma.doctor.findUnique({
 			where: {
@@ -111,7 +81,7 @@ exports.getOwnDoctorProfile = async (req, res) => {
 	}
 };
 
-exports.updateDoctor = async (req, res) => {
+export const updateDoctor = async (req, res) => {
 	const { id } = req.params;
 	const { specialization } = req.body;
 	try {
@@ -129,7 +99,7 @@ exports.updateDoctor = async (req, res) => {
 	}
 };
 
-exports.deleteDoctor = async (req, res) => {
+export const deleteDoctor = async (req, res) => {
 	const { id } = req.params;
 
 	try {

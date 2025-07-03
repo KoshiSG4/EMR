@@ -24,12 +24,10 @@ model User {
   role      Role
   createdAt DateTime @default(now())
 
-  //Relationships
-  patients       Patient[]       @relation("DoctorPatients") // Doctor-to-many-patients
-  patientProfile Patient?        @relation("PatientUser") // Patient-to-single-user
+  patients       Patient[] @relation("DoctorPatients") // Doctor-to-many-patients
+  patientProfile Patient?  @relation("PatientUser") // Patient-to-single-user
   doctor         Doctor?
   admin          Admin?
-  medicalRecords MedicalRecord[] @relation("DoctorMedicalRecords")
 }
 
 // Patient model (patients are assigned a doctor)
@@ -38,7 +36,6 @@ model Patient {
   fullName         String
   dateOfBirth      DateTime
   gender           String
-  email            String
   phone            String
   address          String
   emergencyContact String
@@ -55,10 +52,11 @@ model Patient {
 
 // Doctor model (doctors are users with specific information)
 model Doctor {
-  id             String @id @default(uuid())
-  userId         Int    @unique
+  id             String          @id @default(uuid())
+  userId         Int             @unique
   specialization String
-  user           User   @relation(fields: [userId], references: [id])
+  user           User?           @relation(fields: [userId], references: [id])
+  MedicalRecord  MedicalRecord[]
 }
 
 // Admin model (admins are users with specific information)
@@ -66,7 +64,7 @@ model Admin {
   id          String @id @default(uuid())
   userId      Int    @unique
   permissions String
-  user        User   @relation(fields: [userId], references: [id])
+  user        User?  @relation(fields: [userId], references: [id])
 }
 
 model MedicalRecord {
@@ -77,8 +75,8 @@ model MedicalRecord {
   patientId String
   patient   Patient  @relation(fields: [patientId], references: [id])
 
-  doctorId Int
-  doctor   User @relation("DoctorMedicalRecords", fields: [doctorId], references: [id])
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
 
   prescriptions Prescription[]
 }

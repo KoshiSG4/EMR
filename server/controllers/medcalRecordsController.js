@@ -1,8 +1,8 @@
-const { PrismaClient } = require('../generated/prisma');
-const { use } = require('../routes/auth');
+import { PrismaClient } from '../generated/prisma/client.js';
+
 const prisma = new PrismaClient();
 
-exports.createMedicalRecord = async (req, res) => {
+export const createMedicalRecord = async (req, res) => {
 	const { patientId, diagnosis, notes, prescriptions } = res.body;
 	const doctorId = req.user.userId;
 
