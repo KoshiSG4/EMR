@@ -1,5 +1,5 @@
 import { PrismaClient } from '../generated/prisma/client.js';
-import { getLoggedInUser, AuthError } from '../utils/getLoggedInUser.js';
+import { getLoggedInUser } from '../utils/getLoggedInUser.js';
 
 const prisma = new PrismaClient();
 
@@ -39,9 +39,10 @@ export const getDoctorById = async (req, res) => {
 
 export const getOwnDoctorProfile = async (req, res) => {
 	try {
+		const user = await getLoggedInUser(req);
 		const doctor = await prisma.doctor.findUnique({
 			where: {
-				userId: req.user.userId,
+				userId: user.id,
 			},
 			include: {
 				user: true,

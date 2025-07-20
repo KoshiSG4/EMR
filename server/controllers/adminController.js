@@ -4,21 +4,22 @@ import {
 	authenticateKcAdmin,
 } from '../keycloak/kcAdminClient.js';
 import { PrismaClient, Role } from '../generated/prisma/client.js';
+import { getLoggedInUser } from '../utils/getLoggedInUser.js';
 
 const prisma = new PrismaClient();
 
 //Create Admin Profile (only if user is a SUPER ADMIN)
 export const createAdmin = async (req, res) => {
 	try {
-		const user = await getLoggedInUser(req);
+		const user = req.user;
 
-		if (user.role !== 'ADMIN') {
-			return res
-				.status(404)
-				.json({ message: 'Forbidden: Not an admin user' });
+		if (!user?.realm_access?.roles.includes('SUPER-ADMIN')) {
+			return res.status(403).json({
+				message: 'Forbidden: Only super admins can create admins',
+			});
 		}
 
-		const { name, email, password, permissions } = req.body;
+		const { name, email, permissions } = req.body;
 
 		const existingUser = await prisma.user.findUnique({
 			where: { email },
@@ -29,10 +30,9 @@ export const createAdmin = async (req, res) => {
 		}
 
 		const newUser = await prisma.user.create({
+			where: { email },
 			data: {
 				name,
-				email,
-				password,
 				role: 'ADMIN',
 				admin: {
 					create: {
@@ -47,11 +47,6 @@ export const createAdmin = async (req, res) => {
 			admin: newUser,
 		});
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({
 			message: 'Failed to create admin profile',
@@ -79,11 +74,6 @@ export const getAllAdmins = async (req, res) => {
 
 		res.status(200).json(admins);
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({ error: error.message });
 	}
@@ -102,7 +92,7 @@ export const getAdminById = async (req, res) => {
 				.json({ message: 'Forbidden: Not an admin user' });
 		}
 
-		const admin = await prisma.findUnique({
+		const admin = await prisma.admin.findUnique({
 			where: { id: parseInt(id) },
 			include: {
 				user: true,
@@ -113,11 +103,6 @@ export const getAdminById = async (req, res) => {
 
 		res.status(200).json(admin);
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({ error: error.message });
 	}
@@ -127,14 +112,15 @@ export const getAdminById = async (req, res) => {
 export const getOwnAdminProfile = async (req, res) => {
 	try {
 		const user = await getLoggedInUser(req);
+		console.log(user);
 		if (user.role !== 'ADMIN') {
 			return res
 				.status(403)
 				.json({ message: 'Forbidden: Not an admin user' });
 		}
 
-		const admin = await prisma.findUnique({
-			where: { userId: req.user.userId },
+		const admin = await prisma.admin.findUnique({
+			where: { userId: user.id },
 			include: {
 				user: {
 					select: {
@@ -152,11 +138,6 @@ export const getOwnAdminProfile = async (req, res) => {
 
 		res.status(200).json(admin);
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({
 			message: 'Something went wrong',
@@ -184,11 +165,6 @@ export const updateAdmin = async (req, res) => {
 		});
 		res.status(200).json(admin);
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({
 			message: 'Something went wrong',
@@ -214,11 +190,6 @@ export const deleteAdmin = async (req, res) => {
 		});
 		res.json({ message: 'Admin deleted successfully' });
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({
 			message: 'Something went wrong',

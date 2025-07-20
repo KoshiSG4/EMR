@@ -2,36 +2,44 @@ import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import dotenv from 'dotenv';
-import { keycloak, memoryStore } from './keycloak/keycloak.js';
+import morgan from 'morgan';
 import { patientRouter } from './routes/patientRoutes.js';
 import { doctorRouter } from './routes/doctorRoutes.js';
 import { adminRouter } from './routes/adminRoutes.js';
+import { authenticateToken } from './middleware/authMiddleware.js';
+import { PrismaClient } from './generated/prisma/index.js';
+import { getLoggedInUser } from './utils/getLoggedInUser.js';
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+const prisma = new PrismaClient();
+const PORT = process.env.PORT || 5000;
 
+//middleware
 app.use(
-	session({
-		secret: 'some secret',
-		resave: false,
-		saveUninitialized: true,
-		store: memoryStore,
+	cors({
+		origin: 'http://localhost:5173',
+		credentials: true,
 	})
 );
-
-app.use(keycloak.middleware());
-app.use('/api/patients', patientRouter);
-app.use('/api/doctors', doctorRouter);
-app.use('/api/admins', adminRouter);
+app.use(express.json());
+app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
 	res.send('EMR Server is running...');
 });
 
-const PORT = process.env.PORT || 5000;
+app.get('/api/', authenticateToken, getLoggedInUser);
+app.use('/api/patients', authenticateToken, patientRouter);
+app.use('/api/doctors', authenticateToken, doctorRouter);
+app.use('/api/admins', authenticateToken, adminRouter);
+
+app.use((err, req, res, next) => {
+	console.error(err.stack);
+	res.status(500).json({ message: 'Something broke!', error: err.message });
+});
+
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
 });

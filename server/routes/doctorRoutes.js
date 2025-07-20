@@ -1,21 +1,26 @@
 import express from 'express';
 import * as doctorController from '../controllers/doctorController.js';
 import { keycloak } from '../keycloak/keycloak.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
+import { withRole } from '../middleware/roleMiddleware.js';
 
 export const doctorRouter = express.Router();
 
 doctorRouter.get(
 	'/',
-	keycloak.protect('realm:ADMIN'),
+	authenticateToken,
+	withRole(['ADMIN']),
 	doctorController.getAllDoctors
 );
 doctorRouter.get(
 	'/me',
-	keycloak.protect('realm:DOCTOR'),
+	authenticateToken,
+	withRole(['ADMIN']),
 	doctorController.getOwnDoctorProfile
 );
 doctorRouter.get(
 	'/:id',
-	keycloak.protect('realm:ADMIN'),
+	authenticateToken,
+	withRole(['ADMIN']),
 	doctorController.getDoctorById
 );

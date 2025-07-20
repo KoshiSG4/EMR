@@ -4,7 +4,7 @@ import {
 	authenticateKcAdmin,
 } from '../keycloak/kcAdminClient.js';
 import { PrismaClient, Role } from '../generated/prisma/client.js';
-import { getLoggedInUser, AuthError } from '../utils/getLoggedInUser.js';
+import { getLoggedInUser } from '../utils/getLoggedInUser.js';
 
 const prisma = new PrismaClient();
 
@@ -78,11 +78,6 @@ export const createUser = async (req, res) => {
 			user: newUser,
 		});
 	} catch (error) {
-		if (error instanceof AuthError) {
-			return res
-				.status(error.statusCode)
-				.json({ message: error.message });
-		}
 		console.error(error);
 		res.status(500).json({
 			message: 'Failed to create admin profile',
