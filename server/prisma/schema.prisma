@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,24 +9,24 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// User model (base model for admin, doctor, patient roles)
+// Main user table (base model for all roles)
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  password  String
   role      Role
   createdAt DateTime @default(now())
 
-  patients       Patient[] @relation("DoctorPatients") // Doctor-to-many-patients
-  patientProfile Patient?  @relation("PatientUser") // Patient-to-single-user
+  patients       Patient[] @relation("DoctorPatients")
+  patientProfile Patient?  @relation("PatientUser")
   doctor         Doctor?
+  nurse          Nurse?
   admin          Admin?
 }
 
-// Patient model (patients are assigned a doctor)
+// Patient model (linked 1:1 to a User with role PATIENT)
 model Patient {
-  id               String   @id @default(uuid())
+  userId           String   @id
   fullName         String
   dateOfBirth      DateTime
   gender           String
@@ -41,58 +35,162 @@ model Patient {
   emergencyContact String
   insuranceDetails String?
 
-  doctorId Int
-  doctor   User @relation("DoctorPatients", fields: [doctorId], references: [id])
+  doctorId String
+  doctor   User   @relation("DoctorPatients", fields: [doctorId], references: [id])
 
-  userId Int   @unique
-  user   User? @relation("PatientUser", fields: [userId], references: [id])
+  user User @relation("PatientUser", fields: [userId], references: [id])
 
-  records MedicalRecord[]
+  records           MedicalRecord[]
+  patientMedication PatientMedication[]
 }
 
-// Doctor model (doctors are users with specific information)
+// Doctor model (linked 1:1 to a User with role DOCTOR)
 model Doctor {
-  id             String          @id @default(uuid())
-  userId         Int             @unique
-  specialization String
-  user           User?           @relation(fields: [userId], references: [id])
-  MedicalRecord  MedicalRecord[]
+  userId            String              @id
+  specialization    String
+  user              User                @relation(fields: [userId], references: [id])
+  patientMedication PatientMedication[]
+  medicalRecords    MedicalRecord[]
 }
 
-// Admin model (admins are users with specific information)
+// Nurse model (linked 1:1 to a User with role NURSE)
+model Nurse {
+  userId     String @id
+  shift      String
+  department String
+  user       User   @relation(fields: [userId], references: [id])
+}
+
+// Admin model (linked 1:1 to a User with role ADMIN)
 model Admin {
-  id          String @id @default(uuid())
-  userId      Int    @unique
+  userId      String @id
   permissions String
-  user        User?  @relation(fields: [userId], references: [id])
+  user        User   @relation(fields: [userId], references: [id])
 }
 
+// Medical records
 model MedicalRecord {
   id        String   @id @default(uuid())
   diagnosis String
   notes     String?
   createdAt DateTime @default(now())
+
   patientId String
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [userId])
 
   doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
+  doctor   Doctor @relation(fields: [doctorId], references: [userId])
+
+  prescriptions Prescription[]
+
+  labTests      LabTest[]
+}
+
+//Medication Inventory
+model MedicationInventory {
+  id           String           @id @default(uuid())
+  name         String
+  form         String
+  strength     String
+  batchNumber  String
+  quantity     Int
+  reorderLevel Int
+  status       MedicationStatus @default(IN_STOCK)
+  supplier     String?
+  orderDate    DateTime?
+  arrivalDate  DateTime?
+  expiryDate   DateTime?
+  reservedFor  String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  // Relations
+  prescriptions Prescription[]
+}
+
+// Prescriptions
+model Prescription {
+  id                    String   @id @default(uuid())
+  patientMedicationId   String
+  medicationInventoryId String
+  createdAt             DateTime @default(now())
+
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId String
+
+  patientMedication PatientMedication   @relation(fields: [patientMedicationId], references: [id])
+  medication        MedicationInventory @relation(fields: [medicationInventoryId], references: [id])
+}
+
+// Medications linked to patients
+model PatientMedication {
+  id        String  @id @default(uuid())
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [userId])
+
+  prescribedById   String
+  prescribedByName String
+  prescribedBy     Doctor @relation(fields: [prescribedById], references: [userId])
+
+  name         String
+  dosage       String
+  frequency    String
+  route        String
+  startDate    DateTime
+  endDate      DateTime?
+  status       String
+  instructions String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   prescriptions Prescription[]
 }
 
-model Prescription {
-  id        Int    @id @default(autoincrement())
-  name      String
-  dosage    String
-  frequency String
+//Lab Tests
+model LabTest {
+  id            String   @id @default(uuid())
+  patientId     String
+  doctorId      String
+  testType      String
+  status        LabStatus @default(PENDING)
+  requestedAt   DateTime @default(now())
+  acceptedAt    DateTime?
+  result        String?
+  validatedAt   DateTime?
+  releasedAt    DateTime?
 
-  medicalRecordId String
   medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  medicalRecordId String
+}
+
+enum LabStatus {
+  PENDING          // test requested
+  ACCEPTED         // sample accepted
+  IN_PROGRESS      // being tested
+  RESULT_ENTERED   // results entered
+  VALIDATED        // validated by supervisor
+  RELEASED         // available to doctor/patient
+}
+
+enum MedicationStatus {
+  IN_STOCK
+  LOW_STOCK
+  OUT_OF_STOCK
+  ON_ORDER
+  ARRIVED
+  EXPIRED
+  RESERVED
+}
+
+enum PrescriptionStatus {
+  NEW
+  ACTIVE
+  DISCONTINUED
 }
 
 enum Role {
   ADMIN
   DOCTOR
+  NURSE
   PATIENT
 }

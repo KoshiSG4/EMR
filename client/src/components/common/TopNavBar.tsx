@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import keycloak from '../keycloak';
-import { getUserInfoFromToken } from '../utils/jwtUtils';
+import keycloak from '../../keycloak';
+import { getUserInfoFromToken } from '../../utils/jwtUtils';
 import { FaBell } from 'react-icons/fa';
 
 const TopNavBar = () => {

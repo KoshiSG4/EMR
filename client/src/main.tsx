@@ -1,17 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import keycloak from './keycloak.tsx';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
+import App from './App.js';
+import keycloak from './keycloak.js';
 import './index.css';
 
 keycloak.init({ onLoad: 'login-required' }).then((authenticated) => {
 	if (authenticated) {
 		ReactDOM.createRoot(document.getElementById('root')!).render(
 			<React.StrictMode>
-				<App />
+				<Provider store={store}>
+					<App />
+				</Provider>
 			</React.StrictMode>
 		);
 	} else {
 		keycloak.login();
 	}
 });
+
+//refresh token automatically
+setInterval(() => {
+	keycloak.updateToken(60).then((refreshed) => {
+		if (refreshed) {
+			console.log('Token Refreshed');
+		}
+	});
+}, 1000);

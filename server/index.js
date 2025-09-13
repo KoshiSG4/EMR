@@ -9,6 +9,8 @@ import { adminRouter } from './routes/adminRoutes.js';
 import { authenticateToken } from './middleware/authMiddleware.js';
 import { PrismaClient } from './generated/prisma/index.js';
 import { getLoggedInUser } from './utils/getLoggedInUser.js';
+import { medicationsRouter } from './routes/medicationRoutes.js';
+import labRouter from './routes/labRoutes.js';
 
 dotenv.config();
 
@@ -20,6 +22,7 @@ const PORT = process.env.PORT || 5000;
 app.use(
 	cors({
 		origin: 'http://localhost:5173',
+		methods: ['GET', 'POST', 'PUT', 'DELETE'],
 		credentials: true,
 	})
 );
@@ -34,6 +37,8 @@ app.get('/api/', authenticateToken, getLoggedInUser);
 app.use('/api/patients', authenticateToken, patientRouter);
 app.use('/api/doctors', authenticateToken, doctorRouter);
 app.use('/api/admins', authenticateToken, adminRouter);
+app.use('/api/medications', authenticateToken, medicationsRouter);
+app.use('/api/laboratory', authenticateToken, labRouter);
 
 app.use((err, req, res, next) => {
 	console.error(err.stack);

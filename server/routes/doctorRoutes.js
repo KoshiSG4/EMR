@@ -1,6 +1,5 @@
 import express from 'express';
 import * as doctorController from '../controllers/doctorController.js';
-import { keycloak } from '../keycloak/keycloak.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { withRole } from '../middleware/roleMiddleware.js';
 

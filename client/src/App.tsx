@@ -7,7 +7,10 @@ const App = () => {
 		<Router>
 			<Routes>
 				<Route path="/" element={<Dashboard />} />
-				<Route path="/:section/:tab?" element={<Dashboard />} />
+				<Route
+					path="/:section/:tab?/:subTab?/:innerTab?/:innerSubTab?"
+					element={<Dashboard />}
+				/>
 			</Routes>
 		</Router>
 	);

@@ -121,13 +121,12 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
-  password: 'password',
   role: 'role',
   createdAt: 'createdAt'
 };
 
 exports.Prisma.PatientScalarFieldEnum = {
-  id: 'id',
+  userId: 'userId',
   fullName: 'fullName',
   dateOfBirth: 'dateOfBirth',
   gender: 'gender',
@@ -135,18 +134,21 @@ exports.Prisma.PatientScalarFieldEnum = {
   address: 'address',
   emergencyContact: 'emergencyContact',
   insuranceDetails: 'insuranceDetails',
-  doctorId: 'doctorId',
-  userId: 'userId'
+  doctorId: 'doctorId'
 };
 
 exports.Prisma.DoctorScalarFieldEnum = {
-  id: 'id',
   userId: 'userId',
   specialization: 'specialization'
 };
 
+exports.Prisma.NurseScalarFieldEnum = {
+  userId: 'userId',
+  shift: 'shift',
+  department: 'department'
+};
+
 exports.Prisma.AdminScalarFieldEnum = {
-  id: 'id',
   userId: 'userId',
   permissions: 'permissions'
 };
@@ -160,11 +162,60 @@ exports.Prisma.MedicalRecordScalarFieldEnum = {
   doctorId: 'doctorId'
 };
 
+exports.Prisma.MedicationInventoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  form: 'form',
+  strength: 'strength',
+  batchNumber: 'batchNumber',
+  quantity: 'quantity',
+  reorderLevel: 'reorderLevel',
+  status: 'status',
+  supplier: 'supplier',
+  orderDate: 'orderDate',
+  arrivalDate: 'arrivalDate',
+  expiryDate: 'expiryDate',
+  reservedFor: 'reservedFor',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.PrescriptionScalarFieldEnum = {
   id: 'id',
+  patientMedicationId: 'patientMedicationId',
+  medicationInventoryId: 'medicationInventoryId',
+  createdAt: 'createdAt',
+  medicalRecordId: 'medicalRecordId'
+};
+
+exports.Prisma.PatientMedicationScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  prescribedById: 'prescribedById',
+  prescribedByName: 'prescribedByName',
   name: 'name',
   dosage: 'dosage',
   frequency: 'frequency',
+  route: 'route',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status',
+  instructions: 'instructions',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.LabTestScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  testType: 'testType',
+  status: 'status',
+  requestedAt: 'requestedAt',
+  acceptedAt: 'acceptedAt',
+  result: 'result',
+  validatedAt: 'validatedAt',
+  releasedAt: 'releasedAt',
   medicalRecordId: 'medicalRecordId'
 };
 
@@ -185,16 +236,40 @@ exports.Prisma.NullsOrder = {
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',
   DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
   PATIENT: 'PATIENT'
+};
+
+exports.MedicationStatus = exports.$Enums.MedicationStatus = {
+  IN_STOCK: 'IN_STOCK',
+  LOW_STOCK: 'LOW_STOCK',
+  OUT_OF_STOCK: 'OUT_OF_STOCK',
+  ON_ORDER: 'ON_ORDER',
+  ARRIVED: 'ARRIVED',
+  EXPIRED: 'EXPIRED',
+  RESERVED: 'RESERVED'
+};
+
+exports.LabStatus = exports.$Enums.LabStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESULT_ENTERED: 'RESULT_ENTERED',
+  VALIDATED: 'VALIDATED',
+  RELEASED: 'RELEASED'
 };
 
 exports.Prisma.ModelName = {
   User: 'User',
   Patient: 'Patient',
   Doctor: 'Doctor',
+  Nurse: 'Nurse',
   Admin: 'Admin',
   MedicalRecord: 'MedicalRecord',
-  Prescription: 'Prescription'
+  MedicationInventory: 'MedicationInventory',
+  Prescription: 'Prescription',
+  PatientMedication: 'PatientMedication',
+  LabTest: 'LabTest'
 };
 
 /**

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { navLinks as links } from '../constants/navLinks';
+import { navLinks as links } from '../../constants/navLinks';
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 

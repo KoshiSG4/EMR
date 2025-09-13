@@ -1,22 +1,49 @@
 import { PrismaClient } from '../generated/prisma/client.js';
+import {
+	kcAdminClient,
+	authenticateKcAdmin,
+} from '../keycloak/kcAdminClient.js';
 
 const prisma = new PrismaClient();
 
 export const createPatient = async (req, res) => {
-	const {
-		fullName,
-		dateOfBirth,
-		gender,
-		email,
-		phone,
-		address,
-		emergencyContact,
-		insuranceDetails,
-		userId,
-	} = req.body;
-	const doctorId = req.user.userId;
-
 	try {
+		const {
+			fullName,
+			dateOfBirth,
+			gender,
+			email,
+			phone,
+			address,
+			emergencyContact,
+			insuranceDetails,
+			userId,
+		} = req.body;
+		await authenticateKcAdmin();
+		const newUser = await kcAdminClient.users.create({
+			realm: process.env.KEYCLOAK_REALM,
+			userName: email,
+			email: email,
+			enabled: true,
+			credentials: [
+				{
+					type: 'password',
+					value: 'TempPassword123',
+					temporary: true,
+				},
+			],
+		});
+
+		const patientRole = await kcAdminClient.roles.findOneByName({
+			realm: process.env.KEYCLOAK_REALM,
+			name: 'patient',
+		});
+		await kcAdminClient.users.addRealmRoleMappings({
+			id: newUser.id,
+			realm: process.env.KEYCLOAK_REALM,
+			roles: [{ id: patientRole.id, name: 'patient' }],
+		});
+
 		const patient = await prisma.patient.create({
 			data: {
 				fullName,
@@ -31,50 +58,36 @@ export const createPatient = async (req, res) => {
 			},
 		});
 
-		res.status(201).json(patient);
+		res.status(201).json({
+			message: 'Patient created successfully',
+			patient,
+		});
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
 };
 
 export const getAllPatients = async (req, res) => {
-	const { role, userId } = req.user;
-
 	try {
-		let patients;
-
-		if (role === 'DOCTOR') {
-			patients = await prisma.patient.findMany({
-				where: { doctorId: userId },
-				include: {
-					user: true,
-					doctor: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-						},
+		const allPatients = await prisma.patient.findMany({
+			orderBy: { fullName: 'asc' },
+			include: {
+				records: true,
+				patientMedication: true,
+				doctor: {
+					select: {
+						name: true,
 					},
 				},
-			});
-		} else if (role === 'ADMIN') {
-			patients = await prisma.patient.findMany({
-				include: {
-					user: true,
-					doctor: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-						},
+				user: {
+					select: {
+						email: true,
 					},
 				},
-			});
-		} else {
-			return res.status(403).json({ message: 'Access denied' });
-		}
-
-		res.json(patients);
+			},
+		});
+		console.log('all Patients: ', allPatients);
+		res.status(200).json(allPatients);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -171,5 +184,76 @@ export const deletePatient = async (req, res) => {
 			message: 'Something went wrong',
 			error: error.message,
 		});
+	}
+};
+
+export const getPatientMedications = async (req, res) => {
+	const { id } = req.params;
+	try {
+		const patient = await prisma.patient.findUnique({
+			where: { userId: id },
+			include: {
+				medications: true,
+				records: true,
+			},
+		});
+
+		console.log(patient);
+		if (!patient)
+			return res.status(404).json({ message: 'Patient not found' });
+		res.json({ patient });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const searchPatients = async (req, res) => {
+	const { query } = req.query;
+
+	try {
+		const patients = await prisma.patient.findMany({
+			where: {
+				user: {
+					OR: [
+						{
+							name: {
+								contains: query,
+								mode: 'insensitive',
+							},
+						},
+						{
+							email: {
+								contains: query,
+								mode: 'insensitive',
+							},
+						},
+					],
+				},
+			},
+			select: {
+				userId: true,
+				user: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
+				dateOfBirth: true,
+				gender: true,
+				medications: true,
+				records: true,
+			},
+		});
+
+		if (patients.length === 0) {
+			return res
+				.status(404)
+				.json({ message: 'No matching patients found' });
+		}
+
+		res.json(patients);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: error.message });
 	}
 };
