@@ -17,11 +17,21 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
+const allowedOrigins = [
+	'http://localhost:5173',
+	'https://emr-project.vercel.app/',
+];
 
 //middleware
 app.use(
 	cors({
-		origin: ['http://localhost:5173', 'https://emr-project.vercel.app/'],
+		origin: (origin, callback) => {
+			if (!origin || allowedOrigins.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error('Not allowed by CORS'));
+			}
+		},
 		methods: ['GET', 'POST', 'PUT', 'DELETE'],
 		credentials: true,
 	})
