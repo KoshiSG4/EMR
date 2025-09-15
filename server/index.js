@@ -21,10 +21,7 @@ const PORT = process.env.PORT || 5000;
 //middleware
 app.use(
 	cors({
-		origin: [
-			'http://localhost:5173',
-			'https://emr-2nar1e5y9-koshis-projects-f908a45d.vercel.app/',
-		],
+		origin: ['http://localhost:5173', 'https://emr-project.vercel.app/'],
 		methods: ['GET', 'POST', 'PUT', 'DELETE'],
 		credentials: true,
 	})
