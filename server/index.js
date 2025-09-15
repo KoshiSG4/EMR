@@ -19,7 +19,7 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
 	'http://localhost:5173',
-	'https://emr-project.vercel.app/',
+	'https://emr-project.vercel.app',
 ];
 
 //middleware
