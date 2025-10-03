@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { AppDispatch, RootState } from '@/store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
-import { ReferralRecord } from '@/types/ReferralRecord ';
+import { ReferralRecord } from '@/types/referralRecord ';
 import { referralsColumns } from './referralsColumns';
 import ReferralsForm from './ReferralsForm';
 

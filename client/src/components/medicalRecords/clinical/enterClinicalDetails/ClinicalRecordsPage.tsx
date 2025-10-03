@@ -1,30 +1,18 @@
 import DataTable from '@/components/common/DataTable';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppDispatch, RootState } from '@/store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
-import { ClinicalDetailRecord } from '@/types/ClinicalDetailRecord';
+import { ClinicalDetailRecord } from '@/types/clinicalDetailRecord';
 import { clinicalDetailsColumns } from './clinicalDetailsColumns';
 import ClinicalDetailsForm from './ClinicalDetailsForm';
-
-const dummyClinicalDetails: ClinicalDetailRecord[] = [
-	{
-		id: '1',
-		date: '2025-09-09',
-		chiefComplaint: 'Persistent cough for 2 weeks',
-		history: 'Started with mild fever, now worsening cough with sputum',
-		pastHistory: 'Asthma since childhood',
-		medications: 'Salbutamol inhaler',
-		allergies: 'Penicillin',
-		examination: 'Bilateral wheeze, temp 37.8°C',
-		assessment: 'Acute bronchitis',
-		plan: 'Start antibiotics, continue inhaler, review in 1 week',
-		recordedBy: 'Dr. Adams',
-	},
-];
+import {
+	addClinicalRecord,
+	addNewClinicalRecord,
+	getSelectedPatientsClinicalRecords,
+} from '@/store/slices/clinicalSlice';
 
 const ClinicalRecordsPage = () => {
-	const [loading, setIsLoading] = useState(false);
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const userName =
 		getUserInfoFromToken().givenName +
@@ -34,25 +22,35 @@ const ClinicalRecordsPage = () => {
 	const selectedPatient = useSelector(
 		(state: RootState) => state.patients.selectedPatient
 	);
+	const { loading, clinicalDetails } = useSelector(
+		(state: RootState) => state.clinical
+	);
+
 	const dispatch = useDispatch<AppDispatch>();
+	const ref = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (selectedPatient && clinicalDetails.length == 0) {
+			dispatch(
+				getSelectedPatientsClinicalRecords({
+					patientId: selectedPatient.userId,
+					clinicalRecord: clinicalDetails,
+				})
+			);
+		}
+		const handleClickOutside = (event: MouseEvent) => {
+			if (ref.current && !ref.current.contains(event.target as Node)) {
+				setIsFormOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		return () =>
+			document.removeEventListener('mousedown', handleClickOutside);
+	}, [selectedPatient]);
 
 	const handleSubmit = (clinicalRecord: ClinicalDetailRecord) => {
-		// if (selectedPatient?.userId) {
-		// 	dispatch(
-		// 		addMedicationsToPatient({
-		// 			patientId: selectedPatient.userId,
-		// 			medication,
-		// 		})
-		// 	);
-
-		// 	dispatch(
-		// 		addMedsToPatientDatabase({
-		// 			patientId: selectedPatient.userId,
-		// 			medication,
-		// 		})
-		// 	);
-		// }
-
+		dispatch(addClinicalRecord({ clinicalRecord: clinicalRecord }));
+		dispatch(addNewClinicalRecord({ clinicalRecord: clinicalRecord }));
 		setIsFormOpen(false);
 	};
 
@@ -65,10 +63,11 @@ const ClinicalRecordsPage = () => {
 					</h1>
 					<DataTable
 						columns={clinicalDetailsColumns}
-						data={dummyClinicalDetails}
+						data={clinicalDetails}
 						loading={loading}
 					/>
 					<div
+						ref={ref}
 						className={`absolute top-0 -right-8 h-auto w-2/5  bg-white border-y-2 border-gray-200 shadow-lg  transform transition-transform duration-300 z-50
         ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 						<div className="p-4 flex items-center justify-between border-b ">
@@ -93,7 +92,7 @@ const ClinicalRecordsPage = () => {
 					<button
 						onClick={() => setIsFormOpen((prev) => !prev)}
 						className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition">
-						➕ Enter Clinical Record
+						➕ Enter New Record
 					</button>
 				</div>
 			</div>

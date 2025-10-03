@@ -1,10 +1,9 @@
-export interface DiagnosisRecord {
+import { MedicalRecord } from './medicalRecords';
+
+export interface DiagnoseRecord {
 	id: string;
-	patientId: string;
-	date: string;
-	code: string;
 	name: string;
-	severity: string;
-	description: string;
-	recordedBy: string;
+	doctorName: string;
+	diagnosisName: string;
+	records?: MedicalRecord[];
 }

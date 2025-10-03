@@ -72,22 +72,37 @@ export const getAllPatients = async (req, res) => {
 		const allPatients = await prisma.patient.findMany({
 			orderBy: { fullName: 'asc' },
 			include: {
-				records: true,
+				records: {
+					include: {
+						diagnosis: true,
+						labTests: true,
+						prescriptions: true,
+						patient: true,
+						doctor: true,
+					},
+				},
 				patientMedication: true,
-				doctor: {
-					select: {
-						name: true,
+				doctors: {
+					include: {
+						user: true,
 					},
 				},
-				user: {
-					select: {
-						email: true,
-					},
-				},
+				user: true,
 			},
 		});
-		console.log('all Patients: ', allPatients);
-		res.status(200).json(allPatients);
+		const formattedPatients = allPatients.map((patient) => ({
+			...patient,
+			dateOfBirth: patient.dateOfBirth
+				? patient.dateOfBirth.toISOString().split('T')[0]
+				: null,
+			records: patient.records.map((record) => ({
+				...record,
+				createdAt: record.createdAt
+					? record.createdAt.toISOString().split('T')[0]
+					: null,
+			})),
+		}));
+		res.status(200).json(formattedPatients);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -155,14 +170,81 @@ export const getOwnPatientProfile = async (req, res) => {
 
 export const updatePatient = async (req, res) => {
 	const { id } = req.params;
-	const { name, age, gender, contact, diagnosis } = req.body;
+	const {
+		fullName,
+		dateOfBirth,
+		gender,
+		phone,
+		address,
+		emergencyContact,
+		insuranceDetails,
+		doctors,
+		user,
+		records,
+		patientMedication,
+	} = req.body;
 	try {
+		const data = {};
+		if (fullName !== undefined) data.fullName = fullName;
+		if (dateOfBirth !== undefined && dateOfBirth !== '')
+			data.dateOfBirth = new Date(dateOfBirth);
+		if (gender !== undefined) data.gender = gender;
+		if (phone !== undefined) data.phone = phone;
+		if (address !== undefined) data.address = address;
+		if (emergencyContact !== undefined)
+			data.emergencyContact = emergencyContact;
+		if (insuranceDetails !== undefined)
+			data.insuranceDetails = insuranceDetails;
+
+		// doctor update
+		if (Array.isArray(doctors)) {
+			const doctorConnects = doctors.map((d) =>
+				typeof d === 'string' ? { userId: d } : { userId: d.userId }
+			);
+			data.doctors = { set: doctorConnects };
+		}
+
+		// user update
+		if (user && (user.name !== undefined || user.email !== undefined)) {
+			data.user = {
+				update: {},
+			};
+			if (user.name !== undefined) data.user.update.name = user.name;
+			if (user.email !== undefined) data.user.update.email = user.email;
+		}
+
+		// records update
+		if (Array.isArray(records)) {
+			data.records = {
+				connect: records.map((r) =>
+					typeof r === 'string' ? { id: r } : { id: r.id }
+				),
+			};
+		}
+
+		// patient medication update
+		if (Array.isArray(patientMedication)) {
+			data.patientMedication = {
+				connect: patientMedication.map((pm) =>
+					typeof pm === 'string' ? { id: pm } : { id: pm.id }
+				),
+			};
+		}
+
 		const patient = await prisma.patient.update({
-			where: { id: parseInt(id) },
-			data: { name, age, gender, contact, diagnosis },
-			include: { user: true, doctor: true },
+			where: { userId: id },
+			data,
+			include: {
+				user: true,
+				doctors: true,
+				patientMedication: true,
+				records: true,
+			},
 		});
-		res.status(200).json([patient]);
+		res.status(200).json({
+			message: 'Patient updated successfully',
+			patient,
+		});
 	} catch (error) {
 		res.status(500).json({
 			message: 'Something went wrong',
@@ -171,12 +253,12 @@ export const updatePatient = async (req, res) => {
 	}
 };
 
-export const deletePatient = async (req, res) => {
+export const deactivatePatient = async (req, res) => {
 	const { id } = req.params;
 
 	try {
 		await prisma.patient.delete({
-			where: { id: parseInt(id) },
+			where: { userId: id },
 		});
 		res.json({ message: 'Patient deleted successfully' });
 	} catch (error) {

@@ -3,21 +3,27 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
-import { openPatientTabs, PatientTab } from '@/store/slices/patientSlice';
+import {
+	openPatientTabs,
+	PatientTab,
+	setSelectedPatient,
+	updatePatient,
+	updatePatientInfo,
+} from '@/store/slices/patientSlice';
 import Forbidden from '../common/Forbidden';
 import { Patient } from '@/types/patientTypes';
 import PatientInfoHeader from './PatientInfoHeader';
 import { ChevronRight } from 'lucide-react';
-import VitalsForm from '../medicalRecords/vitals/VitalsForm';
 import VitalsPage from '../medicalRecords/vitals/VitalsPage';
 import DiagnosePage from '../medicalRecords/diagnoses/DiagnosePage';
-import HistoryRecords from '../medicalRecords/historyRecs/HistoryRecords';
+import HistoryPage from '../medicalRecords/historyRecs/HistoryPage';
 import ClinicalRecordsPage from '../medicalRecords/clinical/enterClinicalDetails/ClinicalRecordsPage';
 import PastVisitsPage from '../medicalRecords/clinical/pastVisits/PastVisitsPage';
 import ReferralsPage from '../medicalRecords/clinical/referrals/ReferralsPage';
-import LabPage from '../medicalRecords/clinical/lab/LabPage';
+import LabPage from '../laboratory/LabPage';
 import PrescriptionPage from '../medicalRecords/clinical/prescription/PrescriptionPage';
 import PatientMedications from '../medicalRecords/clinical/patientMedication/PatientMedications';
+import PatientProfileCard from './PatientProfileCard ';
 
 interface SelectedPatientContentProps {
 	patient: Patient;
@@ -40,13 +46,35 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 
 		try {
 			if (subTab === 'profile') {
+				const handleOnSave = (updated: Patient) => {
+					dispatch(
+						updatePatientInfo({
+							patientId: updated.userId,
+							patient: updated,
+						})
+					);
+					dispatch(
+						updatePatient({
+							patientId: updated.userId,
+							patient: updated,
+						})
+					);
+					dispatch(setSelectedPatient(updated));
+				};
+				setTabContent(
+					<PatientProfileCard
+						open={true}
+						selectedPatient={patient}
+						onSave={handleOnSave}
+					/>
+				);
 			} else if (subTab === 'medical-records') {
 				if (innerTab === 'vitals') {
 					setTabContent(<VitalsPage />);
 				} else if (innerTab === 'diagnoses') {
 					setTabContent(<DiagnosePage />);
 				} else if (innerTab === 'history') {
-					setTabContent(<HistoryRecords />);
+					setTabContent(<HistoryPage />);
 				} else if (innerTab === 'clinical') {
 					if (innerSubTab === 'enter') {
 						setTabContent(<ClinicalRecordsPage />);
@@ -74,7 +102,7 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [selectedPatient, subTab, innerTab, innerSubTab]);
+	}, [selectedPatient, subTab, innerTab, innerSubTab, patient]);
 
 	return (
 		<div>

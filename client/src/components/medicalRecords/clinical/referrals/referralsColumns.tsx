@@ -1,4 +1,4 @@
-import { ReferralRecord } from '@/types/ReferralRecord ';
+import { ReferralRecord } from '@/types/referralRecord ';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const referralsColumns: ColumnDef<ReferralRecord>[] = [

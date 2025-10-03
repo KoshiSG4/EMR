@@ -13,7 +13,7 @@ export const vitalsColumns: ColumnDef<VitalsRecord>[] = [
 					column.toggleSorting(column.getIsSorted() === 'asc')
 				}
 				className="pl-0">
-				Created Date <ArrowUpDown className="ml-2 h-4 w-4" />
+				Date <ArrowUpDown className="ml-2 h-4 w-4" />
 			</Button>
 		),
 	},
@@ -53,17 +53,17 @@ export const vitalsColumns: ColumnDef<VitalsRecord>[] = [
 		accessorKey: 'recordedBy',
 		header: 'Recorded By',
 	},
-	{
-		accessorKey: 'updatedDate',
-		header: ({ column }) => (
-			<Button
-				variant="ghost"
-				onClick={() =>
-					column.toggleSorting(column.getIsSorted() === 'asc')
-				}
-				className="pl-0">
-				Updated Date <ArrowUpDown className="ml-2 h-4 w-4" />
-			</Button>
-		),
-	},
+	// {
+	// 	accessorKey: 'updatedDate',
+	// 	header: ({ column }) => (
+	// 		<Button
+	// 			variant="ghost"
+	// 			onClick={() =>
+	// 				column.toggleSorting(column.getIsSorted() === 'asc')
+	// 			}
+	// 			className="pl-0">
+	// 			Updated Date <ArrowUpDown className="ml-2 h-4 w-4" />
+	// 		</Button>
+	// 	),
+	// },
 ];

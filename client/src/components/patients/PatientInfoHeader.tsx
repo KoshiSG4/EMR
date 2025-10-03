@@ -39,7 +39,7 @@ const PatientInfoHeader = ({ selectedPatient }: PatientInfoHeaderProps) => {
 					{selectedPatient.records.map((d, index) => (
 						<span key={index}>
 							{index > 0 && ' | '}
-							{d.diagnosis}
+							{d.diagnosis?.name}
 						</span>
 					))}
 				</p>

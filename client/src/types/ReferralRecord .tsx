@@ -1,5 +1,6 @@
 export interface ReferralRecord {
 	id: string;
+	patientId: string;
 	date: string;
 	referralType: string;
 	referredTo: string;

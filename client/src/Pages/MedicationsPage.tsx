@@ -1,6 +1,4 @@
-import MedicationInventoryTable, {
-	columns,
-} from '@/components/medications/MedicationsInventoryTable';
+import { medInventryColumns } from '@/components/medications/medInventoryColumns';
 import MedsSummaryCards from '../components/medications/MedsSummaryCards';
 import React, { useEffect, useState } from 'react';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
@@ -12,6 +10,7 @@ import {
 } from '@/store/slices/medicationSlice';
 import AddNewMedicationForm from '@/components/medications/AddNewMedication';
 import { MedicationInventory } from '@/types/medicationInventoryType';
+import DataTable from '@/components/common/DataTable';
 
 const MedicationsPage = () => {
 	const userRole = getUserInfoFromToken().role?.toLowerCase();
@@ -20,14 +19,14 @@ const MedicationsPage = () => {
 		' ' +
 		getUserInfoFromToken().familyName;
 
-	const medicationsInventory = useSelector(
-		(state: RootState) => state.medications.medications
+	const { medications, loading } = useSelector(
+		(state: RootState) => state.medications
 	);
 	const dispatch = useDispatch<AppDispatch>();
 	const [isFormOpen, setIsFormOpen] = useState(false);
 
 	useEffect(() => {
-		dispatch(getMedicationInventory({ medications: medicationsInventory }));
+		dispatch(getMedicationInventory({ medications: medications }));
 	}, [dispatch]);
 
 	const handleSubmitMedicationForm = (medication: MedicationInventory) => {
@@ -36,12 +35,17 @@ const MedicationsPage = () => {
 		setIsFormOpen(false);
 	};
 
-	const data = medicationsInventory || [];
+	// const data = medicationsInventory || [];
 
 	return (
 		<div className="p-6 space-y-6 relative">
-			<MedsSummaryCards medications={data} />
-			<MedicationInventoryTable columns={columns} data={data} />
+			<MedsSummaryCards medications={medications} />
+			{/* <MedicationInventoryTable columns={columns} data={data} /> */}
+			<DataTable
+				columns={medInventryColumns}
+				data={medications}
+				loading={loading}
+			/>
 			<div
 				className={`absolute top-0 -right-8 h-full w-96  bg-white border-l border-gray-200 shadow-lg transform transition-transform duration-300 z-50
         ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>

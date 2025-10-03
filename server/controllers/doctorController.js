@@ -3,6 +3,34 @@ import { getLoggedInUser } from '../utils/getLoggedInUser.js';
 
 const prisma = new PrismaClient();
 
+export const createDoctor = async (req, res) => {
+	try {
+		const { name, email, specialization } = req.body;
+		const newDoctor = await prisma.user.create({
+			data: {
+				name,
+				email,
+			},
+			role: 'DOCTOR',
+			doctor: {
+				create: {
+					specialization,
+				},
+			},
+		});
+
+		res.status(201).json({
+			message: 'Doctor created successfully',
+			newDoctor,
+		});
+	} catch (error) {
+		res.status(500).json({
+			message: 'Failed to create the new doctor',
+			error: error.message,
+		});
+	}
+};
+
 export const getAllDoctors = async (req, res) => {
 	try {
 		const doctors = await prisma.doctor.findMany({
@@ -91,7 +119,10 @@ export const updateDoctor = async (req, res) => {
 			data: { specialization },
 			include: { user: true },
 		});
-		res.status(200).json(doctor);
+		res.status(200).json({
+			message: 'Sucessfully updated the doctor',
+			doctor,
+		});
 	} catch (error) {
 		res.status(500).json({
 			message: 'Something went wrong',
@@ -105,7 +136,7 @@ export const deleteDoctor = async (req, res) => {
 
 	try {
 		await prisma.doctor.delete({
-			where: { id: parseInt(id) },
+			where: { userId: id },
 		});
 		res.json({ message: 'Doctor deleted successfully' });
 	} catch (error) {
@@ -113,5 +144,44 @@ export const deleteDoctor = async (req, res) => {
 			message: 'Something went wrong',
 			error: error.message,
 		});
+	}
+};
+
+export const searchDoctors = async (req, res) => {
+	const { query } = req.query;
+
+	try {
+		const doctors = await prisma.doctor.findMany({
+			where: {
+				user: {
+					name: {
+						contains: query,
+						mode: 'insensitive',
+					},
+				},
+			},
+			select: {
+				userId: true,
+				user: {
+					select: {
+						name: true,
+						email: true,
+					},
+				},
+				medications: true,
+				records: true,
+			},
+		});
+
+		if (doctors.length === 0) {
+			return res
+				.status(404)
+				.json({ message: 'No matching patients found' });
+		}
+
+		res.status(200).json(doctors);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: error.message });
 	}
 };

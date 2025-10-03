@@ -1,29 +1,40 @@
-import { DiagnosisRecord } from '@/types/DiagnoseRecords';
+import { Button } from '@/components/ui/button';
+import { FormattedMedicalRecord } from '@/types/medicalRecords';
 import { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown } from 'lucide-react';
 
-export const diagnosesColumns: ColumnDef<DiagnosisRecord>[] = [
+export const diagnosesColumns: ColumnDef<FormattedMedicalRecord>[] = [
 	{
-		accessorKey: 'date',
-		header: 'Date',
+		accessorKey: 'diagnoseName',
+		header: 'Diagnose',
 	},
 	{
-		accessorKey: 'code',
-		header: 'Code',
+		accessorKey: 'type',
+		header: 'Type',
 	},
 	{
-		accessorKey: 'name',
-		header: 'Diagnosis',
+		accessorKey: 'status',
+		header: 'Status',
 	},
 	{
-		accessorKey: 'severity',
-		header: 'Severity',
-	},
-	{
-		accessorKey: 'description',
+		accessorKey: 'notes',
 		header: 'Notes',
 	},
 	{
-		accessorKey: 'recordedBy',
-		header: 'Recorded By',
+		accessorKey: 'doctorName',
+		header: 'Doctor',
+	},
+	{
+		accessorKey: 'createdAt',
+		header: ({ column }) => (
+			<Button
+				variant="ghost"
+				onClick={() =>
+					column.toggleSorting(column.getIsSorted() === 'asc')
+				}
+				className="pl-0">
+				Date <ArrowUpDown className="ml-2 h-4 w-4" />
+			</Button>
+		),
 	},
 ];

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { AppDispatch, RootState } from '@/store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
-import { PastVisitRecord } from '@/types/PastVisitRecord';
+import { PastVisitRecord } from '@/types/pastVisitRecord';
 import { pastVisitsColumns } from './pastVisitsColumns';
 
 const dummyPastVisits: PastVisitRecord[] = [

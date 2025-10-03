@@ -14,6 +14,7 @@ import {
 	closePatientTab,
 	resetPatient,
 	setActivePatientTab,
+	setSelectedPatient,
 } from '../store/slices/patientSlice';
 import { cn } from '@/lib/utils';
 import {
@@ -30,8 +31,7 @@ import {
 import { Button } from '@/components/ui/button';
 import PatientsPage from '@/components/patients/PatientsPage';
 import SelectedPatientContent from '@/components/patients/SelectedPatientContent';
-import { ChevronRight } from 'lucide-react';
-import ViewRequests from '@/components/laboratory/ViewRequests';
+import LabPage from '@/components/laboratory/LabPage';
 
 interface NavTab {
 	label: string;
@@ -98,7 +98,7 @@ const Dashboard = () => {
 					dispatch(resetPatient());
 				}
 
-				if (section === 'overview' || section === '') {
+				if (section === 'overview' || section === undefined) {
 					setTabContent(<Overview />);
 				} else if (section === 'appointments') {
 					setTabContent(
@@ -115,7 +115,7 @@ const Dashboard = () => {
 				} else if (section === 'medications') {
 					setTabContent(<MedicationsPage />);
 				} else if (section === 'laboratory') {
-					setTabContent(<ViewRequests />);
+					setTabContent(<LabPage />);
 				} else {
 					setTabContent(
 						<pre className="text-sm text-gray-700 whitespace-pre-wrap break-all ">
@@ -134,8 +134,8 @@ const Dashboard = () => {
 			}
 		};
 
-		if (currentSection) fetchTabData();
-	}, [dispatch, section, tab, subTab, innerTab, innerSubTab]);
+		fetchTabData();
+	}, [section, tab, subTab, innerTab, innerSubTab, selectedPatient]);
 
 	const isActive = (path: string) => location.pathname.includes(path);
 
@@ -145,10 +145,24 @@ const Dashboard = () => {
 		if (activeTabId === ptId) {
 			const remainingTabs = openTabs.filter((t) => t.id !== ptId);
 			if (remainingTabs.length > 0) {
-				navigate(`/patients/${remainingTabs[0].id}/profile`);
-				dispatch(setActivePatientTab(remainingTabs[0].id));
+				navigate(
+					`/patients/${
+						remainingTabs[remainingTabs.length - 1].id
+					}/profile`
+				);
+				dispatch(
+					setActivePatientTab(
+						remainingTabs[remainingTabs.length - 1].id
+					)
+				);
+				dispatch(
+					setSelectedPatient(
+						remainingTabs[remainingTabs.length - 1].patient
+					)
+				);
 			} else {
 				navigate(`/patients`);
+				setTabContent(<PatientsPage />);
 			}
 		}
 	};
@@ -157,8 +171,7 @@ const Dashboard = () => {
 		<DashboardLayout>
 			<div className="mb-4 mt-16">
 				<h1 className="text-2xl font-semibold capitalize">
-					{[currentSection?.label].filter(Boolean).join('/') ||
-						'Dashboard'}
+					{currentSection?.label ?? 'overview'}
 				</h1>
 			</div>
 
@@ -314,10 +327,11 @@ const Dashboard = () => {
 							)}
 							onClick={() => {
 								dispatch(setActivePatientTab(pt.id));
+								dispatch(setSelectedPatient(pt.patient));
 								navigate(`/patients/${pt.id}/profile`);
 							}}>
 							<span className="text-sm font-medium">
-								{pt.fullName} ({pt.gender})
+								{pt.patient.fullName} ({pt.patient.gender})
 							</span>
 							<button
 								onClick={(e) => {

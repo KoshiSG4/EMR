@@ -137,8 +137,6 @@ const AddNewMedicationForm = ({
 			<form
 				onSubmit={form.handleSubmit(handleFormSubmit)}
 				className="space-y-6 max-w-2xl mx-auto bg-white shadow rounded-2xl p-6">
-				<h2 className="text-xl font-semibold">Add New Medication</h2>
-
 				{/* Name */}
 				<FormField
 					control={form.control}

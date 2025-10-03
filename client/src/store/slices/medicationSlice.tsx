@@ -167,7 +167,7 @@ const medicationSlice = createSlice({
 			.addCase(updateMedicationInventory.rejected, (state, action) => {
 				state.loading = false;
 				state.error =
-					action.error.message || 'Failed to search medications';
+					action.error.message || 'Failed to update medications';
 			})
 			.addCase(getMedicationInventory.pending, (state) => {
 				state.loading = true;

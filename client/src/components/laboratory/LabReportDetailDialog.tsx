@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LabRequest } from '@/types/LabRequest';
+import { LabRequest } from '@/types/labRequest';
 
 interface LabReportDetailDialogProps {
 	open: boolean;
@@ -37,10 +37,7 @@ const LabReportDetailDialog = ({
 			<DialogContent className="max-w-3xl p-6">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-semibold">
-						{labReport.testName}{' '}
-						<span className="text-gray-500 text-sm">
-							({labReport.testType})
-						</span>
+						{labReport.testType}
 					</DialogTitle>
 					<DialogDescription>
 						Detailed information for this lab request
@@ -49,14 +46,19 @@ const LabReportDetailDialog = ({
 
 				{/* Details Grid */}
 				<div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+					{/* Patient */}
 					<div>
 						<p className="font-medium text-gray-600">Patient</p>
-						<p>{labReport.patientName}</p>
+						<p>{labReport.patient?.fullName || 'N/A'}</p>
 					</div>
+
+					{/* Department */}
 					<div>
 						<p className="font-medium text-gray-600">Department</p>
 						<p>{labReport.department}</p>
 					</div>
+
+					{/* Test Code */}
 					{labReport.testCode && (
 						<div>
 							<p className="font-medium text-gray-600">
@@ -65,21 +67,31 @@ const LabReportDetailDialog = ({
 							<p>{labReport.testCode}</p>
 						</div>
 					)}
+
+					{/* Requested By (Doctor) */}
 					<div>
 						<p className="font-medium text-gray-600">
 							Requested By
 						</p>
-						<p>{labReport.requestedBy}</p>
+						<p>{labReport.doctorName || 'N/A'}</p>
 					</div>
+
+					{/* Requested At */}
 					<div>
-						<p className="font-medium text-gray-600">Date</p>
-						<p>{labReport.date}</p>
+						<p className="font-medium text-gray-600">
+							Requested At
+						</p>
+						<p>
+							{new Date(labReport.requestedAt).toLocaleString()}
+						</p>
 					</div>
+
+					{/* Status */}
 					<div>
 						<p className="font-medium text-gray-600">Status</p>
 						<Badge
 							variant={
-								labReport.status === 'Pending'
+								labReport.status === 'PENDING'
 									? 'secondary'
 									: labReport.status === 'Sample Accepted'
 									? 'outline'
@@ -92,30 +104,86 @@ const LabReportDetailDialog = ({
 							{labReport.status}
 						</Badge>
 					</div>
-					{labReport.result && (
+
+					{/* Specimen Info */}
+					{labReport.specimenType && (
 						<div>
-							<p className="font-medium text-gray-600">Result</p>
-							<p>{labReport.result}</p>
+							<p className="font-medium text-gray-600">
+								Specimen Type
+							</p>
+							<p>{labReport.specimenType}</p>
 						</div>
 					)}
-					<div>
-						<p className="font-medium text-gray-600">
-							Normal Range
-						</p>
-						<p>{labReport.normalRange}</p>
-					</div>
-					<div>
-						<p className="font-medium text-gray-600">
-							Interpretation
-						</p>
-						<p>{labReport.interpretation}</p>
-					</div>
+					{labReport.specimenId && (
+						<div>
+							<p className="font-medium text-gray-600">
+								Specimen ID
+							</p>
+							<p>{labReport.specimenId}</p>
+						</div>
+					)}
+					{labReport.specimenCollectedAt && (
+						<div>
+							<p className="font-medium text-gray-600">
+								Collected At
+							</p>
+							<p>
+								{new Date(
+									labReport.specimenCollectedAt
+								).toLocaleString()}
+							</p>
+						</div>
+					)}
+
+					{/* Results */}
+					{labReport.results?.length
+						? labReport.results.map((res, idx) => (
+								<div key={idx} className="col-span-2">
+									<p className="font-medium text-gray-600">
+										Result – {res.parameter}
+									</p>
+									<p>
+										{res.value} {res.unit || ''} (
+										{res.referenceRange || ''}) –{' '}
+										{res.interpretation || ''}
+									</p>
+								</div>
+						  ))
+						: null}
+
+					{/* Validated By */}
 					{labReport.validatedBy && (
 						<div>
 							<p className="font-medium text-gray-600">
 								Validated By
 							</p>
 							<p>{labReport.validatedBy}</p>
+						</div>
+					)}
+
+					{/* Billing / Insurance */}
+					{labReport.billingCode && (
+						<div>
+							<p className="font-medium text-gray-600">
+								Billing Code
+							</p>
+							<p>{labReport.billingCode}</p>
+						</div>
+					)}
+					<div>
+						<p className="font-medium text-gray-600">
+							Covered by Insurance
+						</p>
+						<p>{labReport.coveredByInsurance ? 'Yes' : 'No'}</p>
+					</div>
+
+					{/* Notes */}
+					{labReport.orderNotes && (
+						<div className="col-span-2">
+							<p className="font-medium text-gray-600">
+								Order Notes
+							</p>
+							<p>{labReport.orderNotes}</p>
 						</div>
 					)}
 				</div>

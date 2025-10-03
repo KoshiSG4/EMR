@@ -21,29 +21,35 @@ import { useEffect, useState } from 'react';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
-import { LabRequest, LabStatus } from '@/types/LabRequest';
+import { LabRequest } from '@/types/labRequest';
 import {
-	enterLabResult,
 	setSelectedLabRequest,
-	updateLabStatus,
+	updateLabTestRecord,
 } from '@/store/slices/laboratorySlice';
+import { getUserInfoFromToken } from '@/utils/jwtUtils';
 
 interface EditLabReportDetailsDialogProps {
 	open: boolean;
 	onClose: () => void;
 	selectedLabReport: LabRequest | null;
+	onSave: (updated: LabRequest) => void;
 }
 
 const EditLabReportDetailsDialog = ({
 	open,
 	onClose,
 	selectedLabReport,
+	onSave,
 }: EditLabReportDetailsDialogProps) => {
 	if (!selectedLabReport) return null;
 
 	const [formData, setFormData] = useState<LabRequest | null>(null);
 
 	const dispatch = useDispatch<AppDispatch>();
+	const userName =
+		getUserInfoFromToken().givenName +
+		' ' +
+		getUserInfoFromToken().familyName;
 
 	useEffect(() => {
 		if (selectedLabReport) {
@@ -54,26 +60,44 @@ const EditLabReportDetailsDialog = ({
 
 	if (!formData) return null;
 
-	const handleChange = (field: keyof LabRequest, value: string | number) => {
+	const handleChange = (
+		field: keyof LabRequest,
+		value: string | number | boolean
+	) => {
 		setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
+	};
+
+	const handleStatusChange = (value: string) => {
+		const now = new Date().toISOString();
+		let updates: Partial<LabRequest> = { status: value };
+
+		if (value === 'ACCEPTED') {
+			updates.acceptedAt = now;
+		}
+		if (value === 'VALIDATED') {
+			updates.validatedAt = now;
+			updates.validatedBy = userName;
+		}
+		if (value === 'RELEASED') {
+			updates.releasedAt = now;
+		}
+		if (value === 'Cancelled') {
+			updates.cancelledAt = now;
+			updates.cancelledBy = userName;
+		}
+
+		setFormData((prev) => (prev ? { ...prev, ...updates } : prev));
 	};
 
 	const handleSubmit = () => {
 		if (!formData) return;
-
 		dispatch(
-			updateLabStatus({
-				id: selectedLabReport.id,
-				status: formData.status,
+			updateLabTestRecord({
+				labRequestId: formData.id,
+				labRequest: formData,
 			})
 		);
-		if (formData.result)
-			dispatch(
-				enterLabResult({
-					id: selectedLabReport.id,
-					result: formData.result,
-				})
-			);
+		onSave(formData);
 		document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 	};
 
@@ -89,7 +113,7 @@ const EditLabReportDetailsDialog = ({
 			<DialogContent className="max-w-3xl p-6">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-semibold">
-						Edit Lab Report – {selectedLabReport.testName}
+						Edit Lab Request – {formData.testType}
 					</DialogTitle>
 					<DialogDescription>
 						Update laboratory test details below
@@ -99,29 +123,11 @@ const EditLabReportDetailsDialog = ({
 				{/* Form Fields */}
 				<div className="grid grid-cols-2 gap-4 mt-4 text-sm">
 					<div>
-						<Label>Patient Name</Label>
-						<Input
-							value={formData.patientName}
-							onChange={(e) =>
-								handleChange('patientName', e.target.value)
-							}
-						/>
-					</div>
-					<div>
 						<Label>Test Type</Label>
 						<Input
 							value={formData.testType}
 							onChange={(e) =>
 								handleChange('testType', e.target.value)
-							}
-						/>
-					</div>
-					<div>
-						<Label>Test Name</Label>
-						<Input
-							value={formData.testName}
-							onChange={(e) =>
-								handleChange('testName', e.target.value)
 							}
 						/>
 					</div>
@@ -144,95 +150,125 @@ const EditLabReportDetailsDialog = ({
 						/>
 					</div>
 					<div>
-						<Label>Requested By</Label>
-						<Input
-							value={formData.requestedBy}
-							onChange={(e) =>
-								handleChange('requestedBy', e.target.value)
-							}
-						/>
+						<Label>Priority</Label>
+						<Select
+							value={formData.priority || 'ROUTINE'}
+							onValueChange={(value) =>
+								handleChange('priority', value)
+							}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select priority" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="ROUTINE">Routine</SelectItem>
+								<SelectItem value="URGENT">Urgent</SelectItem>
+								<SelectItem value="STAT">STAT</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
-					<div>
-						<Label>Date</Label>
-						<Input
-							type="date"
-							value={formData.date}
-							onChange={(e) =>
-								handleChange('date', e.target.value)
-							}
-						/>
-					</div>
+
 					<div>
 						<Label>Status</Label>
 						<Select
 							value={formData.status}
-							onValueChange={(value: LabStatus) =>
-								handleChange('status', value)
+							onValueChange={(value) =>
+								handleStatusChange(value)
 							}>
 							<SelectTrigger>
 								<SelectValue placeholder="Select status" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="Pending">Pending</SelectItem>
-								<SelectItem value="Sample Accepted">
+								<SelectItem value="PENDING">Pending</SelectItem>
+								<SelectItem value="ACCEPTED">
 									Sample Accepted
 								</SelectItem>
-								<SelectItem value="In Progress">
+								<SelectItem value="IN_PROGRESS">
 									In Progress
 								</SelectItem>
-								<SelectItem value="Completed">
+								<SelectItem value="RESULT_ENTERED">
 									Completed
 								</SelectItem>
-								<SelectItem value="Validated">
+								<SelectItem value="VALIDATED">
 									Validated
+								</SelectItem>
+								<SelectItem value="CANCELLED">
+									Cancelled
 								</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
+
+					<div>
+						<Label>Specimen Type</Label>
+						<Select
+							value={formData.specimenType || ''}
+							onValueChange={(value) =>
+								handleChange('specimenType', value)
+							}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select specimen type" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="Blood">Blood</SelectItem>
+								<SelectItem value="Urine">Urine</SelectItem>
+								<SelectItem value="Saliva">Saliva</SelectItem>
+								<SelectItem value="Tissue">Tissue</SelectItem>
+								<SelectItem value="Sputum">Sputum</SelectItem>
+								<SelectItem value="Stool">Stool</SelectItem>
+								<SelectItem value="Other">Other</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
+
 					<div className="col-span-2">
-						<Label>Result</Label>
+						<Label>Order Notes</Label>
 						<Input
-							value={formData.result || ''}
+							value={formData.orderNotes || ''}
 							onChange={(e) =>
-								handleChange('result', e.target.value)
+								handleChange('orderNotes', e.target.value)
+							}
+						/>
+					</div>
+
+					<div>
+						<Label>Billing Code</Label>
+						<Input
+							value={formData.billingCode || ''}
+							onChange={(e) =>
+								handleChange('billingCode', e.target.value)
 							}
 						/>
 					</div>
 					<div>
-						<Label>Normal Range</Label>
+						<Label>Cost</Label>
 						<Input
-							value={formData.normalRange}
+							type="number"
+							value={formData.cost || ''}
 							onChange={(e) =>
-								handleChange('normalRange', e.target.value)
+								handleChange('cost', Number(e.target.value))
 							}
 						/>
 					</div>
 					<div>
-						<Label>Interpretation</Label>
-						<Input
-							value={formData.interpretation}
-							onChange={(e) =>
-								handleChange('interpretation', e.target.value)
+						<Label>Insurance Covered</Label>
+						<Select
+							value={
+								formData.coveredByInsurance ? 'true' : 'false'
 							}
-						/>
-					</div>
-					<div>
-						<Label>Validated By</Label>
-						<Input
-							value={formData.validatedBy || ''}
-							onChange={(e) =>
-								handleChange('validatedBy', e.target.value)
-							}
-						/>
-					</div>
-					<div>
-						<Label>Validator ID</Label>
-						<Input
-							value={formData.validatedById || ''}
-							onChange={(e) =>
-								handleChange('validatedById', e.target.value)
-							}
-						/>
+							onValueChange={(value) =>
+								handleChange(
+									'coveredByInsurance',
+									value === 'true'
+								)
+							}>
+							<SelectTrigger>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="true">Yes</SelectItem>
+								<SelectItem value="false">No</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 				</div>
 

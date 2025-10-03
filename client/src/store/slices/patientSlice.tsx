@@ -5,8 +5,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PatientTab {
 	id: string;
-	fullName: string;
-	gender: string;
+	patient: Patient;
 }
 
 interface PatientsState {
@@ -76,6 +75,24 @@ export const addMedsToPatientDatabase = createAsyncThunk<
 	return response.data;
 });
 
+export const updatePatientInfo = createAsyncThunk<
+	Patient,
+	{ patientId: string; patient: Patient }
+>('patients/update', async ({ patientId, patient }) => {
+	const response = await api.put(`patients/${patientId}/update`, patient);
+	console.log(response.data);
+	return response.data;
+});
+
+export const deactivatePatientFromDB = createAsyncThunk<
+	Patient,
+	{ patientId: string }
+>('patients/delete', async ({ patientId }) => {
+	const response = await api.delete(`patients/${patientId}/delete`);
+	console.log(response.data);
+	return response.data;
+});
+
 const patientSlice = createSlice({
 	name: 'patients',
 	initialState,
@@ -88,6 +105,7 @@ const patientSlice = createSlice({
 		},
 		setSelectedPatient: (state, action: PayloadAction<Patient>) => {
 			state.selectedPatient = action.payload;
+			console.log(state.selectedPatient);
 		},
 		openPatientTabs: (
 			state,
@@ -115,6 +133,43 @@ const patientSlice = createSlice({
 		},
 		setActivePatientTab: (state, action: PayloadAction<string>) => {
 			state.activeTabId = action.payload;
+		},
+		updatePatient(
+			state,
+			action: PayloadAction<{
+				patientId: string;
+				patient: Patient;
+			}>
+		) {
+			const { patientId, patient } = action.payload;
+
+			const index = state.patients.findIndex(
+				(p) => p.userId === patientId
+			);
+			if (index !== -1) {
+				state.patients[index] = {
+					...state.patients[index],
+					...patient,
+				};
+			}
+
+			if (state.selectedPatient?.userId === patientId) {
+				state.selectedPatient = { ...patient };
+			}
+		},
+		deactivatePatient(
+			state,
+			action: PayloadAction<{
+				patientId: string;
+			}>
+		) {
+			state.patients = state.patients.filter(
+				(p) => p.userId !== action.payload.patientId
+			);
+
+			if (state.selectedPatient?.userId === action.payload.patientId) {
+				state.selectedPatient = null;
+			}
 		},
 		addMedicationsToPatient(
 			state,
@@ -229,7 +284,7 @@ const patientSlice = createSlice({
 			.addCase(registerNewPatient.rejected, (state, action) => {
 				state.loading = false;
 				state.error =
-					action.error.message || 'Failed to fetch patients';
+					action.error.message || 'Failed to register new patients';
 			})
 			.addCase(addMedsToPatientDatabase.fulfilled, (state, action) => {
 				const { patientId } = action.meta.arg;
@@ -249,6 +304,8 @@ export const {
 	setSelectedPatient,
 	openPatientTabs,
 	closePatientTab,
+	updatePatient,
+	deactivatePatient,
 	setActivePatientTab,
 	addMedicationsToPatient,
 	updateMedicationForPatient,

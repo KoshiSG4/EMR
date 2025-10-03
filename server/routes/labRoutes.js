@@ -5,35 +5,30 @@ import { withRole } from '../middleware/roleMiddleware.js';
 
 export const labRouter = express.Router();
 
-labRouter.get(
-	'/requests',
-	authenticateToken,
-	withRole(['ADMIN', 'DOCTOR', 'NURSE', 'PATIENT']),
-	labController.getTestRequests
-);
 labRouter.post(
-	'/accept',
+	'/add',
 	authenticateToken,
 	withRole(['DOCTOR', 'NURSE']),
-	labController.acceptSample
-);
-labRouter.post(
-	'/results',
-	authenticateToken,
-	withRole(['DOCTOR', 'NURSE']),
-	labController.enterTestResults
-);
-labRouter.post(
-	'/validate',
-	authenticateToken,
-	withRole(['DOCTOR']),
-	labController.validateResult
-);
-labRouter.post(
-	'/release',
-	authenticateToken,
-	withRole(['DOCTOR']),
-	labController.releaseReport
+	labController.addLabRequest
 );
 
-export default labRouter;
+labRouter.get(
+	'/getAll',
+	authenticateToken,
+	withRole(['ADMIN', 'DOCTOR', 'NURSE']),
+	labController.getAllLabRequests
+);
+
+labRouter.get(
+	'/search',
+	authenticateToken,
+	withRole(['ADMIN', 'DOCTOR', 'NURSE']),
+	labController.searchLabRequest
+);
+
+labRouter.put(
+	'/:id/update',
+	authenticateToken,
+	withRole(['DOCTOR', 'NURSE']),
+	labController.updateLabRequest
+);

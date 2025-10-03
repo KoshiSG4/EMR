@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ClinicalDetailRecord } from '@/types/ClinicalDetailRecord';
+import { ClinicalDetailRecord } from '@/types/clinicalDetailRecord';
 
 interface ClinicalDetailsFormProps {
 	onSubmit: (data: ClinicalDetailRecord) => void;
@@ -16,27 +16,12 @@ const ClinicalDetailsForm = ({
 }: ClinicalDetailsFormProps) => {
 	const [clinicalDetails, setClinicalDetails] = useState({
 		chiefComplaint: '',
-		history: '',
-		pastHistory: '',
-		medications: '',
+		hpi: '',
 		allergies: '',
-		examination: '',
+		notes: '',
 		assessment: '',
 		plan: '',
 	});
-	const [isOpen, setIsOpen] = useState(false);
-	const ref = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (ref.current && !ref.current.contains(event.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return () =>
-			document.removeEventListener('mousedown', handleClickOutside);
-	}, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -49,22 +34,19 @@ const ClinicalDetailsForm = ({
 			id: crypto.randomUUID(),
 			date: new Date().toISOString(),
 			chiefComplaint: clinicalDetails.chiefComplaint,
-			history: clinicalDetails.history,
-			pastHistory: clinicalDetails.pastHistory,
-			medications: clinicalDetails.medications,
+			hpi: clinicalDetails.hpi,
 			allergies: clinicalDetails.allergies,
-			examination: clinicalDetails.examination,
+			notes: clinicalDetails.notes,
 			assessment: clinicalDetails.assessment,
 			plan: clinicalDetails.plan,
 			recordedBy,
+			patientId,
 		};
 		setClinicalDetails({
 			chiefComplaint: '',
-			history: '',
-			pastHistory: '',
-			medications: '',
+			hpi: '',
 			allergies: '',
-			examination: '',
+			notes: '',
 			assessment: '',
 			plan: '',
 		});
@@ -86,26 +68,10 @@ const ClinicalDetailsForm = ({
 						onChange={handleChange}
 					/>
 					<Input
-						name="history"
+						name="hpi"
 						type="text"
-						placeholder="History"
-						value={clinicalDetails.history}
-						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-						onChange={handleChange}
-					/>
-					<Input
-						name="pastHistory"
-						type="text"
-						placeholder="Past History"
-						value={clinicalDetails.pastHistory}
-						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
-						onChange={handleChange}
-					/>
-					<Input
-						name="medications"
-						type="text"
-						placeholder="Medications"
-						value={clinicalDetails.medications}
+						placeholder="HPI"
+						value={clinicalDetails.hpi}
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 					/>
@@ -118,10 +84,10 @@ const ClinicalDetailsForm = ({
 						onChange={handleChange}
 					/>
 					<Input
-						name="examination"
+						name="notes"
 						type="text"
-						placeholder="Examination"
-						value={clinicalDetails.examination}
+						placeholder="Notes"
+						value={clinicalDetails.notes}
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 					/>

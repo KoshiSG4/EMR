@@ -32,3 +32,10 @@ medicationsRouter.put(
 	withRole(['ADMIN', 'DOCTOR', 'NURSE']),
 	medicationsController.updateMedicationDetails
 );
+
+medicationsRouter.delete(
+	'/:id/delete',
+	authenticateToken,
+	withRole(['ADMIN']),
+	medicationsController.deleteMedication
+);

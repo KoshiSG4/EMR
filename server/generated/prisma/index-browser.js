@@ -133,8 +133,7 @@ exports.Prisma.PatientScalarFieldEnum = {
   phone: 'phone',
   address: 'address',
   emergencyContact: 'emergencyContact',
-  insuranceDetails: 'insuranceDetails',
-  doctorId: 'doctorId'
+  insuranceDetails: 'insuranceDetails'
 };
 
 exports.Prisma.DoctorScalarFieldEnum = {
@@ -153,11 +152,92 @@ exports.Prisma.AdminScalarFieldEnum = {
   permissions: 'permissions'
 };
 
+exports.Prisma.DiagnosisScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type',
+  status: 'status'
+};
+
+exports.Prisma.HistoryScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  chronicConditions: 'chronicConditions',
+  pastIllnesses: 'pastIllnesses',
+  surgeries: 'surgeries',
+  hospitalizations: 'hospitalizations',
+  familyHistory: 'familyHistory',
+  lifestyle: 'lifestyle',
+  smokingStatus: 'smokingStatus',
+  smokingNotes: 'smokingNotes',
+  alcoholUse: 'alcoholUse',
+  alcoholNotes: 'alcoholNotes',
+  drugUse: 'drugUse',
+  drugNotes: 'drugNotes',
+  diet: 'diet',
+  dietNotes: 'dietNotes',
+  occupation: 'occupation',
+  allergies: 'allergies',
+  obstetricHistory: 'obstetricHistory',
+  menstrualHistroy: 'menstrualHistroy',
+  immunizations: 'immunizations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  recordedBy: 'recordedBy'
+};
+
 exports.Prisma.MedicalRecordScalarFieldEnum = {
   id: 'id',
-  diagnosis: 'diagnosis',
   notes: 'notes',
   createdAt: 'createdAt',
+  status: 'status',
+  type: 'type',
+  patientId: 'patientId',
+  doctorId: 'doctorId',
+  diagnosisId: 'diagnosisId',
+  clinicalDetailsId: 'clinicalDetailsId'
+};
+
+exports.Prisma.VitalsRecordScalarFieldEnum = {
+  id: 'id',
+  height: 'height',
+  weight: 'weight',
+  bloodPressure: 'bloodPressure',
+  heartRate: 'heartRate',
+  respiratoryRate: 'respiratoryRate',
+  temperature: 'temperature',
+  spo2: 'spo2',
+  painScore: 'painScore',
+  recordedBy: 'recordedBy',
+  createdDate: 'createdDate',
+  updatedDate: 'updatedDate',
+  patientId: 'patientId',
+  medicalRecordId: 'medicalRecordId',
+  clinicalDetailsId: 'clinicalDetailsId'
+};
+
+exports.Prisma.ClinicalDetailsScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  chiefComplaint: 'chiefComplaint',
+  hpi: 'hpi',
+  allergies: 'allergies',
+  notes: 'notes',
+  assessment: 'assessment',
+  plan: 'plan',
+  recordedBy: 'recordedBy',
+  patientId: 'patientId'
+};
+
+exports.Prisma.ReferralRecordScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  referralType: 'referralType',
+  referredTo: 'referredTo',
+  department: 'department',
+  reason: 'reason',
+  notes: 'notes',
+  status: 'status',
   patientId: 'patientId',
   doctorId: 'doctorId'
 };
@@ -182,10 +262,11 @@ exports.Prisma.MedicationInventoryScalarFieldEnum = {
 
 exports.Prisma.PrescriptionScalarFieldEnum = {
   id: 'id',
+  createdAt: 'createdAt',
   patientMedicationId: 'patientMedicationId',
   medicationInventoryId: 'medicationInventoryId',
-  createdAt: 'createdAt',
-  medicalRecordId: 'medicalRecordId'
+  medicalRecordId: 'medicalRecordId',
+  clinicalDetailsId: 'clinicalDetailsId'
 };
 
 exports.Prisma.PatientMedicationScalarFieldEnum = {
@@ -202,26 +283,49 @@ exports.Prisma.PatientMedicationScalarFieldEnum = {
   status: 'status',
   instructions: 'instructions',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  clinicalDetailsId: 'clinicalDetailsId'
 };
 
 exports.Prisma.LabTestScalarFieldEnum = {
   id: 'id',
-  patientId: 'patientId',
-  doctorId: 'doctorId',
   testType: 'testType',
+  testCode: 'testCode',
+  department: 'department',
+  priority: 'priority',
+  doctorId: 'doctorId',
+  patientId: 'patientId',
+  medicalRecordId: 'medicalRecordId',
+  clinicalDetailsId: 'clinicalDetailsId',
+  specimenType: 'specimenType',
+  specimenId: 'specimenId',
+  specimenCollectedAt: 'specimenCollectedAt',
   status: 'status',
   requestedAt: 'requestedAt',
   acceptedAt: 'acceptedAt',
-  result: 'result',
+  cancelledAt: 'cancelledAt',
+  cancelledBy: 'cancelledBy',
+  reasonForCancellation: 'reasonForCancellation',
+  results: 'results',
   validatedAt: 'validatedAt',
+  validatedBy: 'validatedBy',
   releasedAt: 'releasedAt',
-  medicalRecordId: 'medicalRecordId'
+  billingCode: 'billingCode',
+  cost: 'cost',
+  coveredByInsurance: 'coveredByInsurance',
+  orderNotes: 'orderNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -233,11 +337,75 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN',
   DOCTOR: 'DOCTOR',
   NURSE: 'NURSE',
   PATIENT: 'PATIENT'
+};
+
+exports.DiagnoseType = exports.$Enums.DiagnoseType = {
+  MEDICAL: 'MEDICAL',
+  ALLERGY: 'ALLERGY',
+  SURGICAL: 'SURGICAL',
+  FAMILY: 'FAMILY',
+  SOCIAL: 'SOCIAL'
+};
+
+exports.DiagnoseStatus = exports.$Enums.DiagnoseStatus = {
+  ACTIVE: 'ACTIVE',
+  RESOLVED: 'RESOLVED',
+  CHRONIC: 'CHRONIC'
+};
+
+exports.Lifestyle = exports.$Enums.Lifestyle = {
+  SEDENTARY: 'SEDENTARY',
+  LIGHTLY_ACTIVE: 'LIGHTLY_ACTIVE',
+  MODERATELY_ACTIVE: 'MODERATELY_ACTIVE',
+  VERY_ACTIVE: 'VERY_ACTIVE',
+  EXTRA_ACTIVE: 'EXTRA_ACTIVE'
+};
+
+exports.SmokingStatus = exports.$Enums.SmokingStatus = {
+  NEVER: 'NEVER',
+  CURRENT_DAILY: 'CURRENT_DAILY',
+  CURRENT_OCCASIONAL: 'CURRENT_OCCASIONAL',
+  FORMER: 'FORMER',
+  UNKNOWN: 'UNKNOWN'
+};
+
+exports.AlcoholUse = exports.$Enums.AlcoholUse = {
+  NEVER: 'NEVER',
+  OCCASIONAL: 'OCCASIONAL',
+  MODERATE: 'MODERATE',
+  DAILY: 'DAILY',
+  HEAVY: 'HEAVY',
+  FORMER: 'FORMER',
+  UNKNOWN: 'UNKNOWN'
+};
+
+exports.DrugUse = exports.$Enums.DrugUse = {
+  NEVER: 'NEVER',
+  OCCASIONAL: 'OCCASIONAL',
+  REGULAR: 'REGULAR',
+  FORMER: 'FORMER',
+  UNKNOWN: 'UNKNOWN'
+};
+
+exports.Diet = exports.$Enums.Diet = {
+  OMNIVORE: 'OMNIVORE',
+  VEGETARIAN: 'VEGETARIAN',
+  VEGAN: 'VEGAN',
+  PESCATARIAN: 'PESCATARIAN',
+  KETO: 'KETO',
+  HIGH_PROTEIN: 'HIGH_PROTEIN',
+  OTHER: 'OTHER'
 };
 
 exports.MedicationStatus = exports.$Enums.MedicationStatus = {
@@ -248,6 +416,12 @@ exports.MedicationStatus = exports.$Enums.MedicationStatus = {
   ARRIVED: 'ARRIVED',
   EXPIRED: 'EXPIRED',
   RESERVED: 'RESERVED'
+};
+
+exports.Priority = exports.$Enums.Priority = {
+  ROUTINE: 'ROUTINE',
+  URGENT: 'URGENT',
+  STAT: 'STAT'
 };
 
 exports.LabStatus = exports.$Enums.LabStatus = {
@@ -265,7 +439,12 @@ exports.Prisma.ModelName = {
   Doctor: 'Doctor',
   Nurse: 'Nurse',
   Admin: 'Admin',
+  Diagnosis: 'Diagnosis',
+  History: 'History',
   MedicalRecord: 'MedicalRecord',
+  VitalsRecord: 'VitalsRecord',
+  ClinicalDetails: 'ClinicalDetails',
+  ReferralRecord: 'ReferralRecord',
   MedicationInventory: 'MedicationInventory',
   Prescription: 'Prescription',
   PatientMedication: 'PatientMedication',

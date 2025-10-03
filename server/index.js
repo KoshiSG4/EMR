@@ -10,7 +10,12 @@ import { authenticateToken } from './middleware/authMiddleware.js';
 import { PrismaClient } from './generated/prisma/index.js';
 import { getLoggedInUser } from './utils/getLoggedInUser.js';
 import { medicationsRouter } from './routes/medicationRoutes.js';
-import labRouter from './routes/labRoutes.js';
+import { diagnoseRouter } from './routes/diagnoseRoutes.js';
+import { labRouter } from './routes/labRoutes.js';
+import { clinicalDetailRouter } from './routes/clinicalRecordsRoutes.js';
+import { vitalsRecordsRouter } from './routes/vitalsRoutes.js';
+import { medicalRecordsRouter } from './routes/medicalRecordsRoutes.js';
+import { historyRouter } from './routes/historyRoutes.js';
 
 dotenv.config();
 
@@ -48,7 +53,12 @@ app.use('/api/patients', authenticateToken, patientRouter);
 app.use('/api/doctors', authenticateToken, doctorRouter);
 app.use('/api/admins', authenticateToken, adminRouter);
 app.use('/api/medications', authenticateToken, medicationsRouter);
+app.use('/api/diagnosis', authenticateToken, diagnoseRouter);
 app.use('/api/laboratory', authenticateToken, labRouter);
+app.use('/api/clinical', authenticateToken, clinicalDetailRouter);
+app.use('/api/vitals', authenticateToken, vitalsRecordsRouter);
+app.use('/api/medicalRecords', authenticateToken, medicalRecordsRouter);
+app.use('/api/history', authenticateToken, historyRouter);
 
 app.use((err, req, res, next) => {
 	console.error(err.stack);

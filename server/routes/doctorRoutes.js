@@ -5,17 +5,41 @@ import { withRole } from '../middleware/roleMiddleware.js';
 
 export const doctorRouter = express.Router();
 
-doctorRouter.get(
-	'/',
+doctorRouter.post(
+	'/create',
 	authenticateToken,
 	withRole(['ADMIN']),
-	doctorController.getAllDoctors
+	doctorController.createDoctor
 );
 doctorRouter.get(
 	'/me',
 	authenticateToken,
 	withRole(['ADMIN']),
 	doctorController.getOwnDoctorProfile
+);
+doctorRouter.get(
+	'/search',
+	authenticateToken,
+	withRole(['ADMIN', 'DOCTOR']),
+	doctorController.searchDoctors
+);
+doctorRouter.get(
+	'/getAll',
+	authenticateToken,
+	withRole(['ADMIN', 'DOCTOR']),
+	doctorController.getAllDoctors
+);
+doctorRouter.put(
+	'/:id/update',
+	authenticateToken,
+	withRole(['ADMIN', 'DOCTOR']),
+	doctorController.updateDoctor
+);
+doctorRouter.delete(
+	'/:id/delete',
+	authenticateToken,
+	withRole(['ADMIN']),
+	doctorController.deleteDoctor
 );
 doctorRouter.get(
 	'/:id',

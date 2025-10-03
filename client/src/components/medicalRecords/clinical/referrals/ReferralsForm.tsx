@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ReferralRecord } from '@/types/ReferralRecord ';
+import { ReferralRecord } from '@/types/referralRecord ';
 
 interface ReferralsFormProps {
 	onSubmit: (data: ReferralRecord) => void;

@@ -1,4 +1,4 @@
-import { PastVisitRecord } from '@/types/PastVisitRecord';
+import { PastVisitRecord } from '@/types/pastVisitRecord';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const pastVisitsColumns: ColumnDef<PastVisitRecord>[] = [

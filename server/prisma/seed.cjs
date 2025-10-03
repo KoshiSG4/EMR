@@ -70,7 +70,6 @@ async function main() {
 			name: 'Nurse Amy',
 			email: 'nurse1@example.com',
 			department: 'ER',
-
 			shift: 'Day',
 		},
 		{
@@ -110,6 +109,8 @@ async function main() {
 			email: 'patient1@example.com',
 			dob: '1990-05-10',
 			gender: 'Male',
+			phone: '+94781234568',
+			emergencyContact: '+94771234567',
 			condition: 'Hypertension',
 		},
 		{
@@ -118,6 +119,8 @@ async function main() {
 			email: 'patient2@example.com',
 			dob: '1985-08-22',
 			gender: 'Female',
+			phone: '+94791234568',
+			emergencyContact: '+94781234567',
 			condition: 'Diabetes',
 		},
 		{
@@ -126,6 +129,8 @@ async function main() {
 			email: 'patient3@example.com',
 			dob: '1978-12-15',
 			gender: 'Male',
+			phone: '+94771234569',
+			emergencyContact: '+94791234567',
 			condition: 'Asthma',
 		},
 		{
@@ -134,6 +139,8 @@ async function main() {
 			email: 'patient4@example.com',
 			dob: '2000-03-05',
 			gender: 'Female',
+			phone: '+94781234569',
+			emergencyContact: '+94771234568',
 			condition: 'Anemia',
 		},
 		{
@@ -142,7 +149,138 @@ async function main() {
 			email: 'patient5@example.com',
 			dob: '1995-07-19',
 			gender: 'Male',
+			phone: '+94781234567',
+			emergencyContact: '+94771234567',
 			condition: 'Migraine',
+		},
+	];
+
+	const LabStatus = [
+		'PENDING',
+		'ACCEPTED',
+		'IN_PROGRESS',
+		'RESULT_ENTERED',
+		'VALIDATED',
+		'RELEASED',
+	];
+
+	const patientHistoryData = [
+		{
+			chronicConditions: 'Hypertension, Type 2 Diabetes',
+			pastIllnesses: 'Chickenpox (childhood)',
+			surgeries: 'Appendectomy (2015)',
+			hospitalizations: 'Admitted for pneumonia (2020)',
+			familyHistory: 'Father - heart disease, Mother - diabetes',
+			lifestyle: 'SEDENTARY',
+			smokingStatus: 'FORMER',
+			smokingNotes: 'Quit 10 years ago, smoked for 5 years',
+			alcoholUse: 'OCCASIONAL',
+			alcoholNotes: 'Social drinking, weekends only',
+			drugUse: 'NEVER',
+			drugNotes: null,
+			diet: 'OMNIVORE',
+			dietNotes: 'High carb intake',
+			occupation: 'Office worker',
+			allergies: 'Penicillin',
+			obstetricHistory: null,
+			menstrualHistroy: null,
+			immunizations: 'COVID-19 (Pfizer, 2021), Tetanus booster (2018)',
+			createdAt: new Date('2023-05-12'),
+			updatedAt: new Date('2023-05-12'),
+		},
+		{
+			chronicConditions: 'Asthma',
+			pastIllnesses: 'Measles (childhood)',
+			surgeries: null,
+			hospitalizations: null,
+			familyHistory: 'No significant history',
+			lifestyle: 'MODERATELY_ACTIVE',
+			smokingStatus: 'NEVER',
+			smokingNotes: null,
+			alcoholUse: 'NEVER',
+			alcoholNotes: null,
+			drugUse: 'NEVER',
+			drugNotes: null,
+			diet: 'VEGETARIAN',
+			dietNotes: 'Occasional dairy',
+			occupation: 'Teacher',
+			allergies: 'Peanuts',
+			obstetricHistory: 'G2P2 (2 pregnancies, 2 live births)',
+			menstrualHistroy: 'Regular cycles, 28 days',
+			immunizations: 'Up to date (childhood + annual flu shot)',
+			createdAt: new Date('2023-08-21'),
+			updatedAt: new Date('2023-08-21'),
+			recordedBy: 'Dr. Lee',
+		},
+		{
+			chronicConditions: 'None',
+			pastIllnesses: 'Tonsillitis (2019)',
+			surgeries: 'Tonsillectomy (2020)',
+			hospitalizations: null,
+			familyHistory: 'Mother - breast cancer',
+			lifestyle: 'LIGHTLY_ACTIVE',
+			smokingStatus: 'CURRENT_OCCASIONAL',
+			smokingNotes: 'Smokes socially, ~2 cigarettes/week',
+			alcoholUse: 'DAILY',
+			alcoholNotes: '1–2 drinks/day',
+			drugUse: 'NEVER',
+			drugNotes: null,
+			diet: 'PESCATARIAN',
+			dietNotes: null,
+			occupation: 'Software Engineer',
+			allergies: 'None',
+			obstetricHistory: null,
+			menstrualHistroy: null,
+			immunizations: 'COVID-19 (Moderna, 2021)',
+			createdAt: new Date('2024-01-15'),
+			updatedAt: new Date('2024-01-15'),
+		},
+		{
+			chronicConditions: 'Chronic Kidney Disease (Stage 2)',
+			pastIllnesses: 'Tuberculosis (treated 2010)',
+			surgeries: null,
+			hospitalizations: 'Renal check-up admission (2022)',
+			familyHistory: 'Father - stroke',
+			lifestyle: 'VERY_ACTIVE',
+			smokingStatus: 'NEVER',
+			smokingNotes: null,
+			alcoholUse: 'HEAVY',
+			alcoholNotes: 'High consumption, advised to reduce',
+			drugUse: 'FORMER',
+			drugNotes: 'Used cannabis in early 20s',
+			diet: 'KETO',
+			dietNotes: 'Low carb, high fat',
+			occupation: 'Construction worker',
+			allergies: 'Shellfish',
+			obstetricHistory: null,
+			menstrualHistroy: null,
+			immunizations: 'Hepatitis B (2018)',
+			createdAt: new Date('2024-06-02'),
+			updatedAt: new Date('2024-06-02'),
+		},
+		{
+			chronicConditions: 'Rheumatoid Arthritis',
+			pastIllnesses: 'Scarlet fever (childhood)',
+			surgeries: 'Knee replacement (2021)',
+			hospitalizations: 'Multiple flare-ups (2019, 2021)',
+			familyHistory: 'Mother - osteoporosis',
+			lifestyle: 'SEDENTARY',
+			smokingStatus: 'CURRENT_DAILY',
+			smokingNotes: '1 pack/day for 15 years',
+			alcoholUse: 'MODERATE',
+			alcoholNotes: '2–3 drinks/week',
+			drugUse: 'OCCASIONAL',
+			drugNotes: 'Cannabis for pain management',
+			diet: 'VEGAN',
+			dietNotes: 'Strict plant-based, avoids processed foods',
+			occupation: 'Freelance writer',
+			allergies: 'Latex',
+			obstetricHistory:
+				'G3P2 (3 pregnancies, 2 live births, 1 miscarriage)',
+			menstrualHistroy: 'Irregular cycles, menopause at 50',
+			immunizations: 'Shingles vaccine (2022)',
+			createdAt: new Date('2024-09-10'),
+			updatedAt: new Date('2024-09-10'),
 		},
 	];
 
@@ -152,6 +290,162 @@ async function main() {
 		'Asthma',
 		'Anemia',
 		'Migraine',
+	];
+	const diagnoseStatus = ['ACTIVE', 'RESOLVED', 'CHRONIC'];
+	const diagnoseType = ['MEDICAL', 'SURGICAL', 'ALLERGY', 'FAMILY', 'SOCIAL'];
+
+	const clinicalDetailsData = [
+		{
+			chiefComplaint: 'Headache',
+			hpi: 'Patient reports a 3-day history of throbbing headaches, worse in the evenings.',
+			allergies: 'None',
+			notes: 'Patient appears anxious.',
+			assessment: 'Tension headache',
+			plan: 'Recommend hydration, rest, OTC pain relievers; follow-up in 1 week.',
+		},
+		{
+			chiefComplaint: 'Abdominal pain',
+			hpi: 'Sudden onset of lower abdominal cramping for 24 hours.',
+			allergies: 'Penicillin',
+			notes: 'Mild tenderness on palpation.',
+			assessment: 'Gastroenteritis',
+			plan: 'Encourage fluids, bland diet, antispasmodics PRN; monitor for worsening symptoms.',
+		},
+		{
+			chiefComplaint: 'Shortness of breath',
+			hpi: 'Difficulty breathing on exertion for 2 days.',
+			allergies: 'Dust mites',
+			notes: 'No fever, mild cough.',
+			assessment: 'Mild asthma exacerbation',
+			plan: 'Prescribe inhaler, avoid triggers, follow-up in 3 days.',
+		},
+		{
+			chiefComplaint: 'Back pain',
+			hpi: 'Dull lower back pain after lifting heavy boxes yesterday.',
+			allergies: 'NSAIDs',
+			notes: 'Limited range of motion.',
+			assessment: 'Muscle strain',
+			plan: 'Recommend rest, stretching exercises, NSAIDs PRN, physiotherapy referral if no improvement.',
+		},
+		{
+			chiefComplaint: 'Rash',
+			hpi: 'Red, itchy rash on forearms for 2 days, spreading.',
+			allergies: 'Latex',
+			notes: 'No systemic symptoms.',
+			assessment: 'Contact dermatitis',
+			plan: 'Apply topical corticosteroid cream, avoid irritants, monitor for infection.',
+		},
+	];
+
+	const vitalsData = [
+		{
+			height: '170 cm',
+			weight: '68 kg',
+			bloodPressure: '120/80 mmHg',
+			heartRate: '72 bpm',
+			respiratoryRate: '16 breaths/min',
+			temperature: '36.8 °C',
+			spo2: '98%',
+			painScore: '2/10',
+			createdDate: new Date('2025-09-01T09:00:00Z'),
+			updatedDate: new Date('2025-09-01T09:00:00Z'),
+		},
+		{
+			height: '160 cm',
+			weight: '55 kg',
+			bloodPressure: '110/70 mmHg',
+			heartRate: '78 bpm',
+			respiratoryRate: '18 breaths/min',
+			temperature: '37.0 °C',
+			spo2: '97%',
+			painScore: '1/10',
+			createdDate: new Date('2025-09-02T10:30:00Z'),
+			updatedDate: new Date('2025-09-02T10:30:00Z'),
+		},
+		{
+			height: '175 cm',
+			weight: '80 kg',
+			bloodPressure: '130/85 mmHg',
+			heartRate: '80 bpm',
+			respiratoryRate: '17 breaths/min',
+			temperature: '36.9 °C',
+			spo2: '96%',
+			painScore: '3/10',
+			createdDate: new Date('2025-09-03T14:15:00Z'),
+			updatedDate: new Date('2025-09-03T14:15:00Z'),
+		},
+		{
+			height: '165 cm',
+			weight: '60 kg',
+			bloodPressure: '115/75 mmHg',
+			heartRate: '70 bpm',
+			respiratoryRate: '16 breaths/min',
+			temperature: '36.7 °C',
+			spo2: '99%',
+			painScore: '0/10',
+			createdDate: new Date('2025-09-04T08:45:00Z'),
+			updatedDate: new Date('2025-09-04T08:45:00Z'),
+		},
+		{
+			height: '180 cm',
+			weight: '85 kg',
+			bloodPressure: '125/82 mmHg',
+			heartRate: '76 bpm',
+			respiratoryRate: '18 breaths/min',
+			temperature: '37.1 °C',
+			spo2: '97%',
+			painScore: '4/10',
+			createdDate: new Date('2025-09-05T11:20:00Z'),
+			updatedDate: new Date('2025-09-05T11:20:00Z'),
+		},
+	];
+
+	const referralsData = [
+		{
+			date: new Date('2025-09-01T09:30:00Z'),
+			referralType: 'Internal',
+			referredTo: 'Dr. Smith',
+			department: 'Cardiology',
+			reason: 'Chest pain evaluation',
+			notes: 'Patient experiences mild chest discomfort during exercise.',
+			status: 'Pending',
+		},
+		{
+			date: new Date('2025-09-02T11:15:00Z'),
+			referralType: 'External',
+			referredTo: 'Dr. Johnson',
+			department: 'Dermatology',
+			reason: 'Skin rash assessment',
+			notes: 'Red, itchy rash on forearms for 2 days.',
+			status: 'Completed',
+		},
+		{
+			date: new Date('2025-09-03T14:00:00Z'),
+			referralType: 'Internal',
+			referredTo: 'Dr. Lee',
+			department: 'Orthopedics',
+			reason: 'Back pain evaluation',
+			notes: 'Lower back pain after lifting heavy boxes yesterday.',
+			status: 'In Progress',
+		},
+		{
+			date: new Date('2025-09-04T10:45:00Z'),
+			referralType: 'Internal',
+			referredTo: 'Dr. Patel',
+			department: 'Pulmonology',
+			reason: 'Shortness of breath',
+			notes: 'Difficulty breathing on exertion for 2 days.',
+			status: 'Pending',
+		},
+		{
+			date: new Date('2025-09-05T13:30:00Z'),
+			referralType: 'External',
+			referredTo: 'Dr. Nguyen',
+			department: 'Gastroenterology',
+			reason: 'Abdominal pain',
+			notes: 'Sudden onset of lower abdominal cramping for 24 hours.',
+			status: 'Completed',
+		},
 	];
 
 	const medicationTemplates = [
@@ -338,31 +632,108 @@ async function main() {
 		},
 	];
 
-	const labTestsTemplates = [
+	const labTestsData = [
 		{
-			testType: 'Blood Test',
-			status: 'PENDING',
-			result: null,
+			testType: 'Complete Blood Count (CBC)',
+			testCode: 'CBC001',
+			department: 'Hematology',
+			priority: 'ROUTINE',
+			status: 'COMPLETED',
+			requestedAt: new Date('2025-09-20T08:30:00Z'),
+			acceptedAt: new Date('2025-09-20T09:00:00Z'),
+			specimenType: 'Blood',
+			specimenId: 'SMP001',
+			specimenCollectedAt: new Date('2025-09-20T09:15:00Z'),
+			results: {
+				parameter: 'Hemoglobin',
+				value: '13.5',
+				unit: 'g/dL',
+				referenceRange: '12.0 - 15.5',
+				interpretation: 'Normal',
+			},
+			validatedAt: new Date('2025-09-20T12:00:00Z'),
+			validatedBy: 'labtech1',
+			releasedAt: new Date('2025-09-20T12:30:00Z'),
+			billingCode: 'LAB1001',
+			cost: 1500,
+			coveredByInsurance: true,
+			orderNotes: 'Routine annual check-up',
 		},
 		{
-			testType: 'Urine Test',
-			status: 'PENDING',
-			result: null,
+			testType: 'Lipid Profile',
+			testCode: 'LIP002',
+			department: 'Biochemistry',
+			priority: 'ROUTINE',
+			status: 'VALIDATED',
+			requestedAt: new Date('2025-09-19T10:00:00Z'),
+			specimenType: 'Blood',
+			specimenId: 'SMP002',
+			specimenCollectedAt: new Date('2025-09-19T10:20:00Z'),
+			results: {
+				parameter: 'Total Cholesterol',
+				value: '210',
+				unit: 'mg/dL',
+				referenceRange: '< 200',
+				interpretation: 'Slightly High',
+			},
+			validatedAt: new Date('2025-09-19T14:00:00Z'),
+			validatedBy: 'labtech2',
+			billingCode: 'LAB2002',
+			cost: 2500,
+			coveredByInsurance: false,
 		},
 		{
-			testType: 'X-Ray',
-			status: 'PENDING',
-			result: null,
+			testType: 'Urinalysis',
+			testCode: 'URIN003',
+			department: 'Pathology',
+			priority: 'ROUTINE',
+			status: 'IN_PROGRESS',
+			requestedAt: new Date('2025-09-22T08:00:00Z'),
+			acceptedAt: new Date('2025-09-22T08:15:00Z'),
+			specimenType: 'Urine',
+			specimenId: 'SMP003',
+			specimenCollectedAt: new Date('2025-09-22T08:30:00Z'),
+			orderNotes: 'Suspected UTI',
+			billingCode: 'LAB3003',
+			cost: 1000,
+			coveredByInsurance: true,
 		},
 		{
-			testType: 'MRI',
-			status: 'PENDING',
-			result: null,
+			testType: 'COVID-19 PCR Test',
+			testCode: 'COV004',
+			department: 'Microbiology',
+			priority: 'STAT',
+			status: 'COMPLETED',
+			requestedAt: new Date('2025-09-23T06:00:00Z'),
+			acceptedAt: new Date('2025-09-23T06:15:00Z'),
+			specimenType: 'Nasal Swab',
+			specimenId: 'SMP004',
+			specimenCollectedAt: new Date('2025-09-23T06:20:00Z'),
+			results: {
+				parameter: 'SARS-CoV-2 RNA',
+				value: 'Not Detected',
+				interpretation: 'Negative',
+			},
+			validatedAt: new Date('2025-09-23T08:00:00Z'),
+			validatedBy: 'labtech3',
+			releasedAt: new Date('2025-09-23T08:10:00Z'),
+			billingCode: 'LAB4004',
+			cost: 5000,
+			coveredByInsurance: false,
 		},
 		{
-			testType: 'ECG',
+			testType: 'Liver Function Test',
+			testCode: 'LFT005',
+			department: 'Biochemistry',
+			priority: 'URGENT',
 			status: 'PENDING',
-			result: null,
+			requestedAt: new Date('2025-09-25T11:30:00Z'),
+			specimenType: 'Blood',
+			specimenId: 'SMP005',
+			orderNotes: 'Patient with jaundice',
+			billingCode: 'LAB5005',
+			cost: 3200,
+			coveredByInsurance: true,
 		},
 	];
 
@@ -388,6 +759,7 @@ async function main() {
 				name: doctor.name,
 				email: doctor.email,
 				role: 'DOCTOR',
+
 				doctor: {
 					create: {
 						specialization: doctor.specialization,
@@ -416,6 +788,13 @@ async function main() {
 		});
 	}
 	console.log('Nurses created');
+
+	//create diagnosis
+	for (const diagnose of diagnoses) {
+		await prisma.diagnosis.create({
+			data: { name: diagnose },
+		});
+	}
 
 	//create inventory records
 	const inventoryRecords = [];
@@ -453,26 +832,114 @@ async function main() {
 				fullName: patient.name,
 				dateOfBirth: new Date(patient.dob),
 				gender: patient.gender,
-				phone: '123-456-7890',
+				phone: patient.phone,
 				address: '123 Main Street',
-				emergencyContact: 'Emergency Contact - 321-654-0987',
+				emergencyContact: patient.emergencyContact,
 				insuranceDetails: 'ABC Insurance, Plan X',
-				doctor: { connect: { id: assignedDoctor.id } },
+				doctors: {
+					connect: keycloakDoctors.map((d) => ({ userId: d.id })),
+				},
 				user: {
 					connect: { id: patientUser.id },
 				},
 			},
 		});
 
-		// Create Medical Records and medications
 		for (let j = 0; j < 5; j++) {
-			const diagnosis = diagnoses[j % diagnoses.length];
+			const d = diagnoses[j % diagnoses.length];
+			const dt = diagnoseType[j % diagnoseType.length];
+			const ds = diagnoseStatus[j % diagnoseStatus.length];
+
+			//create patient history
+			const patientHistory = await prisma.history.create({
+				data: {
+					patientId: patientProfile.userId,
+					chronicConditions: patientHistoryData[j].chronicConditions,
+					pastIllnesses: patientHistoryData[j].pastIllnesses,
+					surgeries: patientHistoryData[j].surgeries,
+					hospitalizations: patientHistoryData[j].hospitalizations,
+					familyHistory: patientHistoryData[j].familyHistory,
+					smokingStatus: patientHistoryData[j].smokingStatus,
+					smokingNotes: patientHistoryData[j].smokingNotes,
+					alcoholUse: patientHistoryData[j].alcoholUse,
+					alcoholNotes: patientHistoryData[j].alcoholNotes,
+					drugUse: patientHistoryData[j].drugUse,
+					drugNotes: patientHistoryData[j].drugNotes,
+					diet: patientHistoryData[j].diet,
+					dietNotes: patientHistoryData[j].dietNotes,
+					occupation: patientHistoryData[j].occupation,
+					lifestyle: patientHistoryData[j].lifestyle,
+					allergies: patientHistoryData[j].allergies,
+					obstetricHistory: patientHistoryData[j].obstetricHistory,
+					menstrualHistroy: patientHistoryData[j].menstrualHistroy,
+					immunizations: patientHistoryData[j].immunizations,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+					recordedBy: keycloakDoctors[j].name,
+				},
+			});
+
+			//create clinical details
+			const clinicalDetails = await prisma.clinicalDetails.create({
+				data: {
+					date: new Date(),
+					chiefComplaint: clinicalDetailsData[j].chiefComplaint,
+					hpi: clinicalDetailsData[j].hpi,
+					allergies: clinicalDetailsData[j].allergies,
+					notes: clinicalDetailsData[j].notes,
+					assessment: clinicalDetailsData[j].assessment,
+					plan: clinicalDetailsData[j].plan,
+					recordedBy: keycloakDoctors[j].name,
+					patientId: patientProfile.userId,
+				},
+			});
+
+			//create diagnose
+			const createdDiagnoseId = await prisma.diagnosis.findUnique({
+				where: { name: d },
+				select: {
+					id: true,
+				},
+			});
+
+			await prisma.diagnosis.update({
+				where: { id: createdDiagnoseId.id },
+				data: {
+					status: ds,
+					type: dt,
+				},
+			});
+
+			//create medical records
 			const medicalRecord = await prisma.medicalRecord.create({
 				data: {
 					patientId: patientProfile.userId,
 					doctorId: assignedDoctor.id,
-					diagnosis,
-					notes: `Notes for ${diagnosis}`,
+					status: ds,
+					type: dt,
+					notes: `Notes for ${d}`,
+					diagnosisId: createdDiagnoseId.id,
+					clinicalDetailsId: clinicalDetails.id,
+				},
+			});
+
+			//create vitals
+			const vitals = await prisma.vitalsRecord.create({
+				data: {
+					height: vitalsData[j].height,
+					weight: vitalsData[j].weight,
+					bloodPressure: vitalsData[j].bloodPressure,
+					heartRate: vitalsData[j].heartRate,
+					respiratoryRate: vitalsData[j].respiratoryRate,
+					temperature: vitalsData[j].temperature,
+					spo2: vitalsData[j].spo2,
+					painScore: vitalsData[j].painScore,
+					recordedBy: keycloakNurses[j].name,
+					createdDate: vitalsData[j].createdDate,
+					updatedDate: vitalsData[j].updatedDate,
+					patientId: patientProfile.userId,
+					medicalRecordId: medicalRecord.id,
+					clinicalDetailsId: clinicalDetails.id,
 				},
 			});
 
@@ -490,6 +957,7 @@ async function main() {
 					status: medicationStatuses[j],
 					instructions: 'Take as prescirbed',
 					prescribedByName: assignedDoctor.name,
+					clinicalDetailsId: clinicalDetails.id,
 				},
 			});
 
@@ -510,27 +978,62 @@ async function main() {
 					patientMedicationId: patientMedication.id,
 					medicalRecordId: medicalRecord.id,
 					medicationInventoryId: medInventory.id,
+					clinicalDetailsId: clinicalDetails.id,
+				},
+			});
+
+			//create referrals record
+			const referrals = await prisma.referralRecord.create({
+				data: {
+					date: referralsData[j].date,
+					referralType: referralsData[j].referralType,
+					referredTo: referralsData[j].referredTo,
+					department: referralsData[j].department,
+					reason: referralsData[j].reason,
+					notes: referralsData[j].notes,
+					status: referralsData[j].status,
+					patientId: patientProfile.userId,
+					doctorId: keycloakDoctors[j].id,
 				},
 			});
 
 			//create lab reports
-			for (let k = 0; k < labTestsTemplates.length; k++) {
-				const testTemplate = labTestsTemplates[k];
-
-				await prisma.labTest.create({
-					data: {
-						patientId: patientProfile.userId,
-						doctorId: assignedDoctor.id,
-						testType: testTemplate.testType,
-						status: testTemplate.status,
-						requestedAt: new Date(),
-						result: testTemplate.result,
-						medicalRecord: {
-							connect: { id: medicalRecord.id },
-						},
-					},
-				});
-			}
+			const ls = LabStatus[j % LabStatus.length];
+			const labTests = await prisma.labTest.create({
+				data: {
+					testType: labTestsData[j].testType,
+					testCode: labTestsData[j].testCode,
+					department: labTestsData[j].department,
+					priority: labTestsData[j].priority,
+					priority: labTestsData[j].priority,
+					doctorId: keycloakDoctors[j].id,
+					patientId: patientProfile.userId,
+					medicalRecordId: medicalRecord.id,
+					clinicalDetailsId: clinicalDetails.id,
+					specimenType: labTestsData[j].specimenType || '-',
+					specimenId: labTestsData[j].specimenId || null,
+					specimenCollectedAt:
+						labTestsData[j].specimenCollectedAt || null,
+					status: ls,
+					requestedAt: labTestsData[j].requestedAt,
+					acceptedAt: labTestsData[j].acceptedAt || null,
+					cancelledAt: labTestsData[j].cancelledAt || null,
+					cancelledBy: labTestsData[j].cancelledBy || null,
+					reasonForCancellation:
+						labTestsData[j].reasonForCancellation || null,
+					results: labTestsData[j].results || null,
+					validatedAt: labTestsData[j].validatedAt || null,
+					validatedBy: labTestsData[j].validatedBy || null,
+					releasedAt: labTestsData[j].releasedAt || null,
+					billingCode: labTestsData[j].billingCode || null,
+					cost: labTestsData[j].cost || null,
+					coveredByInsurance:
+						labTestsData[j].coveredByInsurance || null,
+					orderNotes: labTestsData[j].orderNotes || null,
+					createdAt: labTestsData[j].createdAt,
+					updatedAt: labTestsData[j].updatedAt,
+				},
+			});
 		}
 	}
 

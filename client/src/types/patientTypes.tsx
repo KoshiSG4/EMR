@@ -1,5 +1,6 @@
+import { Doctor } from './doctorsType';
 import { PatientMedication } from './patientMedicationTypes';
-import { Records } from './recordsTypes';
+import { MedicalRecord } from './medicalRecords';
 
 export interface Patient {
 	userId: string;
@@ -9,12 +10,12 @@ export interface Patient {
 	};
 	fullName: string;
 	email: string;
-	doctor: { name: string };
+	doctors: Doctor[];
 	emergencyContact: string;
 	phone: string;
 	address: string;
 	dateOfBirth: string;
 	gender: string;
 	patientMedication: PatientMedication[];
-	records: Records[];
+	records: MedicalRecord[];
 }

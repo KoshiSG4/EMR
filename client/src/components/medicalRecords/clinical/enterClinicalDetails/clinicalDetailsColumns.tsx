@@ -1,4 +1,4 @@
-import { ClinicalDetailRecord } from '@/types/ClinicalDetailRecord';
+import { ClinicalDetailRecord } from '@/types/clinicalDetailRecord';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const clinicalDetailsColumns: ColumnDef<ClinicalDetailRecord>[] = [
@@ -11,24 +11,16 @@ export const clinicalDetailsColumns: ColumnDef<ClinicalDetailRecord>[] = [
 		header: 'Chief Complaint',
 	},
 	{
-		accessorKey: 'history',
+		accessorKey: 'hpi',
 		header: 'HPI',
-	},
-	{
-		accessorKey: 'pastHistory',
-		header: 'Past History',
-	},
-	{
-		accessorKey: 'medications',
-		header: 'Medications',
 	},
 	{
 		accessorKey: 'allergies',
 		header: 'Allergies',
 	},
 	{
-		accessorKey: 'examination',
-		header: 'Examination',
+		accessorKey: 'notes',
+		header: 'Notes',
 	},
 	{
 		accessorKey: 'assessment',

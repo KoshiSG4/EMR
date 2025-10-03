@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import DataTable from '../common/DataTable';
 import { useNavigate } from 'react-router-dom';
 import { patientColumns } from './patientColumns';
-import SelectedPatientContent from './SelectedPatientContent';
 
 const PatientsPage = () => {
 	const allPatientsList = useSelector(
@@ -54,11 +53,9 @@ const PatientsPage = () => {
 			age: calculateAge(new Date(patient.dateOfBirth)) ?? '',
 			dateOfBirth:
 				new Date(patient.dateOfBirth).toISOString().split('T')[0] ?? '',
-			diagnosis: patient.records?.[0]?.diagnosis ?? '',
 			email: patient.user?.email ?? '',
-			emergencyContact: patient.emergencyContact.split(' - ')[1] ?? '',
+			emergencyContact: patient.emergencyContact ?? '',
 			contactNo: patient.phone ?? '',
-			assignedDoctor: patient.doctor?.name ?? '',
 		};
 	});
 
@@ -72,8 +69,7 @@ const PatientsPage = () => {
 				openPatientTabs({
 					patientTab: {
 						id: selectedPatient.userId,
-						fullName: selectedPatient.fullName,
-						gender: selectedPatient.gender,
+						patient: selectedPatient,
 					},
 				})
 			);
@@ -90,11 +86,6 @@ const PatientsPage = () => {
 				loading={loading}
 				onRowSelect={handleSelectPatient}
 				filters={[
-					{
-						columnId: 'assignedDoctor',
-						placeholder: 'Filter patients by doctor name...',
-						className: 'max-w-sm mr-4',
-					},
 					{
 						columnId: 'name',
 						placeholder: 'Filter patients...',

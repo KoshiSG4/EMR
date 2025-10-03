@@ -17,7 +17,6 @@ model User {
   role      Role
   createdAt DateTime @default(now())
 
-  patients       Patient[] @relation("DoctorPatients")
   patientProfile Patient?  @relation("PatientUser")
   doctor         Doctor?
   nurse          Nurse?
@@ -35,22 +34,30 @@ model Patient {
   emergencyContact String
   insuranceDetails String?
 
-  doctorId String
-  doctor   User   @relation("DoctorPatients", fields: [doctorId], references: [id])
-
-  user User @relation("PatientUser", fields: [userId], references: [id])
+  doctors          Doctor[]  @relation("PatientDoctors")
+  user             User         @relation("PatientUser", fields: [userId], references: [id])
 
   records           MedicalRecord[]
   patientMedication PatientMedication[]
+  vitals            VitalsRecord[]
+  referralRecords   ReferralRecord[]
+  labTests          LabTest[]
+  clinicalDetails   ClinicalDetails[]
+  histories         History[]
 }
 
 // Doctor model (linked 1:1 to a User with role DOCTOR)
 model Doctor {
   userId            String              @id
   specialization    String
+
+  patients          Patient[]           @relation("PatientDoctors")
   user              User                @relation(fields: [userId], references: [id])
+  
   patientMedication PatientMedication[]
   medicalRecords    MedicalRecord[]
+  referralRecords   ReferralRecord[]
+  labTests          LabTest[]
 }
 
 // Nurse model (linked 1:1 to a User with role NURSE)
@@ -68,22 +75,143 @@ model Admin {
   user        User   @relation(fields: [userId], references: [id])
 }
 
-// Medical records
+//Diagnosis Model
+model Diagnosis {
+  id       String         @id @default(uuid())
+  name     String         @unique
+  type     DiagnoseType   @default(MEDICAL)
+  status   DiagnoseStatus @default(ACTIVE)
+  records  MedicalRecord[]
+}
+
+//Patient History
+model History{
+  id              String    @id @default(uuid())
+  patientId       String
+  patient         Patient   @relation(fields:[patientId], references:[userId])
+ 
+  //-- past medical history --
+  chronicConditions   String?
+  pastIllnesses       String?
+  surgeries           String?
+  hospitalizations    String?
+
+  //-- family history --
+  familyHistory       String?
+
+  //-- social history --
+  lifestyle           Lifestyle?
+  smokingStatus       SmokingStatus?
+  smokingNotes        String?
+  alcoholUse          AlcoholUse?
+  alcoholNotes        String?
+  drugUse             DrugUse?
+  drugNotes           String?
+  diet                Diet?
+	dietNotes           String?
+	occupation          String?
+
+  //-- allergies --
+  allergies           String?
+
+  // -- OB/GYN histroy
+  obstetricHistory    String?
+  menstrualHistroy    String?
+
+  // -- immunizations --
+  immunizations       String?
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  recordedBy          String
+  }
+
+//Medical records model
 model MedicalRecord {
-  id        String   @id @default(uuid())
-  diagnosis String
-  notes     String?
-  createdAt DateTime @default(now())
+  id          String    @id @default(uuid())
+  notes       String?
+  createdAt   DateTime  @default(now())
+  status      String
+  type        String
 
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [userId])
+  patientId   String
+  patient     Patient   @relation(fields: [patientId], references: [userId])
 
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [userId])
+  doctorId    String
+  doctor      Doctor    @relation(fields: [doctorId], references: [userId])
+
+  diagnosisId String
+  diagnosis   Diagnosis @relation(fields: [diagnosisId], references: [id])
 
   prescriptions Prescription[]
-
   labTests      LabTest[]
+  vitalsRecords VitalsRecord[]
+
+  clinicalDetailsId String? 
+  clinicalDetails   ClinicalDetails? @relation(fields: [clinicalDetailsId], references: [id])
+}
+
+//patient vitals model
+model VitalsRecord {
+  id              String   @id @default(uuid())
+  height          String
+  weight          String
+  bloodPressure   String
+  heartRate       String
+  respiratoryRate String
+  temperature     String
+  spo2            String
+  painScore       String
+  recordedBy      String
+  createdDate     DateTime @default(now())
+  updatedDate     DateTime @updatedAt
+
+  patientId         String
+  patient           Patient           @relation(fields: [patientId], references: [userId])
+  medicalRecordId   String?
+  medicalRecords    MedicalRecord?    @relation(fields: [medicalRecordId], references: [id])
+  clinicalDetailsId String?
+  clinicalDetails   ClinicalDetails?  @relation(fields: [clinicalDetailsId], references: [id])
+}
+
+//clinical details model
+model ClinicalDetails{
+  id                 String      @id @default(uuid())
+	date               DateTime    @default(now())
+	chiefComplaint     String 
+	hpi                String 
+	allergies          String?
+	notes              String?
+  assessment         String?
+  plan               String?
+	recordedBy         String
+
+  patientId          String
+  patient            Patient                @relation(fields: [patientId], references: [userId])
+
+  vitals             VitalsRecord[]     
+	medications        PatientMedication[]    
+	diagnose           MedicalRecord[]     
+  prescriptions      Prescription[]  
+  labTests           LabTest[] 
+}
+
+//referal model
+model ReferralRecord{
+  id              String    @id @default(uuid())
+	date            DateTime  @default(now())
+	referralType    String
+	referredTo      String
+	department      String
+	reason          String
+	notes           String
+	status          String
+
+  patientId       String
+  patient         Patient   @relation(fields: [patientId], references: [userId])
+
+	doctorId        String
+  doctor          Doctor    @relation(fields: [doctorId], references: [userId])
 }
 
 //Medication Inventory
@@ -110,66 +238,165 @@ model MedicationInventory {
 
 // Prescriptions
 model Prescription {
-  id                    String   @id @default(uuid())
-  patientMedicationId   String
-  medicationInventoryId String
-  createdAt             DateTime @default(now())
+  id                    String              @id @default(uuid())
+  createdAt             DateTime            @default(now())
 
-  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
-  medicalRecordId String
+  patientMedicationId   String?
+  patientMedication     PatientMedication?   @relation(fields: [patientMedicationId], references: [id])
 
-  patientMedication PatientMedication   @relation(fields: [patientMedicationId], references: [id])
-  medication        MedicationInventory @relation(fields: [medicationInventoryId], references: [id])
+  medicationInventoryId String?
+  medication            MedicationInventory? @relation(fields: [medicationInventoryId], references: [id])
+
+  medicalRecordId       String?
+  medicalRecord         MedicalRecord?       @relation(fields: [medicalRecordId], references: [id])
+
+  clinicalDetailsId     String?
+  clinicalDetails       ClinicalDetails?     @relation(fields: [clinicalDetailsId], references: [id])
 }
 
 // Medications linked to patients
 model PatientMedication {
-  id        String  @id @default(uuid())
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [userId])
+  id                String        @id @default(uuid())
+  patientId         String
+  patient           Patient       @relation(fields: [patientId], references: [userId])
 
-  prescribedById   String
-  prescribedByName String
-  prescribedBy     Doctor @relation(fields: [prescribedById], references: [userId])
+  prescribedById    String
+  prescribedByName  String
+  prescribedBy      Doctor        @relation(fields: [prescribedById], references: [userId])
 
-  name         String
-  dosage       String
-  frequency    String
-  route        String
-  startDate    DateTime
-  endDate      DateTime?
-  status       String
-  instructions String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  name              String
+  dosage            String
+  frequency         String
+  route             String
+  startDate         DateTime
+  endDate           DateTime?
+  status            String
+  instructions      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 
-  prescriptions Prescription[]
+  prescriptions     Prescription[]
+
+  clinicalDetailsId String?
+  clinicalDetails   ClinicalDetails? @relation(fields: [clinicalDetailsId], references: [id])
 }
 
 //Lab Tests
 model LabTest {
-  id            String   @id @default(uuid())
-  patientId     String
-  doctorId      String
-  testType      String
-  status        LabStatus @default(PENDING)
-  requestedAt   DateTime @default(now())
-  acceptedAt    DateTime?
-  result        String?
-  validatedAt   DateTime?
-  releasedAt    DateTime?
+  id                 String        @id @default(uuid())
+  testType           String
+  testCode           String?
+  department         String
+  priority           Priority      @default(ROUTINE)
 
-  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
-  medicalRecordId String
+  doctorId           String
+  doctor             Doctor        @relation(fields: [doctorId], references: [userId])
+
+  patientId          String
+  patient            Patient       @relation(fields: [patientId], references: [userId])
+
+  medicalRecordId       String?
+  medicalRecord         MedicalRecord?       @relation(fields: [medicalRecordId], references: [id])
+
+  clinicalDetailsId  String?
+  clinicalDetails   ClinicalDetails? @relation(fields: [clinicalDetailsId], references: [id])
+
+  specimenType       String?
+  specimenId         String?
+  specimenCollectedAt DateTime?
+
+  status             LabStatus     @default(PENDING)
+  requestedAt        DateTime      @default(now())
+  acceptedAt         DateTime?
+  cancelledAt        DateTime?
+  cancelledBy        String?
+  reasonForCancellation String?
+
+  results            Json?
+
+  validatedAt        DateTime?
+  validatedBy        String?
+  releasedAt         DateTime?
+
+  billingCode        String?
+  cost               Float?
+  coveredByInsurance Boolean?      @default(false)
+
+  orderNotes         String?
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 enum LabStatus {
-  PENDING          // test requested
-  ACCEPTED         // sample accepted
-  IN_PROGRESS      // being tested
-  RESULT_ENTERED   // results entered
-  VALIDATED        // validated by supervisor
-  RELEASED         // available to doctor/patient
+  PENDING         
+  ACCEPTED         
+  IN_PROGRESS     
+  RESULT_ENTERED  
+  VALIDATED       
+  RELEASED         
+}
+
+enum Priority {
+  ROUTINE
+  URGENT
+  STAT
+}
+
+enum DiagnoseType{
+  MEDICAL
+  ALLERGY
+  SURGICAL
+  FAMILY
+  SOCIAL
+}
+enum DiagnoseStatus{
+  ACTIVE
+  RESOLVED
+  CHRONIC
+}
+
+enum Diet {
+  OMNIVORE
+  VEGETARIAN
+  VEGAN
+  PESCATARIAN
+  KETO
+  HIGH_PROTEIN
+  OTHER
+}
+enum SmokingStatus {
+  NEVER
+  CURRENT_DAILY
+  CURRENT_OCCASIONAL
+  FORMER
+  UNKNOWN
+}
+
+enum AlcoholUse {
+  NEVER
+  OCCASIONAL
+  MODERATE
+  DAILY
+  HEAVY
+  FORMER
+  UNKNOWN
+}
+
+enum DrugUse {
+  NEVER
+  OCCASIONAL
+  REGULAR
+  FORMER
+  UNKNOWN
+}
+
+enum Lifestyle {
+  SEDENTARY
+  LIGHTLY_ACTIVE
+  MODERATELY_ACTIVE
+  VERY_ACTIVE
+  EXTRA_ACTIVE
 }
 
 enum MedicationStatus {
