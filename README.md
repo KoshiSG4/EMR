@@ -101,6 +101,7 @@ This system is built with **scalability**, **role-based access**, and **real-wor
 
 ## 🧩 Project Structure
 
+```text
 EMR-System/
 ├── server/ # Backend (Node.js + Express + Prisma)
 │ ├── controllers/ # Logic for Admin, Doctor, Patient, Lab, etc.
