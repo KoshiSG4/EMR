@@ -7,7 +7,7 @@
 
 ## 📋 Overview
 
-The **Electronic Medical Record (EMR)** System is a full-stack web application designed to streamline healthcare data management for medical institutions. It enables **admins, doctors, nurses, lab staff, and patients** to securely manage and access medical records, appointments, and user information — following modern standards of **authentication**, **authorization**, and **data privacy**.
+The **Electronic Medical Record (EMR)** System is a full-stack web application designed to streamline healthcare data management for medical institutions. It enables **admins, doctors, nurses, lab staff, and patients** to securely manage and access medical records, appointments, and user information - following modern standards of **authentication**, **authorization**, and **data privacy**.
 
 This system is built with **scalability**, **role-based access**, and **real-world EMR workflows** in mind.
 
