@@ -131,8 +131,6 @@ EMR-System/
 
 ---
 
-### 🚀 Getting Started
-
 ## 🌐 Live Demo
 🔗 [View Deployed App](https://emr-rlh7hc0cm-koshis-projects-f908a45d.vercel.app/)
 
