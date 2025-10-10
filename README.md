@@ -165,7 +165,7 @@ If you'd like to suggest improvements, feel free to open an issue or submit a pu
 
 ## 👩‍💻 Author
 
-# Koshila Gunasinghe
-🎓 BSc (Hons) in Computer Science – University of Westminster
-💻 Passionate about full-stack development (MERN / PERN Stack)
+### Koshila Gunasinghe
+🎓 BSc (Hons) in Computer Science – University of Westminster  
+💻 Passionate about full-stack development (MERN / PERN Stack)  
 🌍 Building projects that make a real-world impact
