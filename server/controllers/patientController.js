@@ -1,8 +1,4 @@
 import { PrismaClient } from '../generated/prisma/client.js';
-import {
-	kcAdminClient,
-	authenticateKcAdmin,
-} from '../keycloak/kcAdminClient.js';
 
 const prisma = new PrismaClient();
 

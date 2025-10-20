@@ -1,5 +1,4 @@
 import { jwtDecode } from 'jwt-decode';
-import keycloak from '../keycloak';
 
 export const getUserInfoFromToken = (): {
 	role: string | null;
@@ -8,19 +7,28 @@ export const getUserInfoFromToken = (): {
 	id: string | null;
 } => {
 	try {
-		const token = keycloak.token;
+		const cookieString = document.cookie;
+		if (!cookieString) {
+			return { role: null, givenName: null, id: null, familyName: null };
+		}
+
+		const token = cookieString
+			.split('; ')
+			.find((row) => row.startsWith('accessToken='))
+			?.split('=')[1];
+
 		if (!token)
 			return { role: null, givenName: null, id: null, familyName: null };
 
 		const decoded: any = jwtDecode(token);
-		// console.log(decoded);
+		console.log(decoded);
 
-		const role = decoded?.realm_access?.roles?.[0] ?? null;
-		const givenName = decoded?.given_name ?? null;
-		const familyName = decoded?.family_name ?? null;
-		const id = decoded?.sub ?? null;
-
-		return { role, givenName, id, familyName };
+		return {
+			role: decoded.role ?? null,
+			givenName: decoded.givenName ?? null,
+			familyName: decoded.familyName ?? null,
+			id: decoded.sub ?? null,
+		};
 	} catch (error) {
 		console.error('Failed to decode token', error);
 		return { role: null, givenName: null, id: null, familyName: null };

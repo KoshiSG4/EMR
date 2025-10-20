@@ -1,5 +1,5 @@
 const { PrismaClient } = require('../generated/prisma');
-// import { PrismaClient } from "../generated/prisma";
+const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 
 async function main() {
@@ -737,6 +737,9 @@ async function main() {
 		},
 	];
 
+	const plainPassword = 'Password123!';
+	const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
 	// create admins
 	for (const admin of keycloakAdmins) {
 		await prisma.user.create({
@@ -744,6 +747,7 @@ async function main() {
 				id: admin.id,
 				name: admin.name,
 				email: admin.email,
+				passwordHash: hashedPassword,
 				role: 'ADMIN',
 				admin: { create: { permissions: 'ALL' } },
 			},
@@ -758,6 +762,7 @@ async function main() {
 				id: doctor.id,
 				name: doctor.name,
 				email: doctor.email,
+				passwordHash: hashedPassword,
 				role: 'DOCTOR',
 
 				doctor: {
@@ -777,6 +782,7 @@ async function main() {
 				id: nurse.id,
 				name: nurse.name,
 				email: nurse.email,
+				passwordHash: hashedPassword,
 				role: 'NURSE',
 				nurse: {
 					create: {
@@ -821,6 +827,7 @@ async function main() {
 				id: patient.id,
 				name: patient.name,
 				email: patient.email,
+				passwordHash: hashedPassword,
 				role: 'PATIENT',
 			},
 		});

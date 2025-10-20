@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import keycloak from '../../keycloak';
-import { getUserInfoFromToken } from '../../utils/jwtUtils';
 import { FaBell } from 'react-icons/fa';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const TopNavBar = () => {
-	const { givenName: userName, role: userRole } = getUserInfoFromToken();
+	const { user } = useAuth();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [notificationsMenuOpen, setNotificationsMenuOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
@@ -38,8 +38,12 @@ const TopNavBar = () => {
 		};
 	}, []);
 
-	const handleLogout = () => {
-		keycloak.logout({ redirectUri: window.location.origin });
+	const { signOut } = useAuth();
+	const navigate = useNavigate();
+	const handleLogout = async () => {
+		await signOut();
+		alert('Logged out successfully');
+		navigate('/login');
 	};
 
 	return (
@@ -84,16 +88,16 @@ const TopNavBar = () => {
 								onClick={toggleMenu}
 								className="flex items-center space-x-2 focus:outline-none">
 								<div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium">
-									{userName?.charAt(0)}
+									{user?.name.charAt(0).toUpperCase()}
 								</div>
 							</button>
 							{menuOpen && (
 								<div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
 									<div className="px-4 py-2 text-sm text-gray-700 font-medium border-b border-gray-100">
-										{userName || 'Loading..'}
+										{user?.name || 'Loading..'}
 									</div>
 									<div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
-										Role: {userRole || '-'}
+										Role: {user?.role || '-'}
 									</div>
 									<button
 										onClick={handleLogout}

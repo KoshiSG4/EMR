@@ -86,6 +86,7 @@ const DiagnosePage = () => {
 					)}
 
 					<div
+						ref={ref}
 						className={`absolute top-0 -right-8 h-auto w-2/5  bg-white border-y-2 border-gray-200 shadow-lg  transform transition-transform duration-300 z-50
         ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 						<div className="p-4 flex items-center justify-between border-b ">

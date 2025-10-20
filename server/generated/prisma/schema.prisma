@@ -11,16 +11,30 @@ datasource db {
 
 // Main user table (base model for all roles)
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  role      Role
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
 
-  patientProfile Patient? @relation("PatientUser")
+  patientProfile Patient?  @relation("PatientUser")
   doctor         Doctor?
   nurse          Nurse?
   admin          Admin?
+  sessions       Session[]
+}
+
+//Session model
+model Session {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiredAt DateTime
 }
 
 // Patient model (linked 1:1 to a User with role PATIENT)

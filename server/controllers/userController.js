@@ -1,8 +1,4 @@
 import express from 'express';
-import {
-	kcAdminClient,
-	authenticateKcAdmin,
-} from '../keycloak/kcAdminClient.js';
 import { PrismaClient, Role } from '../generated/prisma/client.js';
 import { getLoggedInUser } from '../utils/getLoggedInUser.js';
 

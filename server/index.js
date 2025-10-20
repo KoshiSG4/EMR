@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import session from 'express-session';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import { patientRouter } from './routes/patientRoutes.js';
 import { doctorRouter } from './routes/doctorRoutes.js';
 import { adminRouter } from './routes/adminRoutes.js';
@@ -16,6 +16,7 @@ import { clinicalDetailRouter } from './routes/clinicalRecordsRoutes.js';
 import { vitalsRecordsRouter } from './routes/vitalsRoutes.js';
 import { medicalRecordsRouter } from './routes/medicalRecordsRoutes.js';
 import { historyRouter } from './routes/historyRoutes.js';
+import { authRouter } from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -43,12 +44,15 @@ app.use(
 );
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(cookieParser());
+
+app.use('/api/auth', authRouter);
 
 app.get('/', (req, res) => {
 	res.send('EMR Server is running...');
 });
 
-app.get('/api/', authenticateToken, getLoggedInUser);
+app.get('/api/auth/me', authenticateToken, getLoggedInUser);
 app.use('/api/patients', authenticateToken, patientRouter);
 app.use('/api/doctors', authenticateToken, doctorRouter);
 app.use('/api/admins', authenticateToken, adminRouter);

@@ -5,6 +5,13 @@ import { MedicalRecord } from '@/types/medicalRecords';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { getAllDiagnosis } from '@/store/slices/diagnoseSlice';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@radix-ui/react-select';
 
 interface DiagnoseFormProps {
 	onSubmit: (data: MedicalRecord) => void;
@@ -23,32 +30,27 @@ const DiagnoseForm = ({
 		type: '',
 		diagnosisId: '',
 	});
-	const [isOpen, setIsOpen] = useState(false);
+
 	const dispatch = useDispatch<AppDispatch>();
 	const diagnosis = useSelector(
 		(state: RootState) => state.diagnosis.diagnosis
 	);
-	// const diagnosisList = dispatch(getAllDiagnosis({diagnose}))
-	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (ref.current && !ref.current.contains(event.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return () =>
-			document.removeEventListener('mousedown', handleClickOutside);
+		dispatch(getAllDiagnosis({ diagnosis: diagnosis }));
 	}, []);
 
 	const handleChange = (
-		e:
-			| React.ChangeEvent<HTMLInputElement>
-			| React.ChangeEvent<HTMLSelectElement>
+		e?: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		fieldName?: string,
+		value?: string
 	) => {
-		const { name, value } = e.target;
-		setDiagnose((prev) => ({ ...prev, [name]: value }));
+		if (e) {
+			const { name, value } = e.target;
+			setDiagnose((prev) => ({ ...prev, [name]: value }));
+		} else if (fieldName && value !== undefined) {
+			setDiagnose((prev) => ({ ...prev, [fieldName]: value }));
+		}
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
@@ -78,20 +80,26 @@ const DiagnoseForm = ({
 				onSubmit={handleSubmit}
 				className="max-w-xl mx-auto space-y-4 p-6 bg-white rounded-2xl shadow-md">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<select
-						name="name"
+					<Select
+						name="diagnosisId"
 						value={diagnose.diagnosisId}
-						onClick={(e) =>
-							dispatch(getAllDiagnosis({ diagnosis: diagnosis }))
-						}
-						onChange={handleChange}>
-						<option value="">Select Diagnosis</option>
-						{diagnosis.map((d) => (
-							<option key={d.id} value={d.id}>
-								{d.name}
-							</option>
-						))}
-					</select>
+						onValueChange={(val) =>
+							handleChange(undefined, 'diagnosisId', val)
+						}>
+						<SelectTrigger
+							value=""
+							className="text-gray-400"
+							disabled>
+							<SelectValue>Select Diagnosis</SelectValue>
+						</SelectTrigger>
+						<SelectContent className="w-full p-[6.4px] border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-500 placeholder-gray-400">
+							{diagnosis.map((d) => (
+								<SelectItem key={d.id} value={d.id}>
+									{d.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 					<Input
 						name="type"
 						type="text"

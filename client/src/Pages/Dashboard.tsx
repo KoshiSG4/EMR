@@ -32,6 +32,7 @@ import { Button } from '@/components/ui/button';
 import PatientsPage from '@/components/patients/PatientsPage';
 import SelectedPatientContent from '@/components/patients/SelectedPatientContent';
 import LabPage from '@/components/laboratory/LabPage';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavTab {
 	label: string;
@@ -56,7 +57,8 @@ const Dashboard = () => {
 		(state: RootState) => state.patients
 	);
 
-	const userRole = getUserInfoFromToken().role?.toLocaleLowerCase();
+	const { user } = useAuth();
+	const userRole = user?.role.toLowerCase();
 	if (!userRole) {
 		return <div>Unauthorized Access</div>;
 	}

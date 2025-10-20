@@ -121,8 +121,19 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   email: 'email',
+  passwordHash: 'passwordHash',
   role: 'role',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SessionScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  userId: 'userId',
+  revoked: 'revoked',
+  createdAt: 'createdAt',
+  expiredAt: 'expiredAt'
 };
 
 exports.Prisma.PatientScalarFieldEnum = {
@@ -435,6 +446,7 @@ exports.LabStatus = exports.$Enums.LabStatus = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  Session: 'Session',
   Patient: 'Patient',
   Doctor: 'Doctor',
   Nurse: 'Nurse',

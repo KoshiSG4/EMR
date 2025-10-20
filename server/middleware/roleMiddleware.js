@@ -1,10 +1,8 @@
-export const withRole = (allowedRoles) => {
+export const withRole = (allowedRoles = []) => {
 	return (req, res, next) => {
-		const userRoles = req.user?.realm_access?.roles || [];
+		const userRole = req.user?.role;
 
-		const hasAccess = allowedRoles.some((role) => userRoles.includes(role));
-
-		if (!hasAccess) {
+		if (!userRole || !allowedRoles.includes(userRole)) {
 			return res
 				.status(403)
 				.json({ message: 'Forbidden: Insufficient role' });

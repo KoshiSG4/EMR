@@ -4,6 +4,7 @@ const prisma = new PrismaClient();
 
 export const getLoggedInUser = async (req, res) => {
 	try {
+		console.log('request', req);
 		const email = req.user?.email;
 
 		if (!email) {
@@ -16,6 +17,7 @@ export const getLoggedInUser = async (req, res) => {
 			return res.status(404).json({ message: 'User not found' });
 		}
 
+		console.log('user', user);
 		return res.status(200).json(user);
 	} catch (err) {
 		console.error(err);
