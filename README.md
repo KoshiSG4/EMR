@@ -132,7 +132,7 @@ EMR-System/
 ---
 
 ## 🌐 Live Demo
-🔗 [View Deployed App](https://emr-rlh7hc0cm-koshis-projects-f908a45d.vercel.app/)
+🔗 [View Deployed App](https://emr-project.vercel.app)
 
 ### 🧪 Demo Credentials
 | Role | Username | Password |
