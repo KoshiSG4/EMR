@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "nodemon index.js",
 		"start": "node index.js",
-		"test": "npm test --if-present"
+		"test": "echo 'No tests yet' && exit 0"
 	},
 	"prisma": {
 		"seed": "node prisma/seed.cjs"
