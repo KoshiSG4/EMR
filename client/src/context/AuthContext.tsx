@@ -23,7 +23,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const checkAuth = async () => {
 		try {
-			const response = await api.get('/auth/me');
+			const response = await api.get('/auth/me', {
+				withCredentials: true,
+			});
 			const data = await response.data;
 			console.log(data);
 			setUser(data);
@@ -37,7 +39,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const login = async (email: string, password: string) => {
 		try {
-			const response = await api.post('/auth/login', { email, password });
+			const response = await api.post(
+				'/auth/login',
+				{ email, password },
+				{ withCredentials: true }
+			);
 			console.log(response);
 
 			setUser(response.data.user);
@@ -50,11 +56,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const signUp = async (email: string, password: string, name?: string) => {
 		try {
-			const response = await api.post('/auth/signup', {
-				email,
-				password,
-				name,
-			});
+			const response = await api.post(
+				'/auth/signup',
+				{
+					email,
+					password,
+					name,
+				},
+				{ withCredentials: true }
+			);
 			setUser(response.data.user);
 		} catch (error: any) {
 			const errorMsg = error.response?.data?.message || 'Signup failed';
@@ -63,7 +73,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const signOut = async () => {
-		const response = await api.post('/auth/logout');
+		const response = await api.post('/auth/logout', {
+			withCredentials: true,
+		});
 		setUser(null);
 	};
 
