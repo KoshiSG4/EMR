@@ -13,38 +13,37 @@ jobs:
         services:
             postgres:
                 image: postgres:15
-                ports: [5432:5432]
+                ports: ['5432:5432']
                 env:
                     POSTGRES_USER: postgres
                     POSTGRES_PASSWORD: postgres
                     POSTGRES_DB: emr_test
                 options: >-
-                    --health-cmd="ps_isready -U postgres"
-                    --health-interval=10s
-                    --health-timeout=5s
-                    --health-retries=5
+                    --health-cmd="pg_isready -U postgres"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
 
         steps:
             - uses: actions/checkout@v4
 
-            #Setup Node.js
             - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: 'npm'
 
-            #Install & build backend
             - name: Install backend
               working-directory: ./server
+              env:
+                  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/emr_test
               run: |
                   npm install
-                  npm prisma migrate deploy
-                  npm build
+                  npx prisma migrate deploy
+                  npm run build
                   npm test --if-present
 
-            #Install & build frontend
             - name: Install frontend
               working-directory: ./client
               run: |
                   npm install
-                  npm build
+                  npm run build
