@@ -51,6 +51,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 			const errorMsg = error.response?.data?.message || 'Login failed';
 			console.log(errorMsg);
 			throw new Error(errorMsg);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -69,6 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		} catch (error: any) {
 			const errorMsg = error.response?.data?.message || 'Signup failed';
 			throw new Error(errorMsg);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
