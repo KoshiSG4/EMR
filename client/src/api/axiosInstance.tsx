@@ -28,33 +28,45 @@ api.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 
-		if (error.response?.status === 401 && !originalRequest._retry) {
+		if (
+			error.response?.status === 401 &&
+			!(originalRequest as any)._retry
+		) {
 			if (isRefreshing) {
-				return new Promise(function (resolve, reject) {
+				return new Promise((resolve, reject) => {
 					failedQueue.push({ resolve, reject });
 				})
 					.then(() => api(originalRequest))
 					.catch((err) => Promise.reject(err));
 			}
 
-			originalRequest._retry = true;
+			(originalRequest as any)._retry = true;
 			isRefreshing = true;
 
 			return new Promise(async (resolve, reject) => {
-				api.post('/auth/refresh')
-					.then((resp) => {
-						processQueue(null, resp.data.accessToken);
-						resolve(api(originalRequest));
-					})
-					.catch((err) => {
-						processQueue(err, null);
-						reject(err);
-					})
-					.finally(() => {
-						isRefreshing = false;
-					});
+				try {
+					const resp = await api.post(
+						'/auth/refresh',
+						{},
+						{ withCredentials: true }
+					);
+					api.defaults.headers.common[
+						'Authorization'
+					] = `Bearer ${resp.data.accessToken}`;
+					originalRequest.headers[
+						'Authorization'
+					] = `Bearer ${resp.data.accessToken}`;
+					processQueue(null, resp.data.accessToken);
+					resolve(api(originalRequest));
+				} catch (err) {
+					processQueue(err, null);
+					reject(err);
+				} finally {
+					isRefreshing = false;
+				}
 			});
 		}
+
 		return Promise.reject(error);
 	}
 );

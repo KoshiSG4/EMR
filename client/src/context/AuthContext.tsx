@@ -22,6 +22,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	}, []);
 
 	const checkAuth = async () => {
+		const timeout = setTimeout(() => {
+			console.warn('Auth check timed out');
+			setUser(null);
+			setIsLoading(false);
+		}, 5000);
+
 		try {
 			const response = await api.get('/auth/me', {
 				withCredentials: true,
