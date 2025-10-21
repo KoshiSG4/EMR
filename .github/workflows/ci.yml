@@ -20,7 +20,7 @@ jobs:
                     POSTGRES_DB: emr_test
                 options: >-
                     --health-cmd="ps_isready -U postgres"
-                    --health-intervals=10s
+                    --health-interval=10s
                     --health-timeout=5s
                     --health-retries=5
 
