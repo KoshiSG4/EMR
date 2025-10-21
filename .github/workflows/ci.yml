@@ -39,7 +39,6 @@ jobs:
               run: |
                   npm install
                   npx prisma migrate deploy
-                  npm run build
                   npm test --if-present
 
             - name: Install frontend
