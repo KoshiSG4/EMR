@@ -33,6 +33,7 @@ import PatientsPage from '@/components/patients/PatientsPage';
 import SelectedPatientContent from '@/components/patients/SelectedPatientContent';
 import LabPage from '@/components/laboratory/LabPage';
 import { useAuth } from '@/context/AuthContext';
+import { useAutoLogout } from '@/hooks/useAutoLogout';
 
 interface NavTab {
 	label: string;
@@ -57,8 +58,9 @@ const Dashboard = () => {
 		(state: RootState) => state.patients
 	);
 
-	const { user } = useAuth();
-	const userRole = user?.role.toLowerCase();
+	const user = useSelector((state: RootState) => state.user.loggedInUser);
+	const userRole = user?.role?.toLowerCase();
+	console.log(user);
 	if (!userRole) {
 		return <div>Unauthorized Access</div>;
 	}
@@ -86,6 +88,8 @@ const Dashboard = () => {
 	);
 
 	useEffect(() => {
+		if (!user) return;
+
 		const fetchTabData = async () => {
 			setIsLoading(true);
 			setIsForbidden(false);
@@ -101,7 +105,7 @@ const Dashboard = () => {
 				}
 
 				if (section === 'overview' || section === undefined) {
-					setTabContent(<Overview />);
+					setTabContent(<Overview userRole={userRole} />);
 				} else if (section === 'appointments') {
 					setTabContent(
 						<AppointmentsPage activeTab={currentTab?.label} />

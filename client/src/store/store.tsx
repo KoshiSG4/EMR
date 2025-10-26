@@ -8,6 +8,7 @@ import vitalsReducer from './slices/vitalsSlice';
 import medicalRecordsReducer from './slices/medicalRecordSlice';
 import historyReducer from './slices/historySlice';
 import laboratoryReducer from './slices/laboratorySlice';
+import userReducer from './slices/userSlice';
 
 export const store = configureStore({
 	reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
 		medicalRecords: medicalRecordsReducer,
 		history: historyReducer,
 		laboratory: laboratoryReducer,
+		user: userReducer,
 	},
 });
 

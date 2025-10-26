@@ -1,8 +1,7 @@
 import {
-	OverviewChartConfig,
-	OverviewChartData,
+	ChartData,
+	getOverviewChartData,
 } from '../configs/overviewChartsConfig';
-import { getUserInfoFromToken } from '../../../utils/jwtUtils';
 import {
 	LineChart,
 	Line,
@@ -12,17 +11,28 @@ import {
 	ResponsiveContainer,
 	Legend,
 } from 'recharts';
+import { useEffect, useState } from 'react';
 
-const OverviewCharts = () => {
-	const userRole = (getUserInfoFromToken().role?.toLowerCase() ??
-		'patient') as keyof OverviewChartConfig;
+interface OverviewChartsProps {
+	userRole: string;
+}
 
-	const charts = OverviewChartData[userRole];
+const OverviewCharts = ({ userRole }: OverviewChartsProps) => {
+	const [charts, setcharts] = useState<ChartData[]>([]);
+
+	useEffect(() => {
+		const loadCharts = async () => {
+			const config = await getOverviewChartData();
+			setcharts(config[userRole]);
+		};
+		loadCharts();
+	}, [userRole]);
+
 	return (
 		<div className="space-y-6">
 			{}
 			{charts.map((chart, index) => (
-				<div className="bg-white rounded-2xl shadow-md p-4 mb-6">
+				<div className="border-2 border-[#CEDFDF] rounded-2xl shadow-md p-4 mb-6">
 					<h3 className="text-lg font-semibold mb-2">
 						{chart.title}
 					</h3>

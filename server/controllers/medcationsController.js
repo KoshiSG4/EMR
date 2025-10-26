@@ -106,7 +106,6 @@ export const searchMedications = async (req, res) => {
 
 export const updateMedicationDetails = async (req, res) => {
 	const { id } = req.params;
-	console.log('id:', id);
 	const {
 		name,
 		strength,

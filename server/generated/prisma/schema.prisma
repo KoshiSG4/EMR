@@ -17,6 +17,13 @@ model User {
   email        String   @unique
   passwordHash String
   role         Role
+  dateOfBirth  String
+  gender       String
+  phone        String
+  address      String
+  bloodType    String?
+  profileImage String?
+  shift        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
 
@@ -40,12 +47,8 @@ model Session {
 
 // Patient model (linked 1:1 to a User with role PATIENT)
 model Patient {
-  userId           String   @id
+  userId           String  @id
   fullName         String
-  dateOfBirth      DateTime
-  gender           String
-  phone            String
-  address          String
   emergencyContact String
   insuranceDetails String?
 
@@ -65,6 +68,7 @@ model Patient {
 model Doctor {
   userId         String @id
   specialization String
+  onCall         String
 
   patients Patient[] @relation("PatientDoctors")
   user     User      @relation(fields: [userId], references: [id])
@@ -78,8 +82,8 @@ model Doctor {
 // Nurse model (linked 1:1 to a User with role NURSE)
 model Nurse {
   userId     String @id
-  shift      String
   department String
+  onCall     String
   user       User   @relation(fields: [userId], references: [id])
 }
 

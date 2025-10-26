@@ -27,7 +27,7 @@ export const refreshToken = async (req, res) => {
 			where: {
 				token: hashed,
 				revoked: false,
-				expireAt: { gt: new Date() },
+				expiredAt: { gt: new Date() },
 			},
 			include: { user: true },
 		});
@@ -67,7 +67,7 @@ export const refreshToken = async (req, res) => {
 
 		res.json({
 			message: 'Tokens refreshed',
-			user: { id: user.id, email: user.email, role: user.role },
+			user,
 		});
 	} catch (error) {
 		console.log(error);

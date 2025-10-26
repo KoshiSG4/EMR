@@ -3,5 +3,12 @@ export interface User {
 	email: string;
 	password?: string;
 	role: string;
+	dateOfBirth: string;
+	gender: string;
+	phone: string;
+	address: string;
+	bloodType: string;
+	profileImage?: string;
+	shift?: string;
 	id: string;
 }

@@ -2,6 +2,11 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '@/api/axiosInstance';
 import { email, set } from 'zod';
 import { User } from '@/types/userTypes';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store/store';
+import { resetUser, setLoggedInUser } from '@/store/slices/userSlice';
+import { da } from 'zod/v4/locales';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
 	user: User | null;
@@ -14,34 +19,36 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	const [user, setUser] = useState<User | null>(null);
+	// const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const user = useSelector((state: RootState) => state.user.loggedInUser);
+
+	const dispatch = useDispatch<AppDispatch>();
+
+	const [authChecked, setAuthChecked] = useState(false);
 
 	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				const resp = await api.post(
+					'/auth/refresh',
+					{},
+					{ withCredentials: true }
+				);
+				api.defaults.headers.common[
+					'Authorization'
+				] = `Bearer ${resp.data.accessToken}`;
+				dispatch(setLoggedInUser(resp.data.user));
+			} catch {
+				dispatch(resetUser());
+				signOut();
+			} finally {
+				setAuthChecked(true);
+			}
+		};
+
 		checkAuth();
 	}, []);
-
-	const checkAuth = async () => {
-		const timeout = setTimeout(() => {
-			console.warn('Auth check timed out');
-			setUser(null);
-			setIsLoading(false);
-		}, 5000);
-
-		try {
-			const response = await api.get('/auth/me', {
-				withCredentials: true,
-			});
-			const data = await response.data;
-			console.log(data);
-			setUser(data);
-		} catch (error) {
-			console.error('Failed to check auth status:', error);
-			setUser(null);
-		} finally {
-			setIsLoading(false);
-		}
-	};
 
 	const login = async (email: string, password: string) => {
 		try {
@@ -50,9 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				{ email, password },
 				{ withCredentials: true }
 			);
-			console.log(response);
-
-			setUser(response.data.user);
+			dispatch(setLoggedInUser(response.data.user));
 		} catch (error: any) {
 			const errorMsg = error.response?.data?.message || 'Login failed';
 			console.log(errorMsg);
@@ -73,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				},
 				{ withCredentials: true }
 			);
-			setUser(response.data.user);
+			dispatch(setLoggedInUser(response.data));
 		} catch (error: any) {
 			const errorMsg = error.response?.data?.message || 'Signup failed';
 			throw new Error(errorMsg);
@@ -83,11 +88,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	};
 
 	const signOut = async () => {
+		dispatch(resetUser());
 		const response = await api.post('/auth/logout', {
 			withCredentials: true,
 		});
-		setUser(null);
 	};
+
+	if (!authChecked) {
+		return (
+			<div className="flex min-h-screen items-center justify-center bg-purple-50/30">
+				<div className="text-purple-600">Loading...</div>
+			</div>
+		);
+	}
 
 	return (
 		<AuthContext.Provider

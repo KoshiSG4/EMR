@@ -47,61 +47,71 @@ const TopNavBar = () => {
 	};
 
 	return (
-		<div className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm">
+		<div className="fixed top-0 left-0 w-full z-50 bg-[linear-gradient(135deg,#172A3A_0%,#0c3736_45%,#004346_100%)] border-b-2 border-[#508991] shadow-md">
 			<div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
 				<div className="flex h-16 items-center justify-between">
 					{/* App Name */}
-					<div className="flex-shrink-0 text-xl font-bold text-blue-800">
+					<div className="flex-shrink-0 text-2xl font-bold text-[#D6F3F4] tracking-wide drop-shadow-sm">
 						EMR System
 					</div>
 
 					{/* Right Side */}
-					<div className="flex items-center space-x-4">
+					<div className="flex items-center space-x-5">
 						{/* Notifications */}
 						<div className="relative" ref={notificationRef}>
 							<button
 								onClick={toggleNotifications}
-								className="flex items-center space-x-2 focus:outline-none">
-								<FaBell className="h-6 w-6 text-gray-600" />
+								className="relative p-2 rounded-full bg-[#004346] hover:bg-[#74B3CE]  shadow-sm transition-transform duration-200 transform hover:-translate-y-0.5">
+								<FaBell className="h-6 w-6 text-[#D6F3F4] hover:text-[#172A3A]" />
 								{notifications.length > 0 && (
-									<span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+									<span
+										className="absolute -top-1 -right-1 inline-flex items-center justify-center
+									px-1.5 py-0.5 text-xs font-bold text-white bg-[#74B3CE] rounded-full shadow-sm">
 										{notifications.length}
 									</span>
 								)}
 							</button>
+
 							{notificationsMenuOpen && (
-								<div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-									{notifications.map((notification) => (
-										<div
-											key={notification}
-											className="px-4 py-2 text-sm text-gray-700 font-medium border-b border-gray-100">
-											{notification}
+								<div className="absolute right-0 mt-3 w-60 bg-[#d7e1e0] border border-[#b7d6da] rounded-xl shadow-lg z-10">
+									{notifications.length > 0 ? (
+										notifications.map((notification) => (
+											<div
+												key={notification}
+												className="px-4 py-2 text-sm text-[#254e70] font-medium border-b border-[#b3c5cc] hover:bg-[#eef4f4] transition">
+												{notification}
+											</div>
+										))
+									) : (
+										<div className="px-4 py-3 text-sm text-[#D6F3F4] text-center">
+											No notifications
 										</div>
-									))}
+									)}
 								</div>
 							)}
 						</div>
 
-						{/* User */}
+						{/* User Menu */}
 						<div className="relative" ref={menuRef}>
 							<button
 								onClick={toggleMenu}
-								className="flex items-center space-x-2 focus:outline-none">
-								<div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium">
+								className="flex items-center rounded-full bg-[#508991]/50 hover:bg-[#74B3CE] hover:text-[#172A3A] shadow-sm transition-transform duration-200 transform hover:-translate-y-0.5">
+								<div className="w-10 h-10 rounded-full flex items-center justify-center text-[#D6F3F4] hover:text-[#172A3A] font-extrabold shadow-inner">
 									{user?.name.charAt(0).toUpperCase()}
 								</div>
 							</button>
+
 							{menuOpen && (
-								<div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-									<div className="px-4 py-2 text-sm text-gray-700 font-medium border-b border-gray-100">
-										{user?.name || 'Loading..'}
+								<div className="absolute right-0 mt-3 w-56 bg-[#d7e1e0] border border-[#b7d6da] rounded-xl shadow-lg z-10">
+									<div className="px-4 py-2 text-sm text-[#254e70] font-semibold border-b border-[#b3c5cc]">
+										{user?.name || 'Loading...'}
 									</div>
-									<div className="px-4 py-2 text-sm text-gray-500 border-b border-gray-100">
+									<div className="px-4 py-2 text-sm text-[#307593] border-b border-[#b3c5cc]">
 										Role: {user?.role || '-'}
 									</div>
 									<button
 										onClick={handleLogout}
-										className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">
+										className="w-full text-left px-4 py-2 text-sm font-semibold text-[#254e70] hover:bg-[#346164] hover:text-[#c8e8f6] transition">
 										Logout
 									</button>
 								</div>

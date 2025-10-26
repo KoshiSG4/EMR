@@ -276,7 +276,6 @@ export const getPatientMedications = async (req, res) => {
 			},
 		});
 
-		console.log(patient);
 		if (!patient)
 			return res.status(404).json({ message: 'Patient not found' });
 		res.json({ patient });

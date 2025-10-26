@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;
@@ -11,9 +12,11 @@ export const ProtectedRoute = ({
 	children,
 	allowedRoles,
 }: ProtectedRouteProps) => {
-	const { user, isLoading } = useAuth();
+	const { loading, loggedInUser } = useSelector(
+		(state: RootState) => state.user
+	);
 
-	if (isLoading) {
+	if (loading) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-purple-50/30">
 				<div className="text-purple-600">Loading...</div>
@@ -21,11 +24,11 @@ export const ProtectedRoute = ({
 		);
 	}
 
-	if (!user) {
+	if (!loggedInUser) {
 		return <Navigate to="/login" replace />;
 	}
 
-	if (allowedRoles && !allowedRoles.includes(user.role)) {
+	if (allowedRoles && !allowedRoles.includes(loggedInUser.role)) {
 		return <div>403 Forbidden</div>;
 	}
 

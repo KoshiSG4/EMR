@@ -1,12 +1,14 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import TopNavBar from './TopNavBar';
+import { useAutoLogout } from '@/hooks/useAutoLogout';
 
 type DashboardLayoutProps = {
 	children: React.ReactNode;
 };
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+	useAutoLogout();
 	return (
 		<div className="flex h-screen bg-gray-100">
 			<Sidebar />

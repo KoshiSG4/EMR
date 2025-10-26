@@ -123,6 +123,13 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   passwordHash: 'passwordHash',
   role: 'role',
+  dateOfBirth: 'dateOfBirth',
+  gender: 'gender',
+  phone: 'phone',
+  address: 'address',
+  bloodType: 'bloodType',
+  profileImage: 'profileImage',
+  shift: 'shift',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -139,23 +146,20 @@ exports.Prisma.SessionScalarFieldEnum = {
 exports.Prisma.PatientScalarFieldEnum = {
   userId: 'userId',
   fullName: 'fullName',
-  dateOfBirth: 'dateOfBirth',
-  gender: 'gender',
-  phone: 'phone',
-  address: 'address',
   emergencyContact: 'emergencyContact',
   insuranceDetails: 'insuranceDetails'
 };
 
 exports.Prisma.DoctorScalarFieldEnum = {
   userId: 'userId',
-  specialization: 'specialization'
+  specialization: 'specialization',
+  onCall: 'onCall'
 };
 
 exports.Prisma.NurseScalarFieldEnum = {
   userId: 'userId',
-  shift: 'shift',
-  department: 'department'
+  department: 'department',
+  onCall: 'onCall'
 };
 
 exports.Prisma.AdminScalarFieldEnum = {

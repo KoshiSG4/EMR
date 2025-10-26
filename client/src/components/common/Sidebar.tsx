@@ -13,24 +13,22 @@ const Sidebar = () => {
 	};
 
 	return (
-		<aside className="w-60 h-screen bg-white border-r shadow-sm flex flex-col">
-			<div className="p-4 text-xl font-bold border-b">EMR Dashboard</div>
+		<aside className="w-60 h-screen mt-16 pt-3 bg-[#C3C6C3] border-r shadow-sm flex flex-col">
 			<nav className="flex-1 overflow-y-auto">
-				<ul className="p-4 space-y-2">
+				<ul>
 					{links.map((item) => (
 						<li key={item.label}>
 							<NavLink
 								to={item.path}
 								className={({ isActive }) =>
-									`block px-4 py-2 rounded transition ${
+									`block px-4 py-2 h-14 rounded transition ${
 										isActive
-											? 'bg-blue-100 text-blue-700 font-semibold'
-											: 'text-gray-700 hover:bg-gray-100'
+											? 'bg-slate-50/80 text-[#172A3A] font-semibold'
+											: 'text-gray-700 hover:bg-slate-50/50'
 									}`
 								}>
 								<div className="flex items-center justify-between">
 									<div className="flex items-center space-x-2">
-										{/* <item.icon className="w-3 h-3" /> */}
 										<span>{item.label}</span>
 									</div>
 									{item.tabs && (

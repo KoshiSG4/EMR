@@ -17,10 +17,8 @@ export function verifyAccessToken(token) {
 
 // create a secure random refresh token (raw), and hashed string for DB storage
 export function createRefreshToken() {
-	console.log('first');
 	const raw = crypto.randomBytes(64).toString('hex'); // raw token (returned to client via cookie)
 	const hash = crypto.createHash('sha256').update(raw).digest('hex');
-	console.log('raw&hash', raw, hash);
 	return { raw, hash };
 }
 

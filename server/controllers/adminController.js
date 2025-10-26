@@ -74,6 +74,19 @@ export const getAllAdmins = async (req, res) => {
 	}
 };
 
+//get all users (only ADMINs are allowed	)
+export const getAllUsers = async (req, res) => {
+	try {
+		const allUsers = await prisma.user.findMany({
+			orderBy: { role: 'asc' },
+		});
+		res.status(200).json(allUsers);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ error: error.message });
+	}
+};
+
 // Get Admin by ID (ADMIN only)
 export const getAdminById = async (req, res) => {
 	const { id } = req.params;
@@ -107,7 +120,6 @@ export const getAdminById = async (req, res) => {
 export const getOwnAdminProfile = async (req, res) => {
 	try {
 		const user = await getLoggedInUser(req);
-		console.log(user);
 		if (user.role !== 'ADMIN') {
 			return res
 				.status(403)
