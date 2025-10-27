@@ -10,7 +10,7 @@ const COOKIE_CLEAR_OPTS = {
 	httpOnly: true,
 	sameSite: 'none',
 	secure: true,
-	maxAge: maxAgeMs,
+	maxAge: 0,
 };
 
 export const logout = async (req, res) => {
