@@ -1,12 +1,9 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '@/api/axiosInstance';
-import { email, set } from 'zod';
 import { User } from '@/types/userTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { resetUser, setLoggedInUser } from '@/store/slices/userSlice';
-import { da } from 'zod/v4/locales';
-import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
 	user: User | null;
