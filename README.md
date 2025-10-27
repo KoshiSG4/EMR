@@ -11,6 +11,32 @@ The **Electronic Medical Record (EMR)** System is a full-stack web application d
 
 This system is built with **scalability**, **role-based access**, and **real-world EMR workflows** in mind.
 
+---
+
+## 🌐 Live Demo
+🔗 [View Deployed App](https://emr-project.vercel.app)
+
+### 🧪 Demo Credentials
+| Role | Username | Password |
+|------|-----------|-----------|
+| Admin | admin@example.com | Password123! |
+| Doctor | doc1@example.com | Password123! |
+| Nurse | nurse1@example.com | Password123! |
+| Patient | patient1@example.com | Password123! |
+
+
+## ⚙️ Local Development Setup
+If you’d like to run this project locally, follow these steps:
+
+1️. Clone the repository  
+2️. Create a `.env` file in `/server` with your database and Keycloak configurations
+3. Run Prisma migrations and start the backend  
+4. Run the frontend using `npm run dev`
+
+> You’ll need your own database and Keycloak instance for local development.
+
+---
+
 ## ⚙️ Tech Stack
 
 ### 🖥️ Frontend
@@ -128,30 +154,6 @@ EMR-System/
 │ ├── public/
 │ └── package.json
 ```
-
----
-
-## 🌐 Live Demo
-🔗 [View Deployed App](https://emr-project.vercel.app)
-
-### 🧪 Demo Credentials
-| Role | Username | Password |
-|------|-----------|-----------|
-| Admin | admin@example.com | admin123 |
-| Doctor | doctor@example.com | doctor123 |
-| Patient | patient@example.com | patient123 |
-
-
-## ⚙️ Local Development Setup
-If you’d like to run this project locally, follow these steps:
-
-1️. Clone the repository  
-2️. Create a `.env` file in `/server` with your database and Keycloak configurations
-3. Run Prisma migrations and start the backend  
-4. Run the frontend using `npm run dev`
-
-> You’ll need your own database and Keycloak instance for local development.
-
 
 ## 🧪 Testing (Planned)
 
