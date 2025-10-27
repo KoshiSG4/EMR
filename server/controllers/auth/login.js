@@ -4,9 +4,13 @@ import { PrismaClient } from '../../generated/prisma/index.js';
 const prisma = new PrismaClient();
 
 const COOKIE_OPTIONS = (maxAgeMs) => ({
+	// httpOnly: true,
+	// sameSite: 'lax',
+	// secure: process.env.NODE_ENV === 'production',
+	// maxAge: maxAgeMs,
 	httpOnly: true,
-	sameSite: 'lax',
-	secure: process.env.NODE_ENV === 'production',
+	sameSite: 'none',
+	secure: true,
 	maxAge: maxAgeMs,
 });
 
