@@ -1,4 +1,5 @@
 import {
+	clearPatientMedication,
 	getAllPatients,
 	getSelectedPatientData,
 	openPatientTabs,
@@ -70,6 +71,7 @@ const PatientsPage = () => {
 		);
 		if (selectedPatient) {
 			dispatch(setSelectedPatient(selectedPatient));
+			dispatch(clearPatientMedication());
 			dispatch(
 				openPatientTabs({
 					patientTab: {

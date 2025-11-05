@@ -70,7 +70,14 @@ export const getSelectedPatientsMeds = createAsyncThunk<
 	{ patientId: string }
 >('patients/getPatientMeds', async ({ patientId }) => {
 	const response = await api.get(`patients/${patientId}/medications`);
-	return response.data;
+	const formattedData = response.data.map((item: PatientMedication) => ({
+		...item,
+		startDate: item.startDate ? item.startDate.split('T')[0] : null,
+		endDate: item.endDate ? item.endDate.split('T')[0] : null,
+		createdAt: item.createdAt ? item.createdAt.split('T')[0] : null,
+		updatedAt: item.updatedAt ? item.updatedAt.split('T')[0] : null,
+	}));
+	return formattedData;
 });
 
 export const registerNewPatient = createAsyncThunk<
@@ -194,6 +201,10 @@ const patientSlice = createSlice({
 				state.selectedPatient = null;
 			}
 		},
+		clearPatientMedication(state) {
+			state.patientMedication = [];
+		},
+
 		addMedicationsToPatient(
 			state,
 			action: PayloadAction<{
@@ -360,6 +371,7 @@ export const {
 	closePatientTab,
 	updatePatient,
 	deactivatePatient,
+	clearPatientMedication,
 	setActivePatientTab,
 	addMedicationsToPatient,
 	updateMedicationForPatient,
