@@ -57,31 +57,9 @@ export const medInventryColumns: ColumnDef<MedicationInventory>[] = [
 		accessorKey: 'status',
 		header: 'Status',
 	},
-	{ accessorKey: 'batchNumber', header: 'Batch Number' },
-	{
-		accessorKey: 'supplier',
-		header: ({ column }) => {
-			return (
-				<Button
-					variant="ghost"
-					onClick={() =>
-						column.toggleSorting(column.getIsSorted() === 'asc')
-					}>
-					Supplier
-					<ArrowUpDown className="ml-2 h-4 w-4" />
-				</Button>
-			);
-		},
-	},
+
 	{ accessorKey: 'orderDate', header: 'Order Date' },
 	{ accessorKey: 'arrivalDate', header: 'Arrival Date' },
-	{
-		accessorKey: 'reorderLevel',
-		header: 'Order Level',
-		cell: ({ row }) => (
-			<div className="pl-6">{row.getValue('quantity')}</div>
-		),
-	},
 
 	{
 		id: 'actions',

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { getAllUsers, setUsers } from '@/store/slices/userSlice';
 import { useNavigate } from 'react-router-dom';
+import pluralize from 'pluralize';
 
 interface OverviewSummaryCardsProps {
 	userRole: string;
@@ -51,7 +52,11 @@ const OverviewSummaryCards = ({ userRole }: OverviewSummaryCardsProps) => {
 					<Card
 						key={stat.label}
 						onClick={() => {
-							if (stat.link) navigate(stat.link);
+							const label = pluralize.singular(
+								stat.label.toUpperCase()
+							);
+							if (stat.link)
+								navigate(stat.link, { state: { label } });
 						}}
 						className="rounded-2xl shadow-md bg-[#274442] hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer">
 						<CardHeader className="pb-2 p-4">

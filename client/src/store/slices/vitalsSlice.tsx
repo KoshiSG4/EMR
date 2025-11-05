@@ -1,6 +1,5 @@
 import api from '../../api/axiosInstance';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ClinicalDetailRecord } from '@/types/clinicalDetailRecord';
 import { VitalsRecord } from '@/types/vitalsRecords';
 
 interface VitalsState {

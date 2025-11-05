@@ -78,7 +78,7 @@ export const getAllAdmins = async (req, res) => {
 export const getAllUsers = async (req, res) => {
 	try {
 		const allUsers = await prisma.user.findMany({
-			orderBy: { role: 'asc' },
+			orderBy: { name: 'asc' },
 		});
 		res.status(200).json(allUsers);
 	} catch (error) {

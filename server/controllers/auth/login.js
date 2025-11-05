@@ -4,21 +4,20 @@ import { PrismaClient } from '../../generated/prisma/index.js';
 const prisma = new PrismaClient();
 
 const COOKIE_OPTIONS = (maxAgeMs) => ({
-	httpOnly: true,
-	sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-	secure: process.env.NODE_ENV === 'production',
-	maxAge: maxAgeMs,
 	// httpOnly: true,
-	// sameSite: 'none',
-	// secure: true,
+	// sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+	// secure: process.env.NODE_ENV === 'production',
 	// maxAge: maxAgeMs,
+	httpOnly: true,
+	sameSite: 'none',
+	secure: true,
+	maxAge: maxAgeMs,
 });
 
 export const login = async (req, res) => {
-	console.log('server login');
 	try {
 		const { email, password } = req.body;
-		console.log(req.body);
+
 		if (!email || !password) {
 			return res
 				.status(400)
@@ -33,6 +32,14 @@ export const login = async (req, res) => {
 		const isMatch = await bcrypt.compare(password, user.passwordHash);
 		if (!isMatch) {
 			return res.status(403).json({ message: 'Invalid credentials' });
+		}
+
+		//change password
+		if (user.mustChangePassword) {
+			return res.status(200).json({
+				mustChangePassword: true,
+				message: 'You must change your password before continuing',
+			});
 		}
 
 		//issue access token

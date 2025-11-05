@@ -8,6 +8,7 @@ import {
 	BarChart,
 	Settings,
 	LucideProps,
+	User2,
 } from 'lucide-react';
 import { FaUserInjured } from 'react-icons/fa';
 import { IconType } from 'react-icons/lib';
@@ -20,6 +21,7 @@ type NavLink = {
 				Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>
 		  >
 		| IconType;
+	isActive?: boolean;
 	roles?: string[];
 	tabs?: NavLink[];
 };
@@ -73,7 +75,7 @@ export const navLinks: NavLink[] = [
 
 	{
 		path: '/medications',
-		label: 'Medications / Pharmacy',
+		label: 'Pharmacy',
 		icon: Pill,
 		roles: ['admin', 'doctor', 'nurse'],
 		tabs: [
@@ -89,11 +91,9 @@ export const navLinks: NavLink[] = [
 		icon: Users,
 		roles: ['admin'],
 		tabs: [
-			{ label: 'Doctors', path: 'doctors' },
-			{ label: 'Nurses', path: 'nurses' },
-			{ label: 'Patients', path: 'patients' },
-			{ label: 'Lab Staff', path: 'lab-staff' },
-			{ label: 'Admins', path: 'admins' },
+			{ label: 'All Users', path: 'all-users' },
+			{ label: 'Departments', path: 'manage-departments' },
+			{ label: 'Other', path: 'other' },
 		],
 	},
 
@@ -119,9 +119,9 @@ export const navLinks: NavLink[] = [
 			{ label: 'Lab Reports', path: 'lab' },
 			{ label: 'System Reports', path: 'system' },
 			{ label: 'Activity Logs', path: 'activity' },
+			{ label: 'Audit Logs', path: 'audit' },
 		],
 	},
-
 	{
 		path: '/settings',
 		label: 'Settings',

@@ -9,6 +9,7 @@ import { PatientMedication } from '@/types/patientMedicationTypes';
 import {
 	addMedicationsToPatient,
 	addMedsToPatientDatabase,
+	getSelectedPatientsMeds,
 } from '@/store/slices/patientSlice';
 import DataTable from '@/components/common/DataTable';
 
@@ -18,30 +19,28 @@ interface PatientMedicationsProps {
 
 const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 	const navigate = useNavigate();
-	const userRole = getUserInfoFromToken().role?.toLowerCase();
-	const userName =
-		getUserInfoFromToken().givenName +
-		' ' +
-		getUserInfoFromToken().familyName;
-
-	const userId = getUserInfoFromToken().id;
-	const selectedPatient = useSelector(
-		(state: RootState) => state.patients.selectedPatient
+	const user = useSelector((state: RootState) => state.user.loggedInUser);
+	const { selectedPatient, loading, patientMedication } = useSelector(
+		(state: RootState) => state.patients
 	);
 	const dispatch = useDispatch<AppDispatch>();
 
 	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (userRole === 'patient') {
-			navigate(`/patient/${userId}/medications/current`);
+		if (user?.role === 'patient') {
+			navigate(`/patient/${user.id}/medications/current`);
 			return;
 		}
 
 		if (!selectedPatient) {
-			setLoading(true);
 			return;
+		}
+
+		if (!patientMedication || patientMedication.length <= 0) {
+			dispatch(
+				getSelectedPatientsMeds({ patientId: selectedPatient.id })
+			);
 		}
 	}, [selectedPatient]);
 
@@ -65,15 +64,15 @@ const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 		setIsFormOpen(false);
 	};
 
-	const patientMedication = (selectedPatientMeds: PatientMedication[]) => {
-		return selectedPatientMeds.map((m) => ({
-			...m,
-			startDate: m.startDate.split('T')[0],
-			endDate: m.endDate?.split('T')[0],
-			createdAt: m.endDate?.split('T')[0] ?? '',
-			updatedAt: m.endDate?.split('T')[0] ?? '',
-		}));
-	};
+	// const patientMedication = (selectedPatientMeds: PatientMedication[]) => {
+	// 	return selectedPatientMeds.map((m) => ({
+	// 		...m,
+	// 		startDate: m.startDate.split('T')[0],
+	// 		endDate: m.endDate?.split('T')[0],
+	// 		createdAt: m.endDate?.split('T')[0] ?? '',
+	// 		updatedAt: m.endDate?.split('T')[0] ?? '',
+	// 	}));
+	// };
 
 	return (
 		<div className="p-3 space-y-3 relative">
@@ -91,9 +90,7 @@ const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 							<div>
 								<DataTable
 									columns={patientMedicationTableColumns}
-									data={patientMedication(
-										selectedPatient.patientMedication
-									)}
+									data={patientMedication}
 									loading={loading}
 									filters={[
 										{
@@ -138,11 +135,13 @@ const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 							</button>
 						</div>
 						<div className="p-4 overflow-y-auto">
-							<PatientMedicationForm
-								onSubmit={handleSubmitMedicationForm}
-								patientId={selectedPatient.userId}
-								prescribedByName={userName}
-							/>
+							{user && (
+								<PatientMedicationForm
+									onSubmit={handleSubmitMedicationForm}
+									patientId={selectedPatient.userId}
+									prescribedByName={user?.name}
+								/>
+							)}
 						</div>
 					</div>
 

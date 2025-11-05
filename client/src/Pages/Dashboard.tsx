@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 import DashboardLayout from '../components/common/DashboardLayout';
 import Forbidden from '../components/common/Forbidden';
 import axios from 'axios';
-import { getUserInfoFromToken } from '../utils/jwtUtils';
 import { navLinks } from '../constants/navLinks';
 import Overview from '../components/overview/shared/Overview';
 import AppointmentsPage from './AppointmentsPage';
@@ -11,6 +10,7 @@ import MedicationsPage from './MedicationsPage';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import {
+	clearSelectedPatient,
 	closePatientTab,
 	resetPatient,
 	setActivePatientTab,
@@ -29,11 +29,11 @@ import {
 	DropdownMenuTrigger,
 } from '@radix-ui/react-dropdown-menu';
 import { Button } from '@/components/ui/button';
-import PatientsPage from '@/components/patients/PatientsPage';
+import PatientsPage from '@/Pages/PatientsPage';
 import SelectedPatientContent from '@/components/patients/SelectedPatientContent';
-import LabPage from '@/components/laboratory/LabPage';
-import { useAuth } from '@/context/AuthContext';
-import { useAutoLogout } from '@/hooks/useAutoLogout';
+import LabPage from '@/Pages/LabPage';
+import MyAccount from '@/Pages/MyAccountPage';
+import ManageUsersPage from './ManageUsersPage';
 
 interface NavTab {
 	label: string;
@@ -60,7 +60,6 @@ const Dashboard = () => {
 
 	const user = useSelector((state: RootState) => state.user.loggedInUser);
 	const userRole = user?.role?.toLowerCase();
-	console.log(user);
 	if (!userRole) {
 		return <div>Unauthorized Access</div>;
 	}
@@ -100,16 +99,14 @@ const Dashboard = () => {
 					`/api/${userRole}/${section}/${tab || 'default'}`
 				);
 
-				if (section !== 'patients') {
-					dispatch(resetPatient());
-				}
-
 				if (section === 'overview' || section === undefined) {
 					setTabContent(<Overview userRole={userRole} />);
 				} else if (section === 'appointments') {
 					setTabContent(
 						<AppointmentsPage activeTab={currentTab?.label} />
 					);
+				} else if (section === 'myAccount') {
+					setTabContent(<MyAccount selectedUser={user} />);
 				} else if (section === 'patients') {
 					if (tab === 'search' || !selectedPatient) {
 						setTabContent(<PatientsPage />);
@@ -122,6 +119,8 @@ const Dashboard = () => {
 					setTabContent(<MedicationsPage />);
 				} else if (section === 'laboratory') {
 					setTabContent(<LabPage />);
+				} else if (section === 'manage-users') {
+					setTabContent(<ManageUsersPage />);
 				} else {
 					setTabContent(
 						<pre className="text-sm text-gray-700 whitespace-pre-wrap break-all ">
@@ -166,23 +165,37 @@ const Dashboard = () => {
 						remainingTabs[remainingTabs.length - 1].patient
 					)
 				);
-			} else {
+			} else if (remainingTabs.length <= 0) {
 				navigate(`/patients`);
+				dispatch(clearSelectedPatient());
 				setTabContent(<PatientsPage />);
 			}
 		}
 	};
 
+	const handleNavigate = (
+		navigate: NavigateFunction,
+		...segments: string[]
+	) => {
+		const cleaned = segments
+			.filter(Boolean)
+			.map((s) => s.replace(/^\/+|\/+$/g, ''))
+			.join('/');
+
+		console.log('cleaned', cleaned);
+		navigate(`/${cleaned}`, { replace: true });
+	};
+
 	return (
 		<DashboardLayout>
-			<div className="mb-4 mt-16">
+			<div className="mb-4 ">
 				<h1 className="text-2xl font-semibold capitalize">
 					{currentSection?.label ?? 'overview'}
 				</h1>
 			</div>
 
-			{allowedTabs.length > 0 && (
-				<div className="flex gap-4 border-b mb-6 px-2 py-1">
+			{allowedTabs.length > 0 && section && (
+				<div className="flex gap-4 border-b mb-6 px-2 py-1 ">
 					{allowedTabs.map((ct) => {
 						const hasSubTabs = ct.tabs && ct.tabs.length > 0;
 
@@ -193,15 +206,18 @@ const Dashboard = () => {
 										variant="outline"
 										onClick={() =>
 											!hasSubTabs &&
-											navigate(`/${section}/${ct.path}`)
+											handleNavigate(
+												navigate,
+												section,
+												ct.path
+											)
 										}
 										className={cn(
-											'rounded-lg shadow-sm transition-colors',
-											'focus:outline-none focus:ring-0',
+											'rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-0',
 											!hasSubTabs ? 'cursor-pointer' : '',
 											isActive(ct.path)
-												? 'bg-sky-100 text-sky-800 border border-sky-300'
-												: 'bg-white text-gray-700 hover:bg-sky-50 hover:text-sky-800'
+												? 'bg-[#022F56] text-[#d1b515] border hover:bg-[#022F56] hover:text-[#d1b515]'
+												: 'hover:bg-[#022F56] hover:text-[#D6F3F6] border border-[#162726]  text-[#274442]'
 										)}>
 										{ct.label}
 									</Button>
@@ -253,8 +269,13 @@ const Dashboard = () => {
 																						inner.path
 																					}
 																					onClick={() =>
-																						navigate(
-																							`/${section}/${ct.path}/${st.path}/${it.path}/${inner.path}`
+																						handleNavigate(
+																							navigate,
+																							section,
+																							ct.path,
+																							st.path,
+																							it.path,
+																							inner.path
 																						)
 																					}
 																					className={cn(
@@ -279,8 +300,12 @@ const Dashboard = () => {
 																		it.path
 																	}
 																	onClick={() =>
-																		navigate(
-																			`/${section}/${ct.path}/${st.path}/${it.path}`
+																		handleNavigate(
+																			navigate,
+																			section,
+																			ct.path,
+																			st.path,
+																			it.path
 																		)
 																	}
 																	className={cn(
@@ -301,8 +326,11 @@ const Dashboard = () => {
 												<DropdownMenuItem
 													key={st.path}
 													onClick={() =>
-														navigate(
-															`/${section}/${ct.path}/${st.path}`
+														handleNavigate(
+															navigate,
+															section,
+															ct.path,
+															st.path
 														)
 													}
 													className={cn(
@@ -322,38 +350,50 @@ const Dashboard = () => {
 					})}
 
 					{/* Patient tabs bar */}
-					{openTabs.map((pt) => (
-						<div
-							key={pt.id}
-							className={cn(
-								'flex items-center gap-2 px-3 py-1 rounded-t-lg cursor-pointer transition-colors',
-								activeTabId === pt.id
-									? 'bg-purple-100 text-purple-800 border border-b-0 border-purple-300'
-									: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-							)}
-							onClick={() => {
-								dispatch(setActivePatientTab(pt.id));
-								dispatch(setSelectedPatient(pt.patient));
-								navigate(`/patients/${pt.id}/profile`);
-							}}>
-							<span className="text-sm font-medium">
-								{pt.patient.fullName} ({pt.patient.gender})
-							</span>
-							<button
-								onClick={(e) => {
-									e.stopPropagation();
-									handleCloseTab(pt.id);
-								}}
-								className="ml-2 text-gray-500 hover:text-red-500">
-								×
-							</button>
+					{section === 'patients' && openTabs.length > 0 && (
+						<div className="flex">
+							{openTabs.map((pt) => (
+								<div
+									key={pt.id}
+									className={cn(
+										'flex items-center gap-2 px-3 py-1 rounded-t-lg cursor-pointer transition-colors',
+										activeTabId === pt.id
+											? 'bg-purple-100 text-purple-800 border border-b-0 border-purple-300'
+											: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+									)}
+									onClick={() => {
+										dispatch(setActivePatientTab(pt.id));
+										dispatch(
+											setSelectedPatient(pt.patient)
+										);
+										handleNavigate(
+											navigate,
+											'patients',
+											pt.id,
+											'profile'
+										);
+									}}>
+									<span className="text-sm font-medium">
+										{pt.patient.fullName} (
+										{pt.patient.gender})
+									</span>
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											handleCloseTab(pt.id);
+										}}
+										className="ml-2 text-gray-500 hover:text-red-500">
+										×
+									</button>
+								</div>
+							))}
 						</div>
-					))}
+					)}
 				</div>
 			)}
 
 			{/* Tab Content */}
-			<div className="p-4 border rounded shadow bg-white min-h-[200px]">
+			<div className="flex-1 h-[98%] p-4 border rounded shadow bg-white overflow-y-auto overflow-x-hidden scrollbar-thin min-h-[200px]">
 				{isLoading ? (
 					<p>Loading...</p>
 				) : isForbidden ? (

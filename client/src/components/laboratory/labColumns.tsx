@@ -32,10 +32,7 @@ export const labColumns: ColumnDef<LabRequest>[] = [
 		accessorKey: 'priority',
 		header: 'Priority',
 	},
-	{
-		accessorKey: 'doctorName',
-		header: 'Requested By',
-	},
+
 	{
 		accessorKey: 'requestedAt',
 		header: 'Requested Date',

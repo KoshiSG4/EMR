@@ -71,34 +71,22 @@ export const getAllPatients = async (req, res) => {
 				records: {
 					include: {
 						diagnosis: true,
-						labTests: true,
-						prescriptions: true,
-						patient: true,
-						doctor: true,
+						// labTests: true,
+						// prescriptions: true,
+						// patient: true,
+						// doctor: true,
 					},
 				},
-				patientMedication: true,
 				doctors: {
 					include: {
 						user: true,
 					},
 				},
-				user: true,
+				// user: true,
 			},
 		});
-		const formattedPatients = allPatients.map((patient) => ({
-			...patient,
-			dateOfBirth: patient.dateOfBirth
-				? patient.dateOfBirth.toISOString().split('T')[0]
-				: null,
-			records: patient.records.map((record) => ({
-				...record,
-				createdAt: record.createdAt
-					? record.createdAt.toISOString().split('T')[0]
-					: null,
-			})),
-		}));
-		res.status(200).json(formattedPatients);
+
+		res.status(200).json(allPatients);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -108,11 +96,27 @@ export const getPatientById = async (req, res) => {
 	const { id } = req.params;
 
 	try {
-		const patient = await prisma.findUnique({
-			where: { id },
+		const patient = await prisma.patient.findUnique({
+			where: { userId: id },
 			include: {
 				user: true,
-				doctor: true,
+				doctors: {
+					include: {
+						user: true,
+					},
+				},
+				records: {
+					include: {
+						diagnosis: true,
+					},
+				},
+
+				patientMedication: true,
+				vitals: true,
+				referralRecords: true,
+				labTests: true,
+				clinicalDetails: true,
+				histories: true,
 			},
 		});
 

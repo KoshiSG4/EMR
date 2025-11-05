@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { AppDispatch, RootState } from '@/store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
-import { labColumns } from './labColumns';
-import LabRequestsForm from './LabRequestsForm';
+import { labColumns } from '../components/laboratory/labColumns';
+import LabRequestsForm from '../components/laboratory/LabRequestsForm';
 import { LabRequest } from '@/types/labRequest';
 import {
 	addLabTestRequest,

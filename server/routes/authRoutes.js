@@ -6,6 +6,8 @@ import { logout } from '../controllers/auth/logout.js';
 
 export const authRouter = express.Router();
 
+authRouter.post('/change-password', signup);
+
 authRouter.post('/signup', signup);
 authRouter.post('/login', login);
 authRouter.post('/refresh', refreshToken);

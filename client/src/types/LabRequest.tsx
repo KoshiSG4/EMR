@@ -12,7 +12,7 @@ export interface LabRequest {
 	priority?: 'ROUTINE' | 'URGENT' | 'STAT';
 
 	doctorId: string;
-	doctorName: string;
+	doctorName: Doctor;
 
 	patientId: string;
 	patientName: string;
@@ -52,4 +52,7 @@ export interface LabRequest {
 	coveredByInsurance?: boolean;
 
 	orderNotes?: string;
+
+	createdAt: string;
+	updatedAt?: string;
 }

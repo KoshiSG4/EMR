@@ -2,21 +2,6 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '../ui/button';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
 
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@radix-ui/react-dropdown-menu';
-import { useDispatch } from 'react-redux';
-import { useState } from 'react';
-import { AppDispatch } from '@/store/store';
-import PatientProfileCard from './PatientProfileCard ';
-import { Patient } from '@/types/patientTypes';
-import { updatePatient, updatePatientInfo } from '@/store/slices/patientSlice';
-
 interface PatientColumnProps {
 	userId: string;
 	name: string;

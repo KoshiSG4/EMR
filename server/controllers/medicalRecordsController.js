@@ -45,13 +45,13 @@ export const getAllMedicalRecords = async (req, res) => {
 					name: 'asc',
 				},
 			},
-			include: {
-				diagnosis: true,
-				prescriptions: true,
-				labTests: true,
-				vitalsRecords: true,
-				clinicalDetails: true,
-			},
+			// include: {
+			// 	diagnosis: true,
+			// 	prescriptions: true,
+			// 	labTests: true,
+			// 	vitalsRecords: true,
+			// 	clinicalDetails: true,
+			// },
 		});
 		res.status(200).json(allMedicalRecords);
 	} catch (error) {
@@ -71,11 +71,11 @@ export const getSelectedMedicalRecords = async (req, res) => {
 						user: true,
 					},
 				},
-				diagnosis: true,
-				prescriptions: true,
-				labTests: true,
-				vitalsRecords: true,
-				clinicalDetails: true,
+				// diagnosis: true,
+				// prescriptions: true,
+				// labTests: true,
+				// vitalsRecords: true,
+				// clinicalDetails: true,
 			},
 		});
 

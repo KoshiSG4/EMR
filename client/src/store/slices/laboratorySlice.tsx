@@ -29,8 +29,17 @@ export const getAllLabTests = createAsyncThunk<
 	const response = await api.get(`laboratory/getAll`, {
 		params: { labRequests },
 	});
-	console.log('get all');
-	return response.data;
+	const formattedData = response.data.map((item: LabRequest) => ({
+		...item,
+		requestedAt: item.requestedAt ? item.requestedAt.split('T')[0] : null,
+		acceptedAt: item.acceptedAt ? item.acceptedAt.split('T')[0] : null,
+		cancelledAt: item.cancelledAt ? item.cancelledAt.split('T')[0] : null,
+		validatedAt: item.validatedAt ? item.validatedAt.split('T')[0] : null,
+		releasedAt: item.releasedAt ? item.releasedAt.split('T')[0] : null,
+		createdAt: item.createdAt ? item.createdAt.split('T')[0] : null,
+		updatedAt: item.updatedAt ? item.updatedAt.split('T')[0] : null,
+	}));
+	return formattedData;
 });
 
 export const getSelectedPatientsLabTests = createAsyncThunk<
@@ -43,8 +52,17 @@ export const getSelectedPatientsLabTests = createAsyncThunk<
 			params: { labRequests },
 		}
 	);
-	console.log('get selected');
-	return response.data;
+	const formattedData = response.data.map((item: LabRequest) => ({
+		...item,
+		requestedAt: item.requestedAt ? item.requestedAt.split('T')[0] : null,
+		acceptedAt: item.acceptedAt ? item.acceptedAt.split('T')[0] : null,
+		cancelledAt: item.cancelledAt ? item.cancelledAt.split('T')[0] : null,
+		validatedAt: item.validatedAt ? item.validatedAt.split('T')[0] : null,
+		releasedAt: item.releasedAt ? item.releasedAt.split('T')[0] : null,
+		createdAt: item.createdAt ? item.createdAt.split('T')[0] : null,
+		updatedAt: item.updatedAt ? item.updatedAt.split('T')[0] : null,
+	}));
+	return formattedData;
 });
 
 export const addLabTestRequest = createAsyncThunk<

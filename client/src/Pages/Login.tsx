@@ -1,40 +1,88 @@
 import { SVGProps, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { set, z, ZodError } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { FaStethoscope } from 'react-icons/fa';
+import { z, ZodError } from 'zod';
+import { User } from '@/types/userTypes';
+import { da } from 'zod/v4/locales';
 
 const loginSchema = z.object({
 	email: z.string().email('Invalid email address'),
 	password: z.string().min(6, 'Password must be at least 6 characters long'),
 });
 
+const changePasswordSchema = z
+	.object({
+		email: z.string().email('Invalid email address'),
+		newPassword: z
+			.string()
+			.min(6, 'Password must be at least 6 characters long'),
+		confirmPassword: z
+			.string()
+			.min(6, 'Password must be at least 6 characters long'),
+	})
+	.refine((data) => data.newPassword === data.confirmPassword, {
+		message: 'Passwords do not match',
+		path: ['confirmPassword'],
+	});
+
 const Login = () => {
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
+		newPassword: '',
+		confirmPassword: '',
 	});
 	const [errors, setErrors] = useState<{
 		email?: string;
 		password?: string;
+		newPassword?: string;
+		confirmPassword?: string;
 		submit?: string;
 	}>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [mode, setMode] = useState<'login' | 'changePassword'>('login');
+
 	const navigate = useNavigate();
-	const { login } = useAuth();
+	const { login, changePassword } = useAuth();
 
 	const handleSubmit = async (data: typeof formData) => {
 		try {
 			setIsSubmitting(true);
 			setErrors({});
 
-			const validatedData = loginSchema.parse(data);
+			if (mode === 'login') {
+				const validatedData = loginSchema.parse(data);
 
-			await login(validatedData.email, validatedData.password);
-			navigate('/');
+				const user = await login(
+					validatedData.email,
+					validatedData.password
+				);
+				if (user.mustChangePassword) {
+					setMode('changePassword');
+				} else {
+					navigate('/');
+				}
+			} else if (mode === 'changePassword') {
+				if (formData.newPassword !== formData.confirmPassword) {
+					setErrors({ submit: 'Passwords do not match' });
+					return;
+				}
+
+				const validatedData = changePasswordSchema.parse(data);
+				await changePassword(
+					validatedData.email,
+					validatedData.newPassword
+				);
+
+				alert('Password changed successfully! Please log in again.');
+				setMode('login');
+				setFormData({
+					email: formData.email,
+					password: '',
+					newPassword: '',
+					confirmPassword: '',
+				});
+			}
 		} catch (error) {
 			if (error instanceof ZodError) {
 				const formattedErrors: Record<string, string> = {};
@@ -175,7 +223,9 @@ const Login = () => {
 								Sign In
 							</h2>
 							<p className="mb-4 text-center text-sm text-[#D6F3F4] opacity-80">
-								Enter your credentials to continue
+								{mode === 'login'
+									? 'Enter your credentials to continue'
+									: 'You must create a new password before continuing'}
 							</p>
 
 							<form
@@ -219,39 +269,115 @@ const Login = () => {
 									)}
 								</div>
 
-								{/* Password */}
-								<div>
-									<label
-										htmlFor="password"
-										className="mb-1 block text-sm font-medium text-[#D6F3F4] opacity-85">
-										Password
-									</label>
-									<input
-										id="password"
-										name="password"
-										type="password"
-										value={formData.password}
-										onChange={handleChange}
-										required
-										placeholder="Password"
-										className={`w-full rounded-lg border px-3 py-2 text-white placeholder:text-white/60 bg-white/10 backdrop-blur-sm
+								{mode === 'login' ? (
+									<div>
+										<label
+											htmlFor="password"
+											className="mb-1 block text-sm font-medium text-[#D6F3F4] opacity-85">
+											Password
+										</label>
+										<input
+											id="password"
+											name="password"
+											type="password"
+											value={formData.password}
+											onChange={handleChange}
+											required
+											placeholder="Password"
+											className={`w-full rounded-lg border px-3 py-2 text-white placeholder:text-white/60 bg-white/10 backdrop-blur-sm
                       focus:outline-none focus:ring-2 focus:ring-[#74B3CE]/50 focus:border-[#74B3CE]/60
                       border-[#508991]/30`}
-										aria-invalid={!!errors.password}
-										aria-describedby={
-											errors.password
-												? 'password-error'
-												: undefined
-										}
-									/>
-									{errors.password && (
-										<p
-											id="password-error"
-											className="mt-1 text-sm text-red-400">
-											{errors.password}
-										</p>
-									)}
-								</div>
+											aria-invalid={!!errors.password}
+											aria-describedby={
+												errors.password
+													? 'password-error'
+													: undefined
+											}
+										/>
+										{errors.password && (
+											<p
+												id="password-error"
+												className="mt-1 text-sm text-red-400">
+												{errors.password}
+											</p>
+										)}
+									</div>
+								) : (
+									<>
+										{/* New Password */}
+										<div>
+											<label
+												htmlFor="newPassword"
+												className="mb-1 block text-sm font-medium text-[#D6F3F4] opacity-85">
+												New Password
+											</label>
+											<input
+												id="newPassword"
+												name="newPassword"
+												type="password"
+												value={formData.newPassword}
+												onChange={handleChange}
+												required
+												placeholder="New Password"
+												className={`w-full rounded-lg border px-3 py-2 text-white placeholder:text-white/60 bg-white/10 backdrop-blur-sm
+                      focus:outline-none focus:ring-2 focus:ring-[#74B3CE]/50 focus:border-[#74B3CE]/60
+                      border-[#508991]/30`}
+												aria-invalid={
+													!!errors.newPassword
+												}
+												aria-describedby={
+													errors.newPassword
+														? 'newPassword-error'
+														: undefined
+												}
+											/>
+											{errors.newPassword && (
+												<p
+													id="newPassword-error"
+													className="mt-1 text-sm text-red-400">
+													{errors.newPassword}
+												</p>
+											)}
+										</div>
+
+										{/* confirm password */}
+										<div>
+											<label
+												htmlFor="confirmPassword"
+												className="mb-1 block text-sm font-medium text-[#D6F3F4] opacity-85">
+												Confirm Password
+											</label>
+											<input
+												id="confirmPassword"
+												name="confirmPassword"
+												type="confirmPassword"
+												value={formData.confirmPassword}
+												onChange={handleChange}
+												required
+												placeholder="Confirm Password"
+												className={`w-full rounded-lg border px-3 py-2 text-white placeholder:text-white/60 bg-white/10 backdrop-blur-sm
+                      focus:outline-none focus:ring-2 focus:ring-[#74B3CE]/50 focus:border-[#74B3CE]/60
+                      border-[#508991]/30`}
+												aria-invalid={
+													!!errors.confirmPassword
+												}
+												aria-describedby={
+													errors.confirmPassword
+														? 'confirmPassword-error'
+														: undefined
+												}
+											/>
+											{errors.confirmPassword && (
+												<p
+													id="confirmPassword-error"
+													className="mt-1 text-sm text-red-400">
+													{errors.confirmPassword}
+												</p>
+											)}
+										</div>
+									</>
+								)}
+								{/* Password */}
 
 								{errors.submit && (
 									<p className="text-center text-sm text-red-400">
@@ -277,18 +403,15 @@ const Login = () => {
 										e.currentTarget.style.boxShadow =
 											'0 4px 12px rgba(0,67,70,0.18)';
 									}}>
-									{isSubmitting ? 'Signing In...' : 'Sign In'}
+									{isSubmitting
+										? mode === 'login'
+											? 'Signing In...'
+											: 'Updating...'
+										: mode === 'login'
+										? 'Sign In'
+										: 'Update Password'}
 								</button>
 							</form>
-
-							<div className="mt-4 text-center text-sm text-[#D6F3F4] opacity-80">
-								Don't have an account?{' '}
-								<a
-									href="/signup"
-									className="font-medium underline text-[#74B3CE]">
-									Sign up
-								</a>
-							</div>
 
 							{/* subtle footer / version */}
 							<div className="mt-6 text-center text-xs text-[#D6F3F4] opacity-60">

@@ -1,5 +1,6 @@
 import {
 	AlarmClock,
+	Building2,
 	CalendarCheck2,
 	CalendarPlus,
 	ClipboardList,
@@ -23,6 +24,7 @@ export type QuickAction = {
 	label: string;
 	icon: React.ReactNode;
 	onClick?: () => void;
+	link?: string;
 	variant?: 'default' | 'outline';
 };
 
@@ -33,19 +35,37 @@ export type QuickActionsConfig = Record<UserRole, QuickAction[]>;
 export const getQuickActionsConfig = async (): Promise<QuickActionsConfig> => {
 	return {
 		admin: [
-			{ label: 'Create User', icon: <UserPlus size={18} /> },
-			{ label: 'Add Doctor', icon: <UserCog size={18} /> },
-			{ label: 'Register Patient', icon: <UserPlus2 size={18} /> },
-			{ label: 'View Records', icon: <FolderOpenDot size={18} /> },
+			{
+				label: 'Add New User',
+				icon: <UserPlus size={18} />,
+				link: '/manage-users/all-users',
+			},
+			{
+				label: 'Manage Users',
+				icon: <UserCog size={18} />,
+				link: '/manage-users',
+			},
+			{
+				label: 'View Audit Logs',
+				icon: <UserPlus2 size={18} />,
+				link: '/reports/audit',
+			},
+			{
+				label: 'View Reports',
+				icon: <FolderOpenDot size={18} />,
+				link: '/reports',
+			},
 			{
 				label: 'System Settings',
 				icon: <Settings size={18} />,
 				variant: 'outline',
+				link: '/settings/general',
 			},
 			{
-				label: 'Manage Access',
-				icon: <ShieldCheck size={18} />,
+				label: 'Manage Departments',
+				icon: <Building2 size={18} />,
 				variant: 'outline',
+				link: '/manage-users/manage-departments',
 			},
 		],
 		doctor: [

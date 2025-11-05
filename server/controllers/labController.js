@@ -99,20 +99,8 @@ export const getAllLabRequests = async (req, res) => {
 				},
 			},
 		});
-		const formattedLabRequests = allLabRequests.map((labRequest) => ({
-			...labRequest,
-			doctorName: labRequest.doctor.user.name || null,
-			patientName: labRequest.patient.fullName || null,
-			requestedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			acceptedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			cancelledAt: labRequest.requestedAt.toISOString().split('T')[0],
-			validatedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			releasedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			createdAt: labRequest.requestedAt.toISOString().split('T')[0],
-			updatedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			doctor: undefined,
-		}));
-		res.status(200).json(formattedLabRequests);
+
+		res.status(200).json(allLabRequests);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
@@ -142,20 +130,8 @@ export const getSelectedPatientsLabTests = async (req, res) => {
 				},
 			},
 		});
-		const formattedLabRequests = allLabRequests.map((labRequest) => ({
-			...labRequest,
-			doctorName: labRequest.doctor.user.name || null,
-			patientName: labRequest.patient.fullName || null,
-			requestedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			acceptedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			cancelledAt: labRequest.requestedAt.toISOString().split('T')[0],
-			validatedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			releasedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			createdAt: labRequest.requestedAt.toISOString().split('T')[0],
-			updatedAt: labRequest.requestedAt.toISOString().split('T')[0],
-			doctor: undefined,
-		}));
-		res.status(200).json(formattedLabRequests);
+
+		res.status(200).json(allLabRequests);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}

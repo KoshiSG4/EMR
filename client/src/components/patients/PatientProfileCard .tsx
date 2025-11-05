@@ -31,11 +31,15 @@ import { Check, Edit3, X } from 'lucide-react';
 import { getAllDoctors } from '@/store/slices/doctorsSlice';
 import { Popover, PopoverTrigger } from '@radix-ui/react-popover';
 import { PopoverContent } from '../ui/popover';
+import { PatientWithUserData } from '@/types/patientWithUserDataType';
+import { FaUserCircle } from 'react-icons/fa';
+import patientFemale from '../../assets/female_patient.jpg';
+import patientMale from '../../assets/male_patient.jpg';
 
 interface EditPatientInfoDialogProps {
 	open: boolean;
-	selectedPatient: Patient | null;
-	onSave: (updated: Patient) => void;
+	selectedPatient: PatientWithUserData | null;
+	onSave: (updated: PatientWithUserData) => void;
 }
 
 const PatientProfileCard = ({
@@ -45,11 +49,11 @@ const PatientProfileCard = ({
 }: EditPatientInfoDialogProps) => {
 	if (!selectedPatient) return null;
 
-	const [formData, setFormData] = useState<Patient | null>(null);
+	const [formData, setFormData] = useState<PatientWithUserData | null>(null);
 	const [editMode, setEditMode] = useState<Record<string, boolean>>({});
 	const [showDoctorSuggestions, setShowDoctorSuggestions] = useState(false);
-	const activeTabId = useSelector(
-		(state: RootState) => state.patients.activeTabId
+	const { activeTabId, selectedPatientWithAllData } = useSelector(
+		(state: RootState) => state.patients
 	);
 	const doctors = useSelector((state: RootState) => state.doctors.doctors);
 	const dispatch = useDispatch<AppDispatch>();
@@ -99,16 +103,22 @@ const PatientProfileCard = ({
 						};
 					}
 
-					if (field === 'name' || field === 'email') {
+					if (field === 'name') {
 						return {
 							...prevForm,
-							user: {
-								...prevForm.user,
-								[field]:
-									selectedPatient.user[
-										field as 'name' | 'email'
-									],
-							},
+							fullName: selectedPatient.fullName,
+						};
+					}
+					if (field === 'email') {
+						return {
+							...prevForm,
+							email: selectedPatient.email,
+						};
+					}
+					if (field === 'bloodType') {
+						return {
+							...prevForm,
+							bloodType: selectedPatient.bloodType,
 						};
 					}
 
@@ -122,12 +132,12 @@ const PatientProfileCard = ({
 		});
 	};
 
-	const handleChange = <K extends keyof Patient>(
+	const handleChange = <K extends keyof PatientWithUserData>(
 		field: K,
 		value:
-			| Patient[K]
-			| (Patient[K] extends Array<infer U>
-					? (prev: Patient[K]) => Patient[K]
+			| PatientWithUserData[K]
+			| (PatientWithUserData[K] extends Array<infer U>
+					? (prev: PatientWithUserData[K]) => PatientWithUserData[K]
 					: never)
 	) => {
 		setFormData((prev) => {
@@ -136,7 +146,7 @@ const PatientProfileCard = ({
 			if (field === 'fullName' || field === 'email') {
 				return {
 					...prev,
-					user: { ...prev.user, [field]: value as string },
+					user: { ...prev, [field]: value as string },
 				};
 			}
 
@@ -145,9 +155,11 @@ const PatientProfileCard = ({
 			if (typeof value === 'function') {
 				return {
 					...prev,
-					[field]: (value as (prev: Patient[K]) => Patient[K])(
-						prevValue
-					),
+					[field]: (
+						value as (
+							prev: PatientWithUserData[K]
+						) => PatientWithUserData[K]
+					)(prevValue),
 				};
 			}
 
@@ -185,15 +197,33 @@ const PatientProfileCard = ({
 		<Card className="w-full max-w-3xl mx-auto shadow-sm rounded-xl">
 			<CardContent className="max-w-3xl p-6">
 				<CardHeader>
-					<CardTitle className="text-xl font-semibold">
-						Profile Information
+					<CardTitle className="text-xl font-semibold text-[#2C6A74]">
+						{selectedPatient?.fullName.split(' ')[0]}'s Profile
 					</CardTitle>
 				</CardHeader>
-
+				<div className="flex flex-col mb-8 items-center">
+					{selectedPatient?.gender === 'Female' ? (
+						<img
+							src={patientFemale}
+							alt="Profile"
+							className="w-28 h-28 rounded-full object-cover shadow-md"
+						/>
+					) : selectedPatient?.gender === 'Male' ? (
+						<img
+							src={patientMale}
+							alt="Profile"
+							className="w-28 h-28 rounded-full object-cover shadow-md"
+						/>
+					) : (
+						<FaUserCircle className="w-28 h-28 text-gray-400" />
+					)}
+				</div>
 				<CardContent className="grid grid-cols-2 gap-6 mt-4 text-sm">
+					{/* Profile Image */}
+
 					{/* Name */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">Name</Label>
+						<Label className="text-xs text-gray-400">Name</Label>
 						<div className="flex items-center justify-between gap-2">
 							{editMode['name'] ? (
 								<Input
@@ -229,7 +259,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() => toggleEdit('name')}>
 									<Edit3 size={16} />
 								</Button>
@@ -239,12 +269,12 @@ const PatientProfileCard = ({
 
 					{/* Email */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">Email</Label>
+						<Label className="text-xs text-gray-400">Email</Label>
 						<div className="flex items-center justify-between gap-2">
 							{editMode['email'] ? (
 								<Input
 									type="email"
-									value={formData.user.email}
+									value={formData.email}
 									onChange={(e) =>
 										handleChange('email', e.target.value)
 									}
@@ -252,7 +282,7 @@ const PatientProfileCard = ({
 								/>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.user.email}
+									{formData.email}
 								</p>
 							)}
 
@@ -278,7 +308,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() => toggleEdit('email')}>
 									<Edit3 size={16} />
 								</Button>
@@ -288,7 +318,7 @@ const PatientProfileCard = ({
 
 					{/* Date of Birth */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">
+						<Label className="text-xs text-gray-400">
 							Date of Birth
 						</Label>
 						<div className="flex items-center justify-between gap-2">
@@ -334,7 +364,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() => toggleEdit('dateOfBirth')}>
 									<Edit3 size={16} />
 								</Button>
@@ -344,7 +374,7 @@ const PatientProfileCard = ({
 
 					{/* Age */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">Age</Label>
+						<Label className="text-xs text-gray-400">Age</Label>
 						<div className="flex items-center justify-between gap-2">
 							<p className="flex-1 text-gray-900 font-serif">
 								{calculateAge(new Date(formData.dateOfBirth))}{' '}
@@ -353,9 +383,59 @@ const PatientProfileCard = ({
 						</div>
 					</div>
 
+					{/* Blood Type */}
+					<div className="flex flex-col gap-1">
+						<Label className="text-xs text-gray-400">
+							Blood Type
+						</Label>
+						<div className="flex items-center justify-between gap-2">
+							{editMode['name'] ? (
+								<Input
+									value={formData.bloodType}
+									onChange={(e) =>
+										handleChange('fullName', e.target.value)
+									}
+									className="flex-1"
+								/>
+							) : (
+								<p className="flex-1 text-gray-900 font-serif">
+									{formData.bloodType}
+								</p>
+							)}
+
+							{editMode['bloodType'] ? (
+								<div className="flex items-center gap-1">
+									<Button
+										size="icon"
+										className="h-8 w-8 bg-green-500 hover:bg-green-600 text-white"
+										onClick={() =>
+											handleSaveField('bloodType')
+										}>
+										<Check size={16} />
+									</Button>
+									<Button
+										size="icon"
+										variant="ghost"
+										className="h-8 w-8"
+										onClick={() => toggleEdit('bloodType')}>
+										<X size={16} />
+									</Button>
+								</div>
+							) : (
+								<Button
+									size="icon"
+									variant="ghost"
+									className="h-8 w-8 text-gray-400"
+									onClick={() => toggleEdit('bloodType')}>
+									<Edit3 size={16} />
+								</Button>
+							)}
+						</div>
+					</div>
+
 					{/* Gender */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">Gender</Label>
+						<Label className="text-xs text-gray-400">Gender</Label>
 						<div className="flex items-center justify-between gap-2">
 							{editMode['gender'] ? (
 								<Select
@@ -406,7 +486,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8  text-gray-500"
+									className="h-8 w-8  text-gray-400"
 									onClick={() => toggleEdit('gender')}>
 									<Edit3 size={16} />
 								</Button>
@@ -416,7 +496,7 @@ const PatientProfileCard = ({
 
 					{/* Contact No */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">
+						<Label className="text-xs text-gray-400">
 							Contact No
 						</Label>
 						<div className="flex items-center justify-between gap-2">
@@ -461,7 +541,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() => toggleEdit('phone')}>
 									<Edit3 size={16} />
 								</Button>
@@ -471,7 +551,7 @@ const PatientProfileCard = ({
 
 					{/* Emergency Contact No */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">
+						<Label className="text-xs text-gray-400">
 							Emergency Contact
 						</Label>
 						<div className="flex items-center justify-between gap-2">
@@ -521,7 +601,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() =>
 										toggleEdit('emergencyContact')
 									}>
@@ -533,7 +613,7 @@ const PatientProfileCard = ({
 
 					{/* Address */}
 					<div className="flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">Address</Label>
+						<Label className="text-xs text-gray-400">Address</Label>
 						<div className="flex items-center justify-between gap-2">
 							{editMode['address'] ? (
 								<Input
@@ -572,17 +652,17 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() => toggleEdit('address')}>
 									<Edit3 size={16} />
 								</Button>
 							)}
 						</div>
 					</div>
-
+					<div className=" flex flex-col gap-1"></div>
 					{/* Doctor */}
 					<div className=" flex flex-col gap-1">
-						<Label className="text-xs text-gray-500">Doctors</Label>
+						<Label className="text-xs text-gray-400">Doctors</Label>
 
 						<div className="flex flex-col gap-2 flex-1">
 							{/* Assigned doctors list */}
@@ -595,7 +675,7 @@ const PatientProfileCard = ({
 											<span className="font-medium">
 												{d.user.name}
 											</span>
-											<span className="ml-2 text-xs text-gray-500">
+											<span className="ml-2 text-xs text-gray-400">
 												({d.specialization})
 											</span>
 
@@ -668,7 +748,7 @@ const PatientProfileCard = ({
 														<p className="text-gray-900 font-serif">
 															{doc.user.name}
 														</p>
-														<p className="text-xs text-gray-500 font-serif">
+														<p className="text-xs text-gray-400 font-serif">
 															{doc.specialization}
 														</p>
 													</div>
@@ -715,7 +795,7 @@ const PatientProfileCard = ({
 								<Button
 									size="icon"
 									variant="ghost"
-									className="h-8 w-8 text-gray-500"
+									className="h-8 w-8 text-gray-400"
 									onClick={() => toggleEdit('doctor')}>
 									<Edit3 size={16} />
 								</Button>
@@ -725,7 +805,7 @@ const PatientProfileCard = ({
 
 					{/* Diagnosis */}
 					<div className=" flex flex-col h-fit gap-1">
-						<Label className="text-xs text-gray-500">
+						<Label className="text-xs text-gray-400">
 							Diagnosis
 						</Label>
 
@@ -758,7 +838,7 @@ const PatientProfileCard = ({
 						<PopoverTrigger>
 							<div
 								role="button"
-								className=" w-50 cursor-pointer rounded-md px-3 py-2 text-center text-sm text-gray-500 shadow-sm transition-colors  border hover:bg-red-50 hover:text-red-700 focus:outline-dashed focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+								className=" w-50 cursor-pointer rounded-md px-3 py-2 text-center text-sm text-gray-400 shadow-sm transition-colors  border hover:bg-red-50 hover:text-red-700 focus:outline-dashed focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
 								Deactivate
 							</div>
 						</PopoverTrigger>

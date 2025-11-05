@@ -38,23 +38,35 @@ export const getSummaryStatsConfig = (
 	switch (role) {
 		case 'admin':
 			return [
-				{ label: 'Doctors', value: doctors, icon: FaUserDoctor },
 				{
 					label: 'Patients',
 					value: patients,
 					icon: FaUserInjured,
 					link: '/patients',
 				},
-				{ label: 'Nurses', value: nurses, icon: FaUserNurse },
+				{
+					label: 'Doctors',
+					value: doctors,
+					icon: FaUserDoctor,
+					link: '/manage-users/doctors',
+				},
+				{
+					label: 'Nurses',
+					value: nurses,
+					icon: FaUserNurse,
+					link: '/manage-users/nurses',
+				},
 				{
 					label: 'Appointments',
 					value: appointments,
 					icon: FaCalendarCheck,
+					link: '/appointments',
 				},
 				{
 					label: 'Prescriptions',
 					value: prescriptions,
 					icon: FaFilePrescription,
+					link: '/medications/prescriptions',
 				},
 			];
 

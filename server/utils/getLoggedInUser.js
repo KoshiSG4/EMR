@@ -19,6 +19,6 @@ export const getLoggedInUser = async (req, res) => {
 		return res.status(200).json(user);
 	} catch (err) {
 		console.error(err);
-		res.status(500).json({ messag: 'Internal Server Error' });
+		res.status(500).json({ message: 'Internal Server Error' });
 	}
 };

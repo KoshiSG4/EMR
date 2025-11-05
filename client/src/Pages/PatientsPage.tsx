@@ -1,30 +1,34 @@
 import {
 	getAllPatients,
+	getSelectedPatientData,
 	openPatientTabs,
 	registerNewPatient,
+	setPatients,
 	setSelectedPatient,
 } from '@/store/slices/patientSlice';
 import { AppDispatch, RootState } from '@/store/store';
 import { Patient } from '@/types/patientTypes';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import DataTable from '../common/DataTable';
+import DataTable from '../components/common/DataTable';
 import { useNavigate } from 'react-router-dom';
-import { patientColumns } from './patientColumns';
+import { patientColumns } from '../components/patients/patientColumns';
+import { selectPatientsWithUserData } from '../components/patients/patientSelecter';
+import { PatientWithUserData } from '@/types/patientWithUserDataType';
 
 const PatientsPage = () => {
-	const allPatientsList = useSelector(
-		(state: RootState) => state.patients.patients
+	const { patients, loading } = useSelector(
+		(state: RootState) => state.patients
 	);
+	const patientsWithUserData = useSelector(selectPatientsWithUserData);
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 	const [isFormOpen, setIsFormOpen] = useState(false);
-	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (!allPatientsList || allPatientsList.length === 0) {
-			setLoading(true);
-			dispatch(getAllPatients({ patients: allPatientsList }));
+		if (!patientsWithUserData || patientsWithUserData.length <= 0) {
+			dispatch(getAllPatients({ patients: patients }));
+			dispatch(setPatients(patients));
 		}
 	}, [dispatch]);
 
@@ -45,23 +49,24 @@ const PatientsPage = () => {
 		return age;
 	};
 
-	const patientsData = allPatientsList.map((patient) => {
-		return {
-			userId: patient.userId ?? '',
-			name: patient.fullName ?? '',
-			gender: patient.gender ?? '',
-			age: calculateAge(new Date(patient.dateOfBirth)) ?? '',
-			dateOfBirth:
-				new Date(patient.dateOfBirth).toISOString().split('T')[0] ?? '',
-			email: patient.user?.email ?? '',
-			emergencyContact: patient.emergencyContact ?? '',
-			contactNo: patient.phone ?? '',
-		};
-	});
+	const patientsData = patientsWithUserData.map(
+		(patient: PatientWithUserData) => {
+			return {
+				userId: patient.userId ?? '',
+				name: patient.fullName ?? '',
+				emergencyContact: patient.emergencyContact ?? '',
+				gender: patient.gender ?? '',
+				age: calculateAge(new Date(patient.dateOfBirth)) ?? '',
+				dateOfBirth: patient.dateOfBirth ?? '',
+				email: patient.email ?? '',
+				contactNo: patient.phone ?? '',
+			};
+		}
+	);
 
 	const handleSelectPatient = (rowData: (typeof patientsData)[number]) => {
-		const selectedPatient = allPatientsList.find(
-			(patient) => patient.userId === rowData.userId
+		const selectedPatient = patientsWithUserData.find(
+			(patient: PatientWithUserData) => patient.userId === rowData?.userId
 		);
 		if (selectedPatient) {
 			dispatch(setSelectedPatient(selectedPatient));
@@ -73,6 +78,7 @@ const PatientsPage = () => {
 					},
 				})
 			);
+			dispatch(getSelectedPatientData({ patientId: selectedPatient.id }));
 
 			navigate(`/patients/${selectedPatient.userId}/profile`);
 		}

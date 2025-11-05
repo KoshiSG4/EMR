@@ -46,6 +46,8 @@ interface TableFilter<TData> {
 	type?: 'text' | 'select';
 	placeholder?: string;
 	options?: string[];
+	value?: string;
+	onChange?: (val: string) => void;
 	className?: string;
 }
 interface DataTableProps<TData, TValue> {
@@ -91,7 +93,9 @@ const DataTable = <TData extends object, TValue>({
 
 					if (filter.type === 'select' && filter.options) {
 						const currentValue =
-							(column.getFilterValue() as string) ?? '';
+							(column.getFilterValue() as string) ??
+							filter.value ??
+							'';
 
 						return (
 							<DropdownMenu key={String(filter.columnId)}>
@@ -100,8 +104,8 @@ const DataTable = <TData extends object, TValue>({
 										variant="outline"
 										className={cn(
 											'flex items-center justify-between gap-2 px-3 py-1.5',
-											'rounded-md border border-gray-300 bg-white text-gray-700 shadow-sm',
-											'hover:bg-sky-50 hover:text-sky-800 hover:border-sky-400',
+											'rounded-md border bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120]  shadow-sm',
+											'hover:bg-[#c5ab19] ',
 											'focus-visible:outline-none focus-visible:ring-0 transition-all'
 										)}>
 										{currentValue || 'All'}
@@ -111,17 +115,17 @@ const DataTable = <TData extends object, TValue>({
 
 								<DropdownMenuContent
 									align="start"
-									className="z-50 w-44 rounded-lg border border-gray-200 bg-white shadow-lg">
+									className="z-50 w-44 rounded-lg border border-gray-200 bg-[#D4DEE1]  shadow-lg">
 									<DropdownMenuItem
 										onClick={() =>
 											column.setFilterValue('')
 										}
 										className={cn(
 											'cursor-pointer px-3 py-2 text-sm select-none',
-											'hover:bg-sky-50 hover:text-sky-800 transition-colors',
+											'hover:bg-[#c1cacc] hover:text-sky-800 transition-colors',
 											'focus:outline-none focus:ring-0 focus-visible:ring-0 data-[highlighted]:outline-none data-[highlighted]:ring-0',
 											currentValue === '' &&
-												'bg-sky-100 text-sky-800 font-medium'
+												'bg-[#949b9c] text-sky-800 font-medium'
 										)}>
 										All
 									</DropdownMenuItem>
@@ -133,11 +137,11 @@ const DataTable = <TData extends object, TValue>({
 												column.setFilterValue(opt)
 											}
 											className={cn(
-												'cursor-pointer px-3 py-2 text-sm select-none',
-												'hover:bg-sky-50 hover:text-sky-800 transition-colors',
+												'cursor-pointer px-3 py-2 text-sm select-none border-[1px]',
+												'hover:bg-[#c1cacc] hover:text-sky-800 transition-colors',
 												'focus:outline-none focus:ring-0 focus-visible:ring-0 data-[highlighted]:outline-none data-[highlighted]:ring-0',
 												currentValue === opt &&
-													'bg-sky-100 text-sky-800 font-medium'
+													'bg-[#c1cacc] text-sky-800 font-medium '
 											)}>
 											{opt}
 										</DropdownMenuItem>

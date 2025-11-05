@@ -4,10 +4,13 @@ import { User } from '@/types/userTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/store/store';
 import { resetUser, setLoggedInUser } from '@/store/slices/userSlice';
+import { LoaderIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AuthContextType {
 	user: User | null;
-	login: (email: string, password: string) => Promise<void>;
+	login: (email: string, password: string) => Promise<User>;
+	changePassword: (email: string, password: string) => Promise<void>;
 	signUp: (email: string, password: string, name?: string) => Promise<void>;
 	signOut: () => Promise<void>;
 	isLoading: boolean;
@@ -38,6 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				dispatch(setLoggedInUser(resp.data.user));
 			} catch {
 				dispatch(resetUser());
+				dispatch({ type: 'auth/logout' });
 				signOut();
 			} finally {
 				setAuthChecked(true);
@@ -54,9 +58,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				{ email, password },
 				{ withCredentials: true }
 			);
+
 			dispatch(setLoggedInUser(response.data.user));
+			return response.data.user;
 		} catch (error: any) {
 			const errorMsg = error.response?.data?.message || 'Login failed';
+			console.log(errorMsg);
+			throw new Error(errorMsg);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+	const changePassword = async (email: string, password: string) => {
+		try {
+			const response = await api.post(
+				'/auth/change-password',
+				{ email, password },
+				{ withCredentials: true }
+			);
+
+			dispatch(setLoggedInUser(response.data.user));
+		} catch (error: any) {
+			const errorMsg =
+				error.response?.data?.message || 'Password Change failed';
 			console.log(errorMsg);
 			throw new Error(errorMsg);
 		} finally {
@@ -86,6 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	const signOut = async () => {
 		dispatch(resetUser());
+		dispatch({ type: 'auth/logout' });
 		const response = await api.post('/auth/logout', {
 			withCredentials: true,
 		});
@@ -94,14 +119,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	if (!authChecked) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-purple-50/30">
-				<div className="text-purple-600">Loading...</div>
+				<div className="text-purple-600 pr-3">Loading...</div>
+				<LoaderIcon
+					role="status"
+					aria-label="Loading"
+					className={cn('size-4 animate-spin')}
+				/>
 			</div>
 		);
 	}
 
 	return (
 		<AuthContext.Provider
-			value={{ user, login, signUp, signOut, isLoading }}>
+			value={{ user, login, changePassword, signUp, signOut, isLoading }}>
 			{children}
 		</AuthContext.Provider>
 	);

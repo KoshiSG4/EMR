@@ -12,11 +12,12 @@ datasource db {
 
 // Main user table (base model for all roles)
 model User {
-  id            String   @id @default(uuid())
-  name          String
-  email         String   @unique
-  passwordHash  String
-  role          Role
+  id                  String   @id @default(uuid())
+  name                String
+  email               String   @unique
+  passwordHash        String
+  mustChangePassword  Boolean  @default(true)
+  role             Role
   dateOfBirth      String
   gender           String
   phone            String

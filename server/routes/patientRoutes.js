@@ -42,6 +42,7 @@ patientRouter.get(
 	withRole(['ADMIN', 'DOCTOR']),
 	patientController.getPatientMedications
 );
+
 patientRouter.delete(
 	'/:id/delete',
 	authenticateToken,

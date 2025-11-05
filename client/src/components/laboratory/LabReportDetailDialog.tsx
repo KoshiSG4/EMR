@@ -73,7 +73,7 @@ const LabReportDetailDialog = ({
 						<p className="font-medium text-gray-600">
 							Requested By
 						</p>
-						<p>{labReport.doctorName || 'N/A'}</p>
+						<p>{labReport.doctorName?.user.name || 'N/A'}</p>
 					</div>
 
 					{/* Requested At */}

@@ -2,14 +2,8 @@ import { useState } from 'react';
 import { FaEdit, FaUserCircle } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-import adminMale from '../../../assets/male_admin.jpg';
-import nurseMale from '../../../assets/male_nurse.jpg';
-import doctorMale from '../../../assets/male_doctor.png';
-import patientMale from '../../../assets/male_patient.jpg';
-import adminFemale from '../../../assets/female_admin.jpg';
-import nurseFemale from '../../../assets/female_nurse.jpg';
-import doctorFemale from '../../../assets/female_doctor.jpg';
-import patientFemale from '../../../assets/female_patient.jpg';
+import { useNavigate } from 'react-router-dom';
+import UserProfImage from '@/components/common/UserProfImage';
 
 interface UserProfileCardProps {
 	userRole: string;
@@ -18,25 +12,7 @@ interface UserProfileCardProps {
 const UserProfileCard = ({ userRole }: UserProfileCardProps) => {
 	const [hover, setHover] = useState(false);
 	const user = useSelector((state: RootState) => state.user.loggedInUser);
-
-	let image = user?.profileImage;
-	if (user?.role == 'ADMIN' && user.gender == 'Male') {
-		image = adminMale;
-	} else if (user?.role == 'ADMIN' && user.gender == 'Female') {
-		image = adminFemale;
-	} else if (user?.role == 'NURSE' && user.gender == 'Female') {
-		image = nurseFemale;
-	} else if (user?.role == 'NURSE' && user.gender == 'Male') {
-		image = nurseMale;
-	} else if (user?.role == 'DOCTOR' && user.gender == 'Male') {
-		image = doctorMale;
-	} else if (user?.role == 'DOCTOR' && user.gender == 'Female') {
-		image = doctorFemale;
-	} else if (user?.role == 'PATIENT' && user.gender == 'Female') {
-		image = patientFemale;
-	} else if (user?.role == 'PATIENT' && user.gender == 'Male') {
-		image = patientMale;
-	}
+	const navigate = useNavigate();
 
 	return (
 		<div className="bg-white shadow-md rounded-2xl max-w-md w-full border border-gray-200">
@@ -48,6 +24,7 @@ const UserProfileCard = ({ userRole }: UserProfileCardProps) => {
 				<button
 					onMouseEnter={() => setHover(true)}
 					onMouseLeave={() => setHover(false)}
+					onClick={() => navigate(`/myAccount`)}
 					className="text-[#c5ab19] hover:text-[#D6F3F6] transition-colors">
 					<FaEdit size={20} />
 				</button>
@@ -56,10 +33,11 @@ const UserProfileCard = ({ userRole }: UserProfileCardProps) => {
 			{/* Profile Image */}
 			<div className="flex flex-col items-center">
 				{user?.profileImage ? (
-					<img
-						src={image}
-						alt="Profile"
-						className="w-28 h-28 rounded-full object-cover shadow-md"
+					<UserProfImage
+						width="w-28"
+						height="h-28"
+						gender={user.gender}
+						role={user.role}
 					/>
 				) : (
 					<FaUserCircle className="w-28 h-28 text-gray-400" />

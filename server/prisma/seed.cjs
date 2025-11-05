@@ -219,7 +219,7 @@ async function main() {
 			bloodType: 'B+',
 			profileImage:
 				'https://drive.google.com/file/d/1suI42zPonNMHB27QQOczOIpROqX74t3r/view?usp=drive_link',
-			shift: '09:00 - 17:00',
+			shift: '09:00AM - 05:00PM',
 			onCall: 'No',
 			department: 'Pediatrics',
 		},

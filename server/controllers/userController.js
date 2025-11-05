@@ -1,39 +1,31 @@
 import express from 'express';
 import { PrismaClient, Role } from '../generated/prisma/client.js';
 import { getLoggedInUser } from '../utils/getLoggedInUser.js';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-//Create User Profile (only if user is a SUPER ADMIN)
+function generateTempPassword() {
+	const chars =
+		'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!';
+	return Array.from(
+		{ length: 10 },
+		() => chars[Math.floor(Math.random() * chars.length)]
+	).join('');
+}
+
+//Create User Profile (only if user is an ADMIN)
 export const createUser = async (req, res) => {
 	try {
-		const admin = await getLoggedInUser(req);
+		const user = await getLoggedInUser(req);
 
-		if (admin.role !== 'ADMIN') {
+		if (user.role !== 'ADMIN') {
 			return res
 				.status(404)
 				.json({ message: 'Forbidden: Only admins can create users' });
 		}
 
-		const { name, email, password, role } = req.body;
-
-		//Auth to Keycloak as service account
-		await authenticateKcAdmin();
-
-		//Create a new user in Keycloak
-		const keycloakUser = await kcAdminClient.users.create({
-			realm: kcAdminClient.realmName,
-			username: email,
-			email,
-			enabled: true,
-			credentials: [
-				{
-					type: 'password',
-					value: password,
-					temporary: false,
-				},
-			],
-		});
+		const { name, email, role } = req.body;
 
 		//Check if user exist in DB
 		const existingUser = await prisma.user.findUnique({
@@ -44,39 +36,40 @@ export const createUser = async (req, res) => {
 			return res.status(400).json({ message: 'Email already in use' });
 		}
 
-		//Assign realm role
-		const allRoles = await kcAdminClient.roles.find();
-		const selectedRole = allRoles.find((r) => r.name === role);
-
-		if (!selectedRole) {
-			return res
-				.status(400)
-				.json({ message: `Role ${role} not found in Keycloak` });
-		}
-
-		await kcAdminClient.users.addRealmRoleMappings({
-			id: keycloakUser.id,
-			realm: kcAdminClient.realmName,
-			roles: [{ id: selectedRole.id, name: selectedRole.name }],
-		});
+		const tempPassword = generateTempPassword();
+		const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
 		//sync to prisma db
 		const newUser = await prisma.user.create({
 			data: {
 				name,
 				email,
-				role: role.toUpperCase(),
+				role,
+				dateOfBirth,
+				gender,
+				phone,
+				address,
+				bloodType,
+				shift,
+				passwordHash: hashedPassword,
+				mustChangePassword: true,
 			},
 		});
 
 		res.status(201).json({
 			message: 'User profile created successfully',
-			user: newUser,
+			user: {
+				id: newUser.id,
+				name: newUser.name,
+				email: newUser.email,
+				role: newUser.role,
+				tempPassword,
+			},
 		});
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({
-			message: 'Failed to create admin profile',
+			message: 'Failed to create user profile',
 			error: error.message,
 		});
 	}

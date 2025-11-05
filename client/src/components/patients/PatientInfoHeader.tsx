@@ -1,7 +1,7 @@
-import { Patient } from '@/types/patientTypes';
+import { PatientWithUserData } from '@/types/patientWithUserDataType';
 
 interface PatientInfoHeaderProps {
-	selectedPatient: Patient;
+	selectedPatient: PatientWithUserData;
 }
 
 const calculateAge = (dob: Date) => {
@@ -17,7 +17,7 @@ const calculateAge = (dob: Date) => {
 
 const PatientInfoHeader = ({ selectedPatient }: PatientInfoHeaderProps) => {
 	return (
-		<div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-2">
+		<div className="bg-[#B9D8E1] p-4 rounded-xl border border-gray-200 shadow-sm mb-2">
 			{/* Name & Gender */}
 			<h2 className="text-lg font-semibold text-gray-800">
 				{selectedPatient.fullName}

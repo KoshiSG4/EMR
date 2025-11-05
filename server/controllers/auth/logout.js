@@ -3,14 +3,14 @@ import { hashToken } from '../../utils/tokenUtils.js';
 const prisma = new PrismaClient();
 
 const COOKIE_CLEAR_OPTS = {
-	httpOnly: true,
-	sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-	secure: process.env.NODE_ENV === 'production',
-	maxAge: 0,
 	// httpOnly: true,
-	// sameSite: 'none',
-	// secure: true,
+	// sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+	// secure: process.env.NODE_ENV === 'production',
 	// maxAge: 0,
+	httpOnly: true,
+	sameSite: 'none',
+	secure: true,
+	maxAge: 0,
 };
 
 export const logout = async (req, res) => {

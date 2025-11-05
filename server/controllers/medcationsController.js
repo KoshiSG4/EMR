@@ -66,22 +66,8 @@ export const getAllMedications = async (req, res) => {
 				name: 'asc',
 			},
 		});
-		const formattedMeds = allMeds.map((med) => ({
-			...med,
-			orderDate: med.orderDate
-				? med.orderDate.toISOString().split('T')[0]
-				: null,
-			arrivalDate: med.arrivalDate
-				? med.arrivalDate.toISOString().split('T')[0]
-				: null,
-			expiryDate: med.expiryDate
-				? med.expiryDate.toISOString().split('T')[0]
-				: null,
-			createdAt: med.createdAt.toISOString().split('T')[0],
-			updatedAt: med.updatedAt.toISOString().split('T')[0],
-		}));
 
-		res.status(200).json(formattedMeds);
+		res.status(200).json(allMeds);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}

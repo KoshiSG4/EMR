@@ -29,6 +29,16 @@ export const getAllUsers = createAsyncThunk<User[]>(
 		return response.data;
 	}
 );
+export const addNewUser = createAsyncThunk<User, { user: User }>(
+	'users/create',
+	async ({ user }) => {
+		const response = await api.post('admins/create', {
+			params: { user },
+			withCredentials: true,
+		});
+		return response.data;
+	}
+);
 
 export const getLoggedInUser = createAsyncThunk<User>('user/me', async () => {
 	const response = await api.get('auth/me', { withCredentials: true });
@@ -44,6 +54,12 @@ const userSlice = createSlice({
 		},
 		setUsers: (state, action: PayloadAction<User[]>) => {
 			state.users = action.payload;
+		},
+		setSelectedUser: (state, action: PayloadAction<User>) => {
+			state.selectedUser = action.payload;
+		},
+		clearSelectedUser: (state) => {
+			state.selectedUser = null;
 		},
 		setLoggedInUser: (state, action: PayloadAction<User>) => {
 			state.loggedInUser = action.payload;
@@ -67,10 +83,32 @@ const userSlice = createSlice({
 				state.loading = false;
 				state.error =
 					action.error.message || 'Failed to search doctors';
+			})
+			.addCase(addNewUser.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(
+				addNewUser.fulfilled,
+				(state, action: PayloadAction<User>) => {
+					state.loading = false;
+					state.users.push(action.payload);
+				}
+			)
+			.addCase(addNewUser.rejected, (state, action) => {
+				state.loading = false;
+				state.error =
+					action.error.message || 'Failed to search doctors';
 			});
 	},
 });
 
-export const { clearResults, setUsers, setLoggedInUser, resetUser } =
-	userSlice.actions;
+export const {
+	clearResults,
+	setUsers,
+	setSelectedUser,
+	clearSelectedUser,
+	setLoggedInUser,
+	resetUser,
+} = userSlice.actions;
 export default userSlice.reducer;

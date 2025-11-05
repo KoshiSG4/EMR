@@ -20,13 +20,14 @@ import HistoryPage from '../medicalRecords/historyRecs/HistoryPage';
 import ClinicalRecordsPage from '../medicalRecords/clinical/enterClinicalDetails/ClinicalRecordsPage';
 import PastVisitsPage from '../medicalRecords/clinical/pastVisits/PastVisitsPage';
 import ReferralsPage from '../medicalRecords/clinical/referrals/ReferralsPage';
-import LabPage from '../laboratory/LabPage';
+import LabPage from '../../Pages/LabPage';
 import PrescriptionPage from '../medicalRecords/clinical/prescription/PrescriptionPage';
 import PatientMedications from '../medicalRecords/clinical/patientMedication/PatientMedications';
 import PatientProfileCard from './PatientProfileCard ';
+import { PatientWithUserData } from '@/types/patientWithUserDataType';
 
 interface SelectedPatientContentProps {
-	patient: Patient;
+	patient: PatientWithUserData;
 }
 
 const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
@@ -46,7 +47,7 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 
 		try {
 			if (subTab === 'profile') {
-				const handleOnSave = (updated: Patient) => {
+				const handleOnSave = (updated: PatientWithUserData) => {
 					dispatch(
 						updatePatientInfo({
 							patientId: updated.userId,

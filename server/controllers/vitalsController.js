@@ -69,10 +69,10 @@ export const getSelectedVitalsRecords = async (req, res) => {
 	try {
 		const vitalsRecords = await prisma.vitalsRecord.findMany({
 			where: { patientId: id },
-			include: {
-				medicalRecords: true,
-				clinicalDetails: true,
-			},
+			// include: {
+			// 	medicalRecords: true,
+			// 	clinicalDetails: true,
+			// },
 		});
 
 		if (vitalsRecords.length === 0) {

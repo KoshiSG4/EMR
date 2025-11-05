@@ -5,7 +5,8 @@ import RecentActivityList from '../shared/RecentActivityList';
 import SystemHealthStatus from '../admin/SystemHealthStatus';
 import OverviewCharts from '../shared/OverviewCharts';
 import WelcomeCard from '../shared/WelcomeCard';
-import UserProfileCard from '../shared/UserProfileCard';
+import UserProfileCard from '../shared/MyProfileCard';
+import UserCalendarCard from '../shared/CalendarCard';
 
 type RoleDashboardWidgets = {
 	welcomeCard?: ReactNode;
@@ -22,6 +23,7 @@ export const dashBoardWidgets = (userRole: string): RoleDashboardWidgets => ({
 	],
 	rightColumn: [
 		<UserProfileCard userRole={userRole} />,
+		<UserCalendarCard userRole={userRole} />,
 		<RecentActivityList userRole={userRole} />,
 		<SystemHealthStatus />,
 	],

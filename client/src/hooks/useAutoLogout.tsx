@@ -8,7 +8,6 @@ import { resetUser } from '@/store/slices/userSlice';
 const AUTO_LOGOUT_MINUTES = 10; //10 minutes
 
 export const useAutoLogout = () => {
-	console.log('auto log out');
 	const { signOut } = useAuth();
 	const navigate = useNavigate();
 	const timerRef = useRef<NodeJS.Timeout | null>(null);

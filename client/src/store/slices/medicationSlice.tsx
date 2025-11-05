@@ -41,7 +41,17 @@ export const getMedicationInventory = createAsyncThunk<
 	const response = await api.get('medications/getAll', {
 		params: { medications },
 	});
-	return response.data;
+
+	const formattedData = response.data.map((item: MedicationInventory) => ({
+		...item,
+		orderDate: item.orderDate ? item.orderDate.split('T')[0] : null,
+		arrivalDate: item.arrivalDate ? item.arrivalDate.split('T')[0] : null,
+		expiryDate: item.expiryDate ? item.expiryDate.split('T')[0] : null,
+		createdAt: item.createdAt ? item.createdAt.split('T')[0] : null,
+		updatedAt: item.updatedAt ? item.updatedAt.split('T')[0] : null,
+	}));
+
+	return formattedData;
 });
 
 export const updateMedicationInventory = createAsyncThunk<

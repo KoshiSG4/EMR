@@ -2,15 +2,17 @@ import { PatientMedication } from '@/types/patientMedicationTypes';
 import api from '../../api/axiosInstance';
 import { Patient } from '../../types/patientTypes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PatientWithUserData } from '@/types/patientWithUserDataType';
 
 export interface PatientTab {
 	id: string;
-	patient: Patient;
+	patient: PatientWithUserData;
 }
 
 interface PatientsState {
 	patients: Patient[];
-	selectedPatient: Patient | null;
+	selectedPatient: PatientWithUserData | null;
+	selectedPatientWithAllData: PatientWithUserData | null;
 	patientMedication: PatientMedication[];
 	openTabs: PatientTab[];
 	activeTabId: string | null;
@@ -22,6 +24,7 @@ interface PatientsState {
 const initialState: PatientsState = {
 	patients: [],
 	selectedPatient: null,
+	selectedPatientWithAllData: null,
 	patientMedication: [],
 	openTabs: [],
 	activeTabId: null,
@@ -50,7 +53,23 @@ export const getAllPatients = createAsyncThunk<
 	const response = await api.get('patients/getAll', {
 		params: { patients },
 	});
+	return response.data;
+});
+
+export const getSelectedPatientData = createAsyncThunk<
+	PatientWithUserData,
+	{ patientId: string }
+>('patients/getPatientData', async ({ patientId }) => {
+	const response = await api.get(`patients/${patientId}`);
 	console.log(response.data);
+	return response.data;
+});
+
+export const getSelectedPatientsMeds = createAsyncThunk<
+	PatientMedication[],
+	{ patientId: string }
+>('patients/getPatientMeds', async ({ patientId }) => {
+	const response = await api.get(`patients/${patientId}/medications`);
 	return response.data;
 });
 
@@ -80,7 +99,6 @@ export const updatePatientInfo = createAsyncThunk<
 	{ patientId: string; patient: Patient }
 >('patients/update', async ({ patientId, patient }) => {
 	const response = await api.put(`patients/${patientId}/update`, patient);
-	console.log(response.data);
 	return response.data;
 });
 
@@ -89,7 +107,6 @@ export const deactivatePatientFromDB = createAsyncThunk<
 	{ patientId: string }
 >('patients/delete', async ({ patientId }) => {
 	const response = await api.delete(`patients/${patientId}/delete`);
-	console.log(response.data);
 	return response.data;
 });
 
@@ -103,9 +120,15 @@ const patientSlice = createSlice({
 		setPatients: (state, action: PayloadAction<Patient[]>) => {
 			state.patients = action.payload;
 		},
-		setSelectedPatient: (state, action: PayloadAction<Patient>) => {
+		setSelectedPatient: (
+			state,
+			action: PayloadAction<PatientWithUserData>
+		) => {
 			state.selectedPatient = action.payload;
 			console.log(state.selectedPatient);
+		},
+		clearSelectedPatient: (state) => {
+			state.selectedPatient = null;
 		},
 		openPatientTabs: (
 			state,
@@ -138,7 +161,7 @@ const patientSlice = createSlice({
 			state,
 			action: PayloadAction<{
 				patientId: string;
-				patient: Patient;
+				patient: PatientWithUserData;
 			}>
 		) {
 			const { patientId, patient } = action.payload;
@@ -181,15 +204,12 @@ const patientSlice = createSlice({
 			const patient = state.patients.find(
 				(p) => p.userId === action.payload.patientId
 			);
-			console.log('patient', patient);
 			if (patient) {
-				patient.patientMedication.push(action.payload.medication);
+				patient.patientMedication?.push(action.payload.medication);
 
 				if (state.selectedPatient?.userId === patient.userId) {
-					state.selectedPatient = {
-						...patient,
-						patientMedication: patient.patientMedication,
-					};
+					state.selectedPatient.patientMedication =
+						patient.patientMedication;
 				}
 			}
 		},
@@ -204,14 +224,15 @@ const patientSlice = createSlice({
 				(p) => p.userId === action.payload.patientId
 			);
 			if (patient) {
-				const index = patient.patientMedication.findIndex(
+				const index = patient.patientMedication?.findIndex(
 					(m) => m.id === action.payload.medication.id
 				);
-				if (index > -1) {
+				if (index && index > -1 && patient.patientMedication) {
 					patient.patientMedication[index] =
 						action.payload.medication;
 					if (state.selectedPatient?.userId === patient.userId) {
-						state.selectedPatient = { ...patient };
+						state.selectedPatient.patientMedication =
+							patient.patientMedication;
 					}
 				}
 			}
@@ -224,11 +245,12 @@ const patientSlice = createSlice({
 				(p) => p.userId === action.payload.patientId
 			);
 			if (patient) {
-				patient.patientMedication = patient.patientMedication.filter(
+				patient.patientMedication = patient.patientMedication?.filter(
 					(m) => m.id !== action.payload.medicationId
 				);
 				if (state.selectedPatient?.userId === patient.userId) {
-					state.selectedPatient = { ...patient };
+					state.selectedPatient.patientMedication =
+						patient.patientMedication;
 				}
 			}
 		},
@@ -262,13 +284,44 @@ const patientSlice = createSlice({
 				(state, action: PayloadAction<Patient[]>) => {
 					state.loading = false;
 					state.patients = action.payload;
-					const query = (action as any).meta.arg as string;
 				}
 			)
 			.addCase(getAllPatients.rejected, (state, action) => {
 				state.loading = false;
 				state.error =
 					action.error.message || 'Failed to fetch patients';
+			})
+			.addCase(getSelectedPatientData.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(
+				getSelectedPatientData.fulfilled,
+				(state, action: PayloadAction<PatientWithUserData>) => {
+					state.loading = false;
+					state.selectedPatientWithAllData = action.payload;
+				}
+			)
+			.addCase(getSelectedPatientData.rejected, (state, action) => {
+				state.loading = false;
+				state.error =
+					action.error.message || `Failed to fetch patient's data`;
+			})
+			.addCase(getSelectedPatientsMeds.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(
+				getSelectedPatientsMeds.fulfilled,
+				(state, action: PayloadAction<PatientMedication[]>) => {
+					state.loading = false;
+					state.patientMedication = action.payload;
+				}
+			)
+			.addCase(getSelectedPatientsMeds.rejected, (state, action) => {
+				state.loading = false;
+				state.error =
+					action.error.message || `Failed to fetch patient's meds`;
 			})
 			.addCase(registerNewPatient.pending, (state) => {
 				state.loading = true;
@@ -292,7 +345,7 @@ const patientSlice = createSlice({
 					(p) => p.userId === patientId
 				);
 				if (patient) {
-					patient.patientMedication.push(action.payload);
+					patient.patientMedication?.push(action.payload);
 				}
 			});
 	},
@@ -302,6 +355,7 @@ export const {
 	clearResults,
 	setPatients,
 	setSelectedPatient,
+	clearSelectedPatient,
 	openPatientTabs,
 	closePatientTab,
 	updatePatient,

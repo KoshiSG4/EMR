@@ -14,10 +14,7 @@ import {
 
 const ClinicalRecordsPage = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false);
-	const userName =
-		getUserInfoFromToken().givenName +
-		' ' +
-		getUserInfoFromToken().familyName;
+	const user = useSelector((state: RootState) => state.user.loggedInUser);
 
 	const selectedPatient = useSelector(
 		(state: RootState) => state.patients.selectedPatient
@@ -80,11 +77,11 @@ const ClinicalRecordsPage = () => {
 								✕
 							</button>
 						</div>
-						{selectedPatient && (
+						{selectedPatient && user && (
 							<ClinicalDetailsForm
 								onSubmit={handleSubmit}
 								patientId={selectedPatient.userId}
-								recordedBy={userName}
+								recordedBy={user.name}
 							/>
 						)}
 					</div>

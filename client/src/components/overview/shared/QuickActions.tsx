@@ -4,6 +4,7 @@ import {
 	getQuickActionsConfig,
 	QuickAction,
 } from '../configs/quickActionsConfig';
+import { useNavigate } from 'react-router-dom';
 
 interface QuickActionsProps {
 	userRole: string;
@@ -11,6 +12,7 @@ interface QuickActionsProps {
 
 const QuickActions = ({ userRole }: QuickActionsProps) => {
 	const [quickActions, setQuickActions] = useState<QuickAction[]>([]);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const loadQuickActions = async () => {
@@ -31,7 +33,11 @@ const QuickActions = ({ userRole }: QuickActionsProps) => {
 						key={index}
 						variant={action.variant || 'default'}
 						className="gap-2 "
-						onClick={action.onClick}>
+						onClick={() => {
+							const label = action.label;
+							if (action.link)
+								navigate(action.link, { state: { label } });
+						}}>
 						{action.icon}
 						{action.label}
 					</Button>

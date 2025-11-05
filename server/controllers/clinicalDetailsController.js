@@ -62,13 +62,13 @@ export const getSelectedPatientsClinicalRecords = async (req, res) => {
 	try {
 		const clinicalRecords = await prisma.clinicalDetails.findMany({
 			where: { patientId: id },
-			include: {
-				vitals: true,
-				medications: true,
-				diagnose: true,
-				prescriptions: true,
-				labTests: true,
-			},
+			// include: {
+			// 	vitals: true,
+			// 	medications: true,
+			// 	diagnose: true,
+			// 	prescriptions: true,
+			// 	labTests: true,
+			// },
 		});
 
 		if (clinicalRecords.length === 0) {
