@@ -71,11 +71,11 @@ export const getSelectedMedicalRecords = async (req, res) => {
 						user: true,
 					},
 				},
-				// diagnosis: true,
-				// prescriptions: true,
-				// labTests: true,
-				// vitalsRecords: true,
-				// clinicalDetails: true,
+				diagnosis: true,
+				prescriptions: true,
+				labTests: true,
+				vitalsRecords: true,
+				clinicalDetails: true,
 			},
 		});
 

@@ -275,14 +275,13 @@ export const getPatientMedications = async (req, res) => {
 		const patient = await prisma.patient.findUnique({
 			where: { userId: id },
 			include: {
-				medications: true,
-				records: true,
+				patientMedication: true,
 			},
 		});
 
 		if (!patient)
 			return res.status(404).json({ message: 'Patient not found' });
-		res.json({ patient });
+		res.json(patient.patientMedication);
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
