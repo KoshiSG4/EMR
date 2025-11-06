@@ -19,7 +19,7 @@ This system is built with **scalability**, **role-based access**, and **real-wor
 ### 🧪 Demo Credentials
 | Role | Username | Password |
 |------|-----------|-----------|
-| Admin | admin@example.com | Password123! |
+| Admin | admin1@example.com | Password123! |
 | Doctor | doc1@example.com | Password123! |
 | Nurse | nurse1@example.com | Password123! |
 | Patient | patient1@example.com | Password123! |
