@@ -37,7 +37,7 @@ jobs:
                   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/emr_test
                   DIRECT_URL: postgresql://postgres:postgres@localhost:5432/emr_test
               run: |
-                  npm install
+                  npm install --legacy-peer-deps
                   npx prisma migrate deploy
                   npm test --if-present
 
