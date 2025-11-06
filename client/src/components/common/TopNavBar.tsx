@@ -92,16 +92,24 @@ const TopNavBar = () => {
 								onMouseLeave={toggleMenu}
 								className="flex items-center rounded-full bg-[#508991]/50 hover:bg-[#74B3CE]  hover:text-[#172A3A] shadow-sm transition-transform duration-200 transform hover:-translate-y-0.5">
 								<div className="w-10 h-10 rounded-full flex items-center justify-center text-[#D6F3F4] hover:text-[#172A3A] font-extrabold shadow-inner">
-									{user?.profileImage ? (
-										<UserProfImage
-											width="w-10"
-											height="h-10"
-											gender={user.gender}
-											role={user.role}
-										/>
-									) : (
-										user?.name.charAt(0).toUpperCase()
-									)}
+									{user ? (
+										user.profileImage ? (
+											<img
+												src={user.profileImage}
+												alt={`${
+													user.name || 'User'
+												}'s profile`}
+												className="w-8 h-8 rounded-full object-cover"
+											/>
+										) : (
+											<UserProfImage
+												width="w-8"
+												height="h-8"
+												gender={user.gender}
+												role={user.role}
+											/>
+										)
+									) : null}
 								</div>
 							</button>
 

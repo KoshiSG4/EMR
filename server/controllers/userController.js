@@ -17,7 +17,7 @@ function generateTempPassword() {
 //Create User Profile (only if user is an ADMIN)
 export const createUser = async (req, res) => {
 	try {
-		const user = await getLoggedInUser(req);
+		const user = req.user;
 
 		if (user.role !== 'ADMIN') {
 			return res
@@ -25,11 +25,21 @@ export const createUser = async (req, res) => {
 				.json({ message: 'Forbidden: Only admins can create users' });
 		}
 
-		const { name, email, role } = req.body;
+		const {
+			name,
+			email,
+			role,
+			dateOfBirth,
+			gender,
+			phone,
+			address,
+			bloodType,
+			shift,
+		} = req.body.user;
 
 		//Check if user exist in DB
 		const existingUser = await prisma.user.findUnique({
-			where: { email },
+			where: { email: email },
 		});
 
 		if (existingUser) {
@@ -64,6 +74,7 @@ export const createUser = async (req, res) => {
 				email: newUser.email,
 				role: newUser.role,
 				tempPassword,
+				mustChangePassword: true,
 			},
 		});
 	} catch (error) {

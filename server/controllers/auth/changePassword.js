@@ -1,8 +1,12 @@
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from '../../generated/prisma/index.js';
+const prisma = new PrismaClient();
+
 export const changePassword = async (req, res) => {
 	try {
-		const { email, newPassword } = req.body;
+		const { email, password } = req.body;
 
-		const hashed = await bcrypt.hash(newPassword, 10);
+		const hashed = await bcrypt.hash(password, 10);
 
 		await prisma.user.update({
 			where: { email },

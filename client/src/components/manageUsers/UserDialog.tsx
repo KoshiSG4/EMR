@@ -31,16 +31,24 @@ const UserDetailsDialog = ({ open, onClose, user }: UserDialogProps) => {
 					<div className="col-span-1 flex justify-center">
 						<Card className="w-full bg-[#022F56] shadow-sm rounded-xl flex flex-col items-center p-6">
 							<div className="flex flex-col items-center mb-4">
-								{user?.profileImage ? (
-									<UserProfImage
-										width="w-60"
-										height="h-60"
-										gender={user.gender}
-										role={user.role}
-									/>
-								) : (
-									<FaUserCircle className="w-28 h-28 text-gray-400" />
-								)}
+								{user ? (
+									user.profileImage ? (
+										<img
+											src={user.profileImage}
+											alt={`${
+												user.name || 'User'
+											}'s profile`}
+											className="w-64 h-64 rounded-full object-cover"
+										/>
+									) : (
+										<UserProfImage
+											width="w-60"
+											height="h-60"
+											gender={user.gender}
+											role={user.role}
+										/>
+									)
+								) : null}
 							</div>
 							<CardHeader className="text-center space-y-1">
 								<CardTitle className="text-xl font-semibold text-[#CCDEE4]">

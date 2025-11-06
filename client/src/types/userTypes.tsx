@@ -10,5 +10,5 @@ export interface User {
 	mustChangePassword?: boolean;
 	profileImage?: string;
 	shift?: string;
-	id: string;
+	id?: string;
 }

@@ -76,8 +76,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				{ email, password },
 				{ withCredentials: true }
 			);
-
-			dispatch(setLoggedInUser(response.data.user));
 		} catch (error: any) {
 			const errorMsg =
 				error.response?.data?.message || 'Password Change failed';

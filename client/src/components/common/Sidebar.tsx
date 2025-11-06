@@ -166,16 +166,25 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
 								<SidebarMenuButton
 									size="lg"
 									className="data-[state=open]:bg-[#c0a615] data-[state=open]:text-[#384142] hover:text-[#384142] ">
-									{user?.profileImage ? (
-										<UserProfImage
-											width="w-8"
-											height="h-8"
-											gender={user.gender}
-											role={user.role}
-										/>
-									) : (
-										<FaUserCircle className="w-8 h-8 text-gray-400" />
-									)}
+									{user ? (
+										user?.profileImage ? (
+											<img
+												src={user.profileImage}
+												alt={`${
+													user.name || 'User'
+												}'s profile`}
+												className="w-8 h-8 rounded-full object-cover"
+											/>
+										) : (
+											<UserProfImage
+												width="w-8"
+												height="h-8"
+												gender={user.gender}
+												role={user.role}
+											/>
+										)
+									) : null}
+
 									<div className="grid flex-1 text-[#a5babc] hover:text-[#384142] text-left text-sm leading-tight">
 										<span className="truncate font-medium">
 											{user?.name}
@@ -194,16 +203,24 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
 								sideOffset={4}>
 								<DropdownMenuLabel className="p-2 pb-1 font-normal bg-[#274442] text-[#D6F3F6] rounded-t-lg">
 									<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-										{user?.profileImage ? (
-											<UserProfImage
-												width="w-8"
-												height="h-8"
-												gender={user.gender}
-												role={user.role}
-											/>
-										) : (
-											<FaUserCircle className="w-8 h-8 text-gray-400" />
-										)}
+										{user ? (
+											user.profileImage ? (
+												<img
+													src={user.profileImage}
+													alt={`${
+														user.name || 'User'
+													}'s profile`}
+													className="w-8 h-8 rounded-full object-cover"
+												/>
+											) : (
+												<UserProfImage
+													width="w-8"
+													height="h-8"
+													gender={user.gender}
+													role={user.role}
+												/>
+											)
+										) : null}
 										<div className="grid flex-1 text-left text-sm leading-tight">
 											<span className="truncate font-medium">
 												{user?.name}

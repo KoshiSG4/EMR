@@ -32,16 +32,22 @@ const UserProfileCard = ({ userRole }: UserProfileCardProps) => {
 
 			{/* Profile Image */}
 			<div className="flex flex-col items-center">
-				{user?.profileImage ? (
-					<UserProfImage
-						width="w-28"
-						height="h-28"
-						gender={user.gender}
-						role={user.role}
-					/>
-				) : (
-					<FaUserCircle className="w-28 h-28 text-gray-400" />
-				)}
+				{user ? (
+					user.profileImage ? (
+						<img
+							src={user.profileImage}
+							alt={`${user.name || 'User'}'s profile`}
+							className="w-28 h-28 rounded-full object-cover"
+						/>
+					) : (
+						<UserProfImage
+							width="w-28"
+							height="h-28"
+							gender={user.gender}
+							role={user.role}
+						/>
+					)
+				) : null}
 
 				<h3 className="text-lg font-medium text-[#05668d] mt-3">
 					{user?.name}

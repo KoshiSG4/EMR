@@ -32,17 +32,60 @@ export const getAllUsers = createAsyncThunk<User[]>(
 export const addNewUser = createAsyncThunk<User, { user: User }>(
 	'users/create',
 	async ({ user }) => {
-		const response = await api.post('admins/create', {
-			params: { user },
-			withCredentials: true,
-		});
-		return response.data;
+		try {
+			const response = await api.post('admins/create', {
+				user,
+				withCredentials: true,
+			});
+
+			if (response.status === 201 && response.data?.user) {
+				const { email, tempPassword } = response.data.user;
+				alert(
+					`✅ User Created Successfully! \n A new user account has been created. \n Please use the following temporary login credentials: \n 📧 Email: ${email} \n 🔑 Temporary Password: ${tempPassword} \n ⚠️ Make sure to change your password after the first login.`
+				);
+			} else if (response.status === 400) {
+				alert(
+					'❌ Failed to create user. \n⚠️Email provided is already in use!\nPlease try again with a different email.'
+				);
+			} else {
+				alert(
+					`⚠️ Unexpected response: ${
+						response.data?.message || 'No message from server.'
+					}`
+				);
+			}
+			return response.data.user;
+		} catch (error: unknown) {
+			let message = '❌ Failed to create user. Please try again later.';
+
+			if (error && typeof error === 'object' && 'response' in error) {
+				const err = error as {
+					response?: { data?: { message?: string } };
+				};
+				message = err.response?.data?.message || message;
+			}
+
+			alert(`🚫 ${message}`);
+		}
 	}
 );
 
 export const getLoggedInUser = createAsyncThunk<User>('user/me', async () => {
-	const response = await api.get('auth/me', { withCredentials: true });
-	return response.data;
+	try {
+		const response = await api.get('auth/me', { withCredentials: true });
+		return response.data;
+	} catch (error: unknown) {
+		let message = '❌ Failed to create user. Please try again later.';
+
+		if (error && typeof error === 'object' && 'response' in error) {
+			const err = error as {
+				response?: { data?: { message?: string } };
+			};
+			message = err.response?.data?.message || message;
+		}
+
+		alert(`🚫 ${message}`);
+	}
 });
 
 const userSlice = createSlice({

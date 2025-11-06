@@ -41,14 +41,20 @@ const MyAccount = ({ selectedUser }: MyAccountProps) => {
 						<CardContent className="p-6">
 							<div className="flex flex-col items-center mb-5">
 								{selectedUser?.profileImage ? (
+									<img
+										src={selectedUser.profileImage}
+										alt={`${
+											selectedUser.name || 'User'
+										}'s profile`}
+										className="w-64 h-64 rounded-full object-cover"
+									/>
+								) : (
 									<UserProfImage
 										width="w-64"
 										height="h-64"
 										gender={selectedUser.gender}
 										role={selectedUser.role}
 									/>
-								) : (
-									<FaUserCircle className="w-28 h-28 text-gray-400" />
 								)}
 							</div>
 							<h5 className="text-base text-center font-medium text-[#488DB4]">

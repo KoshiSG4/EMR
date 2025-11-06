@@ -58,6 +58,7 @@ const Login = () => {
 					validatedData.password
 				);
 				if (user.mustChangePassword) {
+					alert('You must change the password before login');
 					setMode('changePassword');
 				} else {
 					navigate('/');

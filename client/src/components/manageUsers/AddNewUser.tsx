@@ -85,7 +85,6 @@ const AddNewUserForm = ({ onSubmit, addedByName }: AddNewUserFormProps) => {
 
 	const handleFormSubmit = (data: UserFormValues) => {
 		const newUser: User = {
-			id: crypto.randomUUID(),
 			name: data.name,
 			email: data.email,
 			role: data.role,
@@ -95,6 +94,8 @@ const AddNewUserForm = ({ onSubmit, addedByName }: AddNewUserFormProps) => {
 			address: data.address || '',
 			bloodType: data.bloodType || '',
 			profileImage: data.profileImage || '',
+			shift: data.shift || '',
+			mustChangePassword: true,
 		};
 
 		onSubmit(newUser);
