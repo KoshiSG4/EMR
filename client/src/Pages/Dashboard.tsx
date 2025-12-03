@@ -34,6 +34,7 @@ import SelectedPatientContent from '@/components/patients/SelectedPatientContent
 import LabPage from '@/Pages/LabPage';
 import MyAccount from '@/Pages/MyAccountPage';
 import ManageUsersPage from './ManageUsersPage';
+import { LoaderIcon } from 'lucide-react';
 
 interface NavTab {
 	label: string;
@@ -375,7 +376,7 @@ const Dashboard = () => {
 									}}>
 									<span className="text-sm font-medium">
 										{pt.patient.fullName} (
-										{pt.patient.gender})
+										{pt.patient.user.gender})
 									</span>
 									<button
 										onClick={(e) => {
@@ -393,9 +394,22 @@ const Dashboard = () => {
 			)}
 
 			{/* Tab Content */}
-			<div className="flex-1 h-[98%] p-4 border rounded shadow bg-white overflow-y-auto overflow-x-hidden scrollbar-thin min-h-[200px]">
+			<div
+				className={cn(
+					'flex-1 p-4 border rounded shadow bg-white overflow-y-auto overflow-x-hidden scrollbar-thin min-h-[200px]',
+					section === 'overview' || section === undefined
+						? 'h-[95%] '
+						: 'h-[88%] '
+				)}>
 				{isLoading ? (
-					<p>Loading...</p>
+					<div className="flex min-h-screen items-center justify-center bg-purple-50/30">
+						<div className="text-purple-600 pr-3">Loading...</div>
+						<LoaderIcon
+							role="status"
+							aria-label="Loading"
+							className={cn('size-4 animate-spin')}
+						/>
+					</div>
 				) : isForbidden ? (
 					<Forbidden />
 				) : (

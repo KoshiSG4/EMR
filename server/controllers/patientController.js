@@ -79,10 +79,14 @@ export const getAllPatients = async (req, res) => {
 				},
 				doctors: {
 					include: {
-						user: true,
+						user: {
+							select: {
+								name: true,
+							},
+						},
 					},
 				},
-				// user: true,
+				user: true,
 			},
 		});
 

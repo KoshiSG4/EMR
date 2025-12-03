@@ -38,7 +38,12 @@ export const getAllHistories = createAsyncThunk<
 	const response = await api.get(`history/${patientId}/getAll`, {
 		params: { histories },
 	});
-	return response.data;
+	const formattedData = response.data.map((history: HistoryRecord) => ({
+		...history,
+		createdAt: history.createdAt ? history.createdAt.split('T')[0] : null,
+		updatedAt: history.updatedAt ? history.updatedAt.split('T')[0] : null,
+	}));
+	return formattedData;
 });
 
 export const addHistory = createAsyncThunk<

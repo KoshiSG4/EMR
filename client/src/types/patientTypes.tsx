@@ -6,12 +6,14 @@ import { VitalsRecord } from './vitalsRecords';
 import { ReferralRecord } from './referralRecord ';
 import { LabRequest } from './labRequest';
 import { HistoryRecord } from './historyType';
+import { User } from './userTypes';
 
 export interface Patient {
 	userId: string;
 	fullName: string;
 	doctors: Doctor[];
 	emergencyContact: string;
+	user: User;
 	patientMedication?: PatientMedication[];
 	records?: MedicalRecord[];
 	vitals?: VitalsRecord[];

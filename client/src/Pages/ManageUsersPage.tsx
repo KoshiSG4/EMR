@@ -1,12 +1,8 @@
 import { AppDispatch, RootState } from '@/store/store';
-import { Patient } from '@/types/patientTypes';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DataTable from '../components/common/DataTable';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { patientColumns } from '../components/patients/patientColumns';
-import { selectPatientsWithUserData } from '../components/patients/patientSelecter';
-import { PatientWithUserData } from '@/types/patientWithUserDataType';
 import {
 	UserColumnProps,
 	UserColumns,
@@ -15,21 +11,18 @@ import {
 	addNewUser,
 	clearSelectedUser,
 	getAllUsers,
-	setSelectedUser,
 	setUsers,
 } from '@/store/slices/userSlice';
 import { User } from '@/types/userTypes';
 import AddNewUserForm from '@/components/manageUsers/AddNewUser';
-import { LoaderIcon, Plus, X } from 'lucide-react';
+import { LoaderIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import UserDetailsDialog from '@/components/manageUsers/UserDialog';
-import { clearSelectedPatient } from '@/store/slices/patientSlice';
 
 const ManageUsersPage = () => {
 	const { users, loggedInUser, loading } = useSelector(
 		(state: RootState) => state.user
 	);
-	const patientsWithUserData = useSelector(selectPatientsWithUserData);
 	const dispatch = useDispatch<AppDispatch>();
 	const navigate = useNavigate();
 	const [isFormOpen, setIsFormOpen] = useState(false);

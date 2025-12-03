@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { HistoryRecord } from '@/types/historyType';
+import { useState } from 'react';
 
 interface HistoryDialogProps {
 	open: boolean;
@@ -26,14 +27,7 @@ const HistoryDetailsDialog = ({
 	if (!history) return null;
 
 	return (
-		<Dialog>
-			<DialogTrigger asChild>
-				<Button
-					variant="ghost"
-					className="px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer text-gray-700">
-					View More Info
-				</Button>
-			</DialogTrigger>
+		<Dialog open={open} onOpenChange={onClose}>
 			<DialogContent className="max-w-3xl p-6">
 				<DialogHeader>
 					<DialogTitle className="text-xl font-semibold">

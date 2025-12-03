@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
 import {
-	openPatientTabs,
-	PatientTab,
 	setSelectedPatient,
 	updatePatient,
 	updatePatientInfo,
@@ -24,14 +22,14 @@ import LabPage from '../../Pages/LabPage';
 import PrescriptionPage from '../medicalRecords/clinical/prescription/PrescriptionPage';
 import PatientMedications from '../medicalRecords/clinical/patientMedication/PatientMedications';
 import PatientProfileCard from './PatientProfileCard ';
-import { PatientWithUserData } from '@/types/patientWithUserDataType';
+import ResizebleTabContent from '../common/ResizebleTabContent';
 
 interface SelectedPatientContentProps {
-	patient: PatientWithUserData;
+	patient: Patient;
 }
 
 const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
-	const { section, tab, subTab, innerTab, innerSubTab } = useParams();
+	const { subTab, innerTab, innerSubTab } = useParams();
 	const dispatch = useDispatch<AppDispatch>();
 	const selectedPatient = useSelector(
 		(state: RootState) => state.patients.selectedPatient
@@ -47,7 +45,7 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 
 		try {
 			if (subTab === 'profile') {
-				const handleOnSave = (updated: PatientWithUserData) => {
+				const handleOnSave = (updated: Patient) => {
 					dispatch(
 						updatePatientInfo({
 							patientId: updated.userId,
@@ -141,7 +139,10 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 			) : isForbidden ? (
 				<Forbidden />
 			) : (
-				tabContent
+				<div>
+					{tabContent}
+					{/* <ResizebleTabContent /> */}
+				</div>
 			)}
 		</div>
 	);

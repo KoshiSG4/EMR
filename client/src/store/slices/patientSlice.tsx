@@ -2,17 +2,16 @@ import { PatientMedication } from '@/types/patientMedicationTypes';
 import api from '../../api/axiosInstance';
 import { Patient } from '../../types/patientTypes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PatientWithUserData } from '@/types/patientWithUserDataType';
 
 export interface PatientTab {
 	id: string;
-	patient: PatientWithUserData;
+	patient: Patient;
 }
 
 interface PatientsState {
 	patients: Patient[];
-	selectedPatient: PatientWithUserData | null;
-	selectedPatientWithAllData: PatientWithUserData | null;
+	selectedPatient: Patient | null;
+	selectedPatientWithAllData: Patient | null;
 	patientMedication: PatientMedication[];
 	openTabs: PatientTab[];
 	activeTabId: string | null;
@@ -57,11 +56,10 @@ export const getAllPatients = createAsyncThunk<
 });
 
 export const getSelectedPatientData = createAsyncThunk<
-	PatientWithUserData,
+	Patient,
 	{ patientId: string }
 >('patients/getPatientData', async ({ patientId }) => {
 	const response = await api.get(`patients/${patientId}`);
-	console.log(response.data);
 	return response.data;
 });
 
@@ -127,12 +125,8 @@ const patientSlice = createSlice({
 		setPatients: (state, action: PayloadAction<Patient[]>) => {
 			state.patients = action.payload;
 		},
-		setSelectedPatient: (
-			state,
-			action: PayloadAction<PatientWithUserData>
-		) => {
+		setSelectedPatient: (state, action: PayloadAction<Patient>) => {
 			state.selectedPatient = action.payload;
-			console.log(state.selectedPatient);
 		},
 		clearSelectedPatient: (state) => {
 			state.selectedPatient = null;
@@ -147,7 +141,6 @@ const patientSlice = createSlice({
 				state.openTabs.push(patientTab);
 			}
 			state.activeTabId = patientTab.id;
-			console.log(state.activeTabId);
 		},
 		closePatientTab: (state, action: PayloadAction<string>) => {
 			const closingId = action.payload;
@@ -168,7 +161,7 @@ const patientSlice = createSlice({
 			state,
 			action: PayloadAction<{
 				patientId: string;
-				patient: PatientWithUserData;
+				patient: Patient;
 			}>
 		) {
 			const { patientId, patient } = action.payload;
@@ -308,7 +301,7 @@ const patientSlice = createSlice({
 			})
 			.addCase(
 				getSelectedPatientData.fulfilled,
-				(state, action: PayloadAction<PatientWithUserData>) => {
+				(state, action: PayloadAction<Patient>) => {
 					state.loading = false;
 					state.selectedPatientWithAllData = action.payload;
 				}

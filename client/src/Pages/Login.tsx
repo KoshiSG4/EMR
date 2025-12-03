@@ -181,7 +181,7 @@ const Login = () => {
 				<div className="flex w-full flex-1 flex-col justify-center px-6 py-12 lg:py-24 lg:px-24">
 					<div className="max-w-xl">
 						<h1 className="mb-4 text-4xl font-extrabold tracking-tight text-[#D6F3F4] sm:text-5xl">
-							ERM
+							EMR
 						</h1>
 						<p className="mb-6 text-lg text-[#D6F3F4] opacity-85">
 							Secure, modern electronic medical records — built
@@ -416,7 +416,7 @@ const Login = () => {
 
 							{/* subtle footer / version */}
 							<div className="mt-6 text-center text-xs text-[#D6F3F4] opacity-60">
-								v1.0 - ERM UI
+								v1.0 - EMR UI
 							</div>
 						</div>
 					</div>

@@ -31,15 +31,15 @@ import { Check, Edit3, X } from 'lucide-react';
 import { getAllDoctors } from '@/store/slices/doctorsSlice';
 import { Popover, PopoverTrigger } from '@radix-ui/react-popover';
 import { PopoverContent } from '../ui/popover';
-import { PatientWithUserData } from '@/types/patientWithUserDataType';
 import { FaUserCircle } from 'react-icons/fa';
 import patientFemale from '../../assets/female_patient.jpg';
 import patientMale from '../../assets/male_patient.jpg';
+import { User } from '@/types/userTypes';
 
 interface EditPatientInfoDialogProps {
 	open: boolean;
-	selectedPatient: PatientWithUserData | null;
-	onSave: (updated: PatientWithUserData) => void;
+	selectedPatient: Patient | null;
+	onSave: (updated: Patient) => void;
 }
 
 const PatientProfileCard = ({
@@ -49,7 +49,7 @@ const PatientProfileCard = ({
 }: EditPatientInfoDialogProps) => {
 	if (!selectedPatient) return null;
 
-	const [formData, setFormData] = useState<PatientWithUserData | null>(null);
+	const [formData, setFormData] = useState<Patient | null>(null);
 	const [editMode, setEditMode] = useState<Record<string, boolean>>({});
 	const [showDoctorSuggestions, setShowDoctorSuggestions] = useState(false);
 	const { activeTabId, selectedPatientWithAllData } = useSelector(
@@ -112,13 +112,13 @@ const PatientProfileCard = ({
 					if (field === 'email') {
 						return {
 							...prevForm,
-							email: selectedPatient.email,
+							email: selectedPatient.user.email,
 						};
 					}
 					if (field === 'bloodType') {
 						return {
 							...prevForm,
-							bloodType: selectedPatient.bloodType,
+							bloodType: selectedPatient.user.bloodType,
 						};
 					}
 
@@ -132,34 +132,14 @@ const PatientProfileCard = ({
 		});
 	};
 
-	const handleChange = <K extends keyof PatientWithUserData>(
-		field: K,
-		value:
-			| PatientWithUserData[K]
-			| (PatientWithUserData[K] extends Array<infer U>
-					? (prev: PatientWithUserData[K]) => PatientWithUserData[K]
-					: never)
-	) => {
+	const handleChange = (field: keyof Patient | keyof User, value: any) => {
 		setFormData((prev) => {
 			if (!prev) return prev;
 
-			if (field === 'fullName' || field === 'email') {
+			if (field in prev.user) {
 				return {
 					...prev,
-					user: { ...prev, [field]: value as string },
-				};
-			}
-
-			const prevValue = prev[field];
-
-			if (typeof value === 'function') {
-				return {
-					...prev,
-					[field]: (
-						value as (
-							prev: PatientWithUserData[K]
-						) => PatientWithUserData[K]
-					)(prevValue),
+					user: { ...prev.user, [field]: value as string },
 				};
 			}
 
@@ -202,13 +182,13 @@ const PatientProfileCard = ({
 					</CardTitle>
 				</CardHeader>
 				<div className="flex flex-col mb-8 items-center">
-					{selectedPatient?.gender === 'Female' ? (
+					{selectedPatient?.user.gender === 'Female' ? (
 						<img
 							src={patientFemale}
 							alt="Profile"
 							className="w-28 h-28 rounded-full object-cover shadow-md"
 						/>
-					) : selectedPatient?.gender === 'Male' ? (
+					) : selectedPatient?.user.gender === 'Male' ? (
 						<img
 							src={patientMale}
 							alt="Profile"
@@ -274,7 +254,7 @@ const PatientProfileCard = ({
 							{editMode['email'] ? (
 								<Input
 									type="email"
-									value={formData.email}
+									value={formData.user.email}
 									onChange={(e) =>
 										handleChange('email', e.target.value)
 									}
@@ -282,7 +262,7 @@ const PatientProfileCard = ({
 								/>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.email}
+									{formData.user.email}
 								</p>
 							)}
 
@@ -325,7 +305,7 @@ const PatientProfileCard = ({
 							{editMode['dateOfBirth'] ? (
 								<Input
 									type="date"
-									value={formData.dateOfBirth}
+									value={formData.user.dateOfBirth}
 									onChange={(e) =>
 										handleChange(
 											'dateOfBirth',
@@ -336,7 +316,7 @@ const PatientProfileCard = ({
 								/>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.dateOfBirth}
+									{formData.user.dateOfBirth}
 								</p>
 							)}
 
@@ -377,7 +357,9 @@ const PatientProfileCard = ({
 						<Label className="text-xs text-gray-400">Age</Label>
 						<div className="flex items-center justify-between gap-2">
 							<p className="flex-1 text-gray-900 font-serif">
-								{calculateAge(new Date(formData.dateOfBirth))}{' '}
+								{calculateAge(
+									new Date(formData.user.dateOfBirth)
+								)}{' '}
 								years
 							</p>
 						</div>
@@ -391,7 +373,7 @@ const PatientProfileCard = ({
 						<div className="flex items-center justify-between gap-2">
 							{editMode['name'] ? (
 								<Input
-									value={formData.bloodType}
+									value={formData.user.bloodType}
 									onChange={(e) =>
 										handleChange('fullName', e.target.value)
 									}
@@ -399,7 +381,7 @@ const PatientProfileCard = ({
 								/>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.bloodType}
+									{formData.user.bloodType}
 								</p>
 							)}
 
@@ -460,7 +442,7 @@ const PatientProfileCard = ({
 								</Select>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.gender}
+									{formData.user.gender}
 								</p>
 							)}
 
@@ -515,7 +497,7 @@ const PatientProfileCard = ({
 								/>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.phone}
+									{formData.user.phone}
 								</p>
 							)}
 
@@ -618,7 +600,7 @@ const PatientProfileCard = ({
 							{editMode['address'] ? (
 								<Input
 									type="text"
-									value={formData.address}
+									value={formData.user.address}
 									onChange={(e) =>
 										handleChange('address', e.target.value)
 									}
@@ -626,7 +608,7 @@ const PatientProfileCard = ({
 								/>
 							) : (
 								<p className="flex-1 text-gray-900 font-serif">
-									{formData.address}
+									{formData.user.address}
 								</p>
 							)}
 
@@ -723,7 +705,7 @@ const PatientProfileCard = ({
 															handleChange(
 																'doctors',
 																(
-																	prevDoctors
+																	prevDoctors: Patient['doctors']
 																) => {
 																	if (
 																		prevDoctors.some(

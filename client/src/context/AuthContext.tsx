@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from '@/store/store';
 import { resetUser, setLoggedInUser } from '@/store/slices/userSlice';
 import { LoaderIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import refreshClient from '@/api/refreshToken';
 
 interface AuthContextType {
 	user: User | null;
@@ -19,7 +20,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-	// const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const user = useSelector((state: RootState) => state.user.loggedInUser);
 
@@ -30,11 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	useEffect(() => {
 		const checkAuth = async () => {
 			try {
-				const resp = await api.post(
-					'/auth/refresh',
-					{},
-					{ withCredentials: true }
-				);
+				const resp = await refreshClient.post('/auth/refresh');
 				api.defaults.headers.common[
 					'Authorization'
 				] = `Bearer ${resp.data.accessToken}`;

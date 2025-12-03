@@ -5,11 +5,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
 import { HistoryRecord } from '@/types/historyType';
 import { historyColumns } from './historyColumns';
-import { addHistory, getAllHistories } from '@/store/slices/historySlice';
+import {
+	addHistory,
+	getAllHistories,
+	setSelectedHistoryRec,
+} from '@/store/slices/historySlice';
 import HistoryForm from './HistoryForm';
+import HistoryDetailsDialog from './HistoryDialog';
 
 const HistoryPage = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [selectedHistoryRecord, setSelectedHistoryRecord] =
+		useState<HistoryRecord | null>();
 	const userName =
 		getUserInfoFromToken().givenName +
 		' ' +
@@ -54,6 +61,13 @@ const HistoryPage = () => {
 		setIsFormOpen(false);
 	};
 
+	const handleSelectHistoryRecord: (rowData: HistoryRecord) => void = (
+		rowData
+	) => {
+		const historyRecord = histories.find((rec) => rec.id === rowData.id);
+		setSelectedHistoryRecord(historyRecord);
+	};
+
 	return (
 		<div className="p-3 pt-1 space-y-6 relative">
 			<div className={`flex-1 transition-all duration-300`}>
@@ -65,7 +79,16 @@ const HistoryPage = () => {
 						columns={historyColumns}
 						data={formattedHistories}
 						loading={loading}
+						onRowSelect={handleSelectHistoryRecord}
 					/>
+
+					{selectedHistoryRecord && (
+						<HistoryDetailsDialog
+							open={true}
+							onClose={() => setSelectedHistoryRecord(null)}
+							history={selectedHistoryRecord}
+						/>
+					)}
 					<div
 						ref={ref}
 						className={`absolute top-0 -right-8 h-auto w-2/5  bg-white border-y-2 border-gray-200 shadow-lg  transform transition-transform duration-300 z-50

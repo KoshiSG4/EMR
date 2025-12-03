@@ -39,38 +39,4 @@ export const historyColumns: ColumnDef<HistoryRecord>[] = [
 		accessorKey: 'recordedBy',
 		header: 'Recorded By',
 	},
-	{
-		id: 'actions',
-		cell: ({ row }) => {
-			const historyRec = row.original;
-			const [isDialogOpen, setIsDialogOpen] = useState(true);
-
-			const handleDialogClose = () => {
-				setIsDialogOpen(false);
-			};
-
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						align="end"
-						className="bg-white shadow-2xl shadow-black/50 border-gray-200 rounded-xl p-2">
-						<ul>
-							<li>
-								<HistoryDetailsDialog
-									open={true}
-									onClose={close}
-									history={historyRec}
-								/>
-							</li>
-						</ul>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			);
-		},
-	},
 ];

@@ -104,7 +104,7 @@ const userSlice = createSlice({
 		clearSelectedUser: (state) => {
 			state.selectedUser = null;
 		},
-		setLoggedInUser: (state, action: PayloadAction<User>) => {
+		setLoggedInUser: (state, action: PayloadAction<User | null>) => {
 			state.loggedInUser = action.payload;
 		},
 		resetUser: () => initialState,
