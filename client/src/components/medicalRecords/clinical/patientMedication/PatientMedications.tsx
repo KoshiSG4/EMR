@@ -3,21 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import PatientMedicationForm from './PatientMedicationForm';
 import { useDispatch, useSelector } from 'react-redux';
 import { patientMedicationTableColumns } from './patientMedicationTableColumns.tsx';
-import { getUserInfoFromToken } from '@/utils/jwtUtils';
 import { AppDispatch, RootState } from '@/store/store';
 import { PatientMedication } from '@/types/patientMedicationTypes';
 import {
 	addMedicationsToPatient,
 	addMedsToPatientDatabase,
 	getSelectedPatientsMeds,
+	removePanel,
 } from '@/store/slices/patientSlice';
 import DataTable from '@/components/common/DataTable';
+import { X } from 'lucide-react';
 
-interface PatientMedicationsProps {
-	patientId: string;
-}
-
-const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
+const PatientMedications = () => {
 	const navigate = useNavigate();
 	const user = useSelector((state: RootState) => state.user.loggedInUser);
 	const { selectedPatient, loading, patientMedication } = useSelector(
@@ -39,7 +36,7 @@ const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 
 		if (!patientMedication || patientMedication.length <= 0) {
 			dispatch(
-				getSelectedPatientsMeds({ patientId: selectedPatient.id })
+				getSelectedPatientsMeds({ patientId: selectedPatient.userId })
 			);
 		}
 	}, [selectedPatient]);
@@ -64,16 +61,6 @@ const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 		setIsFormOpen(false);
 	};
 
-	// const patientMedication = (selectedPatientMeds: PatientMedication[]) => {
-	// 	return selectedPatientMeds.map((m) => ({
-	// 		...m,
-	// 		startDate: m.startDate.split('T')[0],
-	// 		endDate: m.endDate?.split('T')[0],
-	// 		createdAt: m.endDate?.split('T')[0] ?? '',
-	// 		updatedAt: m.endDate?.split('T')[0] ?? '',
-	// 	}));
-	// };
-
 	return (
 		<div className="p-3 space-y-3 relative">
 			{/* Content */}
@@ -81,10 +68,22 @@ const PatientMedications = ({ patientId }: PatientMedicationsProps) => {
 				<div className="flex  ">
 					<div className={`flex-1 transition-all duration-300`}>
 						<div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-							<h1 className="text-lg mb-2 font-semibold text-gray-800">
-								{' '}
-								Medication
-							</h1>
+							<div className="flex justify-between">
+								<h1 className="text-lg  font-semibold text-gray-800">
+									Medication
+								</h1>
+								<X
+									className="hover:cursor-pointer text-slate-600 size-4"
+									onClick={() =>
+										dispatch(
+											removePanel({
+												patientId:
+													selectedPatient.userId,
+												panelId: 'clinical-medications',
+											})
+										)
+									}></X>
+							</div>
 
 							{/* Medication Section */}
 							<div>

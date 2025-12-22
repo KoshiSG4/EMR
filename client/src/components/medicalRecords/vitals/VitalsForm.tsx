@@ -7,9 +7,15 @@ interface VitalsFormProps {
 	onSubmit: (data: VitalsRecord) => void;
 	patientId: string;
 	recordedBy: string;
+	onClose: () => void;
 }
 
-const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
+const VitalsForm = ({
+	onSubmit,
+	patientId,
+	recordedBy,
+	onClose,
+}: VitalsFormProps) => {
 	const [vitals, setVitals] = useState({
 		height: '',
 		weight: '',
@@ -60,13 +66,14 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 		<>
 			<form
 				onSubmit={handleSubmit}
-				className="max-w-xl mx-auto space-y-4 p-6 bg-white rounded-2xl shadow-md">
+				className="m-4 space-y-4 p-6 bg-white rounded-2xl shadow-md">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<Input
 						name="height"
 						type="number"
 						placeholder="Height (cm)"
 						value={vitals.height}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -77,6 +84,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Weight (kg)"
 						value={vitals.weight}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -87,6 +95,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Blood Pressure (e.g., 120/80)"
 						value={vitals.bloodPressure}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -97,6 +106,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Heart Rate (bpm)"
 						value={vitals.heartRate}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -107,6 +117,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Respiratory Rate (breaths/min)"
 						value={vitals.respiratoryRate}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -117,6 +128,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Temperature (°C)"
 						value={vitals.temperature}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -127,6 +139,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Oxygen Saturation (%)"
 						value={vitals.spo2}
+						required
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -137,6 +150,7 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 						type="number"
 						placeholder="Pain Score (0–10)"
 						value={vitals.painScore}
+						required={true}
 						className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
 						onChange={handleChange}
 						min={'1'}
@@ -144,11 +158,16 @@ const VitalsForm = ({ onSubmit, patientId, recordedBy }: VitalsFormProps) => {
 					/>
 				</div>
 
-				<div className="flex justify-end mt-6">
+				<div className="flex justify-end mt-6 gap-3">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className="hover:bg-[#162725] hover:text-[#D6F3F6] hover:border-[#162725]  ">
+						Cancel
+					</Button>
 					<Button
 						type="submit"
-						onClick={handleSubmit}
-						className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
+						className="bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]">
 						Save Vitals
 					</Button>
 				</div>

@@ -19,35 +19,35 @@ export const vitalsColumns: ColumnDef<VitalsRecord>[] = [
 	},
 	{
 		accessorKey: 'height',
-		header: 'Height',
+		header: 'Height (cm)',
 	},
 	{
 		accessorKey: 'weight',
-		header: 'Weight',
+		header: 'Weight (kg)',
 	},
 	{
 		accessorKey: 'bloodPressure',
-		header: 'BP',
+		header: 'BP (mmHg)',
 	},
 	{
 		accessorKey: 'heartRate',
-		header: 'HR',
+		header: 'HR (bpm)',
 	},
 	{
 		accessorKey: 'respiratoryRate',
-		header: 'RR',
+		header: 'RR (breaths/min)',
 	},
 	{
 		accessorKey: 'temperature',
-		header: 'Temp',
+		header: 'Temp (°C)',
 	},
 	{
 		accessorKey: 'spo2',
-		header: 'SpO₂',
+		header: 'SpO₂ (%)',
 	},
 	{
 		accessorKey: 'painScore',
-		header: 'Pain',
+		header: 'Pain (x/10)',
 	},
 	{
 		accessorKey: 'recordedBy',

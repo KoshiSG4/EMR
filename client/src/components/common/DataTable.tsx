@@ -2,6 +2,7 @@ import {
 	ColumnDef,
 	ColumnFiltersState,
 	SortingState,
+	VisibilityState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -26,7 +27,7 @@ import {
 	ChevronsLeft,
 	ChevronDown,
 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Select } from '../ui/select';
 import {
 	SelectContent,
@@ -40,10 +41,11 @@ import {
 	DropdownMenuTrigger,
 } from '@radix-ui/react-dropdown-menu';
 import { cn } from '@/lib/utils';
+import { DropdownMenuCheckboxItem } from '../ui/dropdown-menu';
 
 interface TableFilter<TData> {
 	columnId: keyof TData;
-	type?: 'text' | 'select';
+	type?: 'text' | 'select' | 'columnVisibility';
 	placeholder?: string;
 	options?: string[];
 	value?: string;
@@ -68,6 +70,9 @@ const DataTable = <TData extends object, TValue>({
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
+	const [columnVisibility, setColumnVisibility] =
+		React.useState<VisibilityState>({});
+
 	const table = useReactTable({
 		data,
 		columns,
@@ -77,9 +82,11 @@ const DataTable = <TData extends object, TValue>({
 		getSortedRowModel: getSortedRowModel(),
 		onColumnFiltersChange: setColumnFilters,
 		getFilteredRowModel: getFilteredRowModel(),
+		onColumnVisibilityChange: setColumnVisibility,
 		state: {
 			sorting,
 			columnFilters,
+			columnVisibility,
 		},
 	});
 
@@ -152,25 +159,58 @@ const DataTable = <TData extends object, TValue>({
 					}
 
 					return (
-						<Input
-							key={String(filter.columnId)}
-							placeholder={
-								filter.placeholder ??
-								`Filter by ${String(filter.columnId)}...`
-							}
-							value={(column.getFilterValue() as string) ?? ''}
-							onChange={(e) =>
-								column.setFilterValue(e.target.value)
-							}
-							className={`
+						<div className="flex justify-between gap-3">
+							<Input
+								key={String(filter.columnId)}
+								placeholder={
+									filter.placeholder ??
+									`Filter by ${String(filter.columnId)}...`
+								}
+								value={
+									(column.getFilterValue() as string) ?? ''
+								}
+								onChange={(e) =>
+									column.setFilterValue(e.target.value)
+								}
+								className={`
           max-w-sm px-3 py-2 border border-gray-300 rounded-md
           bg-white text-gray-700 shadow-sm
           focus:outline-none focus:ring-2 focus:ring-blue-500
           hover:border-blue-400 transition-colors
         `}
-						/>
+							/>
+						</div>
 					);
 				})}
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="outline"
+							className="flex justify-start">
+							Columns
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent
+						align="end"
+						className="z-50 bg-[#dbe7e4] w-fit rounded-md shadow-md px-2 py-1">
+						{table
+							.getAllColumns()
+							.filter((column) => column.getCanHide())
+							.map((column) => {
+								return (
+									<DropdownMenuCheckboxItem
+										key={column.id}
+										className="capitalize"
+										checked={column.getIsVisible()}
+										onCheckedChange={(value) =>
+											column.toggleVisibility(!!value)
+										}>
+										{column.id}
+									</DropdownMenuCheckboxItem>
+								);
+							})}
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</div>
 
 			<div className="overflow-hidden rounded-md border">

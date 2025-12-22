@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserInfoFromToken } from '@/utils/jwtUtils';
 import { PastVisitRecord } from '@/types/pastVisitRecord';
 import { pastVisitsColumns } from './pastVisitsColumns';
+import { X } from 'lucide-react';
+import { removePanel } from '@/store/slices/patientSlice';
 
 const dummyPastVisits: PastVisitRecord[] = [
 	{
@@ -45,39 +47,37 @@ const PastVisitsPage = () => {
 	const dispatch = useDispatch<AppDispatch>();
 
 	const handleSubmit = (pastVisit: PastVisitRecord) => {
-		// if (selectedPatient?.userId) {
-		// 	dispatch(
-		// 		addMedicationsToPatient({
-		// 			patientId: selectedPatient.userId,
-		// 			medication,
-		// 		})
-		// 	);
-
-		// 	dispatch(
-		// 		addMedsToPatientDatabase({
-		// 			patientId: selectedPatient.userId,
-		// 			medication,
-		// 		})
-		// 	);
-		// }
-
 		setIsFormOpen(false);
 	};
 
 	return (
 		<div className="p-3 pt-1 space-y-6 relative">
-			<div className={`flex-1 transition-all duration-300`}>
-				<div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-					<h1 className="text-lg mb-3 font-semibold text-gray-800">
-						Past Visits - {selectedPatient?.fullName}
-					</h1>
-					<DataTable
-						columns={pastVisitsColumns}
-						data={dummyPastVisits}
-						loading={loading}
-					/>
+			{selectedPatient && (
+				<div className={`flex-1 transition-all duration-300`}>
+					<div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
+						<div className="flex justify-between">
+							<h1 className="text-lg  font-semibold text-gray-800">
+								Past Visits
+							</h1>
+							<X
+								className="hover:cursor-pointer text-slate-600 size-4"
+								onClick={() =>
+									dispatch(
+										removePanel({
+											patientId: selectedPatient.userId,
+											panelId: 'clinical-visits',
+										})
+									)
+								}></X>
+						</div>
+						<DataTable
+							columns={pastVisitsColumns}
+							data={dummyPastVisits}
+							loading={loading}
+						/>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

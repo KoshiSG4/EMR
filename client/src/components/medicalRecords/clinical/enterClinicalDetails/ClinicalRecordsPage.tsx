@@ -11,6 +11,8 @@ import {
 	addNewClinicalRecord,
 	getSelectedPatientsClinicalRecords,
 } from '@/store/slices/clinicalSlice';
+import { X } from 'lucide-react';
+import { removePanel } from '@/store/slices/patientSlice';
 
 const ClinicalRecordsPage = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false);
@@ -53,46 +55,60 @@ const ClinicalRecordsPage = () => {
 
 	return (
 		<div className="p-3 pt-1 space-y-6 relative">
-			<div className={`flex-1 transition-all duration-300`}>
-				<div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
-					<h1 className="text-lg mb-3 font-semibold text-gray-800">
-						Clinical Details - {selectedPatient?.fullName}
-					</h1>
-					<DataTable
-						columns={clinicalDetailsColumns}
-						data={clinicalDetails}
-						loading={loading}
-					/>
-					<div
-						ref={ref}
-						className={`absolute top-0 -right-8 h-auto w-2/5  bg-white border-y-2 border-gray-200 shadow-lg  transform transition-transform duration-300 z-50
-        ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-						<div className="p-4 flex items-center justify-between border-b ">
-							<h3 className="text-lg font-semibold">
+			{selectedPatient && (
+				<div className={`flex-1 transition-all duration-300`}>
+					<div className="bg-white rounded-2xl shadow p-6 border border-gray-200">
+						<div className="flex justify-between">
+							<h1 className="text-lg  font-semibold text-gray-800">
 								Clinical Details
-							</h3>
-							<button
-								onClick={() => setIsFormOpen(false)}
-								className="text-gray-500 hover:text-gray-700">
-								✕
-							</button>
+							</h1>
+							<X
+								className="hover:cursor-pointer text-slate-600 size-4"
+								onClick={() =>
+									dispatch(
+										removePanel({
+											patientId: selectedPatient.userId,
+											panelId: 'clinical-enter',
+										})
+									)
+								}></X>
 						</div>
-						{selectedPatient && user && (
-							<ClinicalDetailsForm
-								onSubmit={handleSubmit}
-								patientId={selectedPatient.userId}
-								recordedBy={user.name}
-							/>
-						)}
-					</div>
+						<DataTable
+							columns={clinicalDetailsColumns}
+							data={clinicalDetails}
+							loading={loading}
+						/>
+						<div
+							ref={ref}
+							className={`absolute top-0 -right-8 h-auto w-2/5  bg-white border-y-2 border-gray-200 shadow-lg  transform transition-transform duration-300 z-50
+        ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+							<div className="p-4 flex items-center justify-between border-b ">
+								<h3 className="text-lg font-semibold">
+									Clinical Details
+								</h3>
+								<button
+									onClick={() => setIsFormOpen(false)}
+									className="text-gray-500 hover:text-gray-700">
+									✕
+								</button>
+							</div>
+							{selectedPatient && user && (
+								<ClinicalDetailsForm
+									onSubmit={handleSubmit}
+									patientId={selectedPatient.userId}
+									recordedBy={user.name}
+								/>
+							)}
+						</div>
 
-					<button
-						onClick={() => setIsFormOpen((prev) => !prev)}
-						className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition">
-						➕ Enter New Record
-					</button>
+						<button
+							onClick={() => setIsFormOpen((prev) => !prev)}
+							className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition">
+							➕ Enter New Record
+						</button>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

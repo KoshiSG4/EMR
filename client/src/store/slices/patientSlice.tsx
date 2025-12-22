@@ -2,10 +2,16 @@ import { PatientMedication } from '@/types/patientMedicationTypes';
 import api from '../../api/axiosInstance';
 import { Patient } from '../../types/patientTypes';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ReactNode } from 'react';
 
 export interface PatientTab {
 	id: string;
 	patient: Patient;
+}
+interface Panel {
+	patientId: string;
+	panelId: string;
+	// component: ReactNode;
 }
 
 interface PatientsState {
@@ -15,6 +21,7 @@ interface PatientsState {
 	patientMedication: PatientMedication[];
 	openTabs: PatientTab[];
 	activeTabId: string | null;
+	openPanelsByPatient: Record<string, Panel[]>;
 	loading: boolean;
 	error: string | null;
 	cache: Record<string, Patient[]>;
@@ -27,6 +34,7 @@ const initialState: PatientsState = {
 	patientMedication: [],
 	openTabs: [],
 	activeTabId: null,
+	openPanelsByPatient: {},
 	loading: false,
 	error: null,
 	cache: {},
@@ -156,6 +164,38 @@ const patientSlice = createSlice({
 		},
 		setActivePatientTab: (state, action: PayloadAction<string>) => {
 			state.activeTabId = action.payload;
+		},
+		addPanel: (state, action: PayloadAction<Panel>) => {
+			const { patientId, panelId } = action.payload;
+
+			if (!state.openPanelsByPatient[patientId]) {
+				state.openPanelsByPatient[patientId] = [];
+			}
+
+			const exists = state.openPanelsByPatient[patientId].some(
+				(p) => p.panelId === panelId
+			);
+
+			if (!exists) {
+				state.openPanelsByPatient[patientId].push(action.payload);
+			}
+		},
+		removePanel: (
+			state,
+			action: PayloadAction<{ patientId: string; panelId: string }>
+		) => {
+			const { patientId, panelId } = action.payload;
+
+			if (state.openPanelsByPatient[patientId]) {
+				state.openPanelsByPatient[patientId] =
+					state.openPanelsByPatient[patientId].filter(
+						(p) => p.panelId !== panelId
+					);
+			}
+		},
+		clearPanels: (state, action: PayloadAction<{ patientId: string }>) => {
+			const patientId = action.payload.patientId;
+			state.openPanelsByPatient[patientId] = [];
 		},
 		updatePatient(
 			state,
@@ -366,6 +406,9 @@ export const {
 	deactivatePatient,
 	clearPatientMedication,
 	setActivePatientTab,
+	addPanel,
+	removePanel,
+	clearPanels,
 	addMedicationsToPatient,
 	updateMedicationForPatient,
 	removeMedicationFromPatient,

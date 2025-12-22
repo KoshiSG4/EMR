@@ -10,6 +10,7 @@ import MedicationsPage from './MedicationsPage';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
 import {
+	clearPanels,
 	clearSelectedPatient,
 	closePatientTab,
 	resetPatient,
@@ -145,8 +146,9 @@ const Dashboard = () => {
 
 	const isActive = (path: string) => location.pathname.includes(path);
 
-	const handleCloseTab = (ptId: string) => {
+	const handleCloseTab = (ptId: string, patientId: string) => {
 		dispatch(closePatientTab(ptId));
+		dispatch(clearPanels({ patientId }));
 
 		if (activeTabId === ptId) {
 			const remainingTabs = openTabs.filter((t) => t.id !== ptId);
@@ -381,7 +383,10 @@ const Dashboard = () => {
 									<button
 										onClick={(e) => {
 											e.stopPropagation();
-											handleCloseTab(pt.id);
+											handleCloseTab(
+												pt.id,
+												pt.patient.userId
+											);
 										}}
 										className="ml-2 text-gray-500 hover:text-red-500">
 										×
@@ -396,7 +401,7 @@ const Dashboard = () => {
 			{/* Tab Content */}
 			<div
 				className={cn(
-					'flex-1 p-4 border rounded shadow bg-white overflow-y-auto overflow-x-hidden scrollbar-thin min-h-[200px]',
+					'flex-1 p-4 border rounded shadow bg-white overflow-x-auto overflow-y-auto scrollbar-thin min-h-[200px] max-w-full ',
 					section === 'overview' || section === undefined
 						? 'h-[95%] '
 						: 'h-[88%] '

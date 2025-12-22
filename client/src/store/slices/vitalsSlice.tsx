@@ -1,6 +1,7 @@
 import api from '../../api/axiosInstance';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { VitalsRecord } from '@/types/vitalsRecords';
+import { toast } from 'sonner';
 
 interface VitalsState {
 	vitals: VitalsRecord[];
@@ -41,7 +42,12 @@ export const getAllvitalsRecords = createAsyncThunk<
 	const response = await api.get('vitals/getAll', {
 		params: { vitalsRecord },
 	});
-	return response.data;
+	const formattedData = response.data.map((item: VitalsRecord) => ({
+		...item,
+		createdDate: item.createdDate ? item.createdDate.split('T')[0] : null,
+		updatedDate: item.updatedDate ? item.updatedDate.split('T')[0] : null,
+	}));
+	return formattedData;
 });
 
 export const getSelectedPatientsVitalsRecords = createAsyncThunk<
@@ -51,26 +57,43 @@ export const getSelectedPatientsVitalsRecords = createAsyncThunk<
 	const response = await api.get(`vitals/${patientId}/getRecords`, {
 		params: { vitalsRecords },
 	});
-	return response.data;
+	const formattedData = response.data.map((item: VitalsRecord) => ({
+		...item,
+		createdDate: item.createdDate ? item.createdDate.split('T')[0] : null,
+		updatedDate: item.updatedDate ? item.updatedDate.split('T')[0] : null,
+	}));
+	return formattedData;
 });
 
 export const updateVitalsRecord = createAsyncThunk<
 	VitalsRecord,
 	{ selectedVitalsRecord: VitalsRecord }
 >('vitals/update', async ({ selectedVitalsRecord }) => {
-	const response = await api.put(
-		`vitals/${selectedVitalsRecord.id}/update`,
-		selectedVitalsRecord
-	);
-	return response.data;
+	try {
+		const response = await api.put(
+			`vitals/${selectedVitalsRecord.id}/update`,
+			selectedVitalsRecord
+		);
+		toast.success('Vital record updated successfully!');
+		return response.data;
+	} catch (error) {
+		console.error(error);
+		toast.error('Vital record has not been updated, Please try again!');
+	}
 });
 
 export const addNewVitalsRecord = createAsyncThunk<
 	VitalsRecord,
 	{ vitalsRecord: VitalsRecord }
 >('vitals/addVitalsRecord', async ({ vitalsRecord }) => {
-	const response = await api.post(`vitals/add`, vitalsRecord);
-	return response.data;
+	try {
+		const response = await api.post(`vitals/add`, vitalsRecord);
+		toast.success('New vital record added successfully!');
+		return response.data;
+	} catch (error) {
+		console.error(error);
+		toast.error('Vital record has not been added, Please try again!');
+	}
 });
 
 const vitalsSlice = createSlice({
@@ -96,11 +119,17 @@ const vitalsSlice = createSlice({
 				vitalsRecord: VitalsRecord;
 			}>
 		) => {
-			const existingRecord = state.vitals.find(
+			let existingRecord = state.vitals.find(
 				(vitalsRec) => vitalsRec.id === action.payload.vitalsRecord.id
 			);
+
 			if (!existingRecord) {
-				state.vitals.push(action.payload.vitalsRecord);
+				existingRecord = {
+					...action.payload.vitalsRecord,
+					createdDate:
+						action.payload.vitalsRecord.createdDate.split('T')[0],
+				};
+				state.vitals.push(existingRecord);
 			} else {
 				Object.assign(existingRecord, action.payload.vitalsRecord);
 			}
@@ -110,7 +139,11 @@ const vitalsSlice = createSlice({
 			state,
 			action: PayloadAction<{ vitalsRecord: VitalsRecord }>
 		) => {
-			const updated = action.payload.vitalsRecord;
+			const updated = {
+				...action.payload.vitalsRecord,
+				updatedDate:
+					action.payload.vitalsRecord.updatedDate.split('T')[0],
+			};
 			const index = state.vitals.findIndex(
 				(vitalsRec) => vitalsRec.id === updated.id
 			);

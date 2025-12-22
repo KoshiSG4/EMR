@@ -107,7 +107,7 @@ const AddNewUserForm = ({ onSubmit, addedByName }: AddNewUserFormProps) => {
 				<form onSubmit={form.handleSubmit(handleFormSubmit)}>
 					<DialogTrigger asChild>
 						<Button
-							className="absolute top-6 right-6 bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]"
+							className="absolute top-6 right-6 bg-addButton-bg text-addButton-text hover:text-addButton-hover_txt hover:bg-addButton-hover_bg"
 							onClick={() => setShowAddDialog(true)}>
 							Add New User
 						</Button>

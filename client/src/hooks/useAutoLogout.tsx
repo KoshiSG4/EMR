@@ -17,7 +17,6 @@ export const useAutoLogout = () => {
 		if (timerRef.current) clearTimeout(timerRef.current);
 		timerRef.current = setTimeout(() => {
 			dispatch(resetUser());
-			signOut();
 			navigate('/login');
 		}, AUTO_LOGOUT_MINUTES * 60 * 1000);
 	};

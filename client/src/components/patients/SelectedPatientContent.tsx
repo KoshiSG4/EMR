@@ -1,9 +1,10 @@
 import { AppDispatch, RootState } from '@/store/store';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
 import {
+	addPanel,
 	setSelectedPatient,
 	updatePatient,
 	updatePatientInfo,
@@ -22,7 +23,11 @@ import LabPage from '../../Pages/LabPage';
 import PrescriptionPage from '../medicalRecords/clinical/prescription/PrescriptionPage';
 import PatientMedications from '../medicalRecords/clinical/patientMedication/PatientMedications';
 import PatientProfileCard from './PatientProfileCard ';
-import ResizebleTabContent from '../common/ResizebleTabContent';
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from '../ui/resizable';
 
 interface SelectedPatientContentProps {
 	patient: Patient;
@@ -31,8 +36,8 @@ interface SelectedPatientContentProps {
 const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 	const { subTab, innerTab, innerSubTab } = useParams();
 	const dispatch = useDispatch<AppDispatch>();
-	const selectedPatient = useSelector(
-		(state: RootState) => state.patients.selectedPatient
+	const { selectedPatient, openPanelsByPatient } = useSelector(
+		(state: RootState) => state.patients
 	);
 	const [tabContent, setTabContent] = useState<React.ReactNode>(null);
 	const [isForbidden, setIsForbidden] = useState(false);
@@ -41,7 +46,6 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 	useEffect(() => {
 		setIsLoading(true);
 		setIsForbidden(false);
-		setTabContent(null);
 
 		try {
 			if (subTab === 'profile') {
@@ -67,30 +71,6 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 						onSave={handleOnSave}
 					/>
 				);
-			} else if (subTab === 'medical-records') {
-				if (innerTab === 'vitals') {
-					setTabContent(<VitalsPage />);
-				} else if (innerTab === 'diagnoses') {
-					setTabContent(<DiagnosePage />);
-				} else if (innerTab === 'history') {
-					setTabContent(<HistoryPage />);
-				} else if (innerTab === 'clinical') {
-					if (innerSubTab === 'enter') {
-						setTabContent(<ClinicalRecordsPage />);
-					} else if (innerSubTab === 'visits') {
-						setTabContent(<PastVisitsPage />);
-					} else if (innerSubTab === 'referrals') {
-						setTabContent(<ReferralsPage />);
-					} else if (innerSubTab === 'lab') {
-						setTabContent(<LabPage />);
-					} else if (innerSubTab === 'prescriptions') {
-						setTabContent(<PrescriptionPage />);
-					} else if (innerSubTab === 'medications') {
-						setTabContent(
-							<PatientMedications patientId={patient.userId} />
-						);
-					}
-				}
 			}
 		} catch (err: any) {
 			if (err.response?.status === 403) {
@@ -101,7 +81,81 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [selectedPatient, subTab, innerTab, innerSubTab, patient]);
+	}, [selectedPatient, subTab, patient]);
+
+	const panelRegistry: Record<string, React.ComponentType<any>> = {
+		vitals: VitalsPage,
+		diagnoses: DiagnosePage,
+		history: HistoryPage,
+
+		'clinical-enter': ClinicalRecordsPage,
+		'clinical-visits': PastVisitsPage,
+		'clinical-lab': LabPage,
+		'clinical-referrals': ReferralsPage,
+		'clinical-prescriptions': PrescriptionPage,
+		'clinical-medications': PatientMedications,
+	};
+
+	const getPanelDefinition = ({
+		subTab,
+		innerTab,
+		innerSubTab,
+	}: {
+		subTab: string;
+		innerTab: string;
+		innerSubTab?: string;
+	}) => {
+		if (subTab !== 'medical-records') return null;
+
+		if (innerTab === 'vitals') return { panelId: 'vitals' };
+
+		if (innerTab === 'diagnoses') return { panelId: 'diagnoses' };
+
+		if (innerTab === 'history') return { panelId: 'history' };
+
+		if (innerTab === 'clinical') {
+			switch (innerSubTab) {
+				case 'enter':
+					return { panelId: 'clinical-enter' };
+				case 'visits':
+					return { panelId: 'clinical-visits' };
+				case 'lab':
+					return { panelId: 'clinical-lab' };
+				case 'referrals':
+					return { panelId: 'clinical-referrals' };
+				case 'prescriptions':
+					return { panelId: 'clinical-prescriptions' };
+				case 'medications':
+					return {
+						panelId: 'clinical-medications',
+					};
+			}
+		}
+
+		return null;
+	};
+
+	useEffect(() => {
+		if (!selectedPatient) return;
+		if (subTab !== 'medical-records' || !innerTab) return;
+
+		const result = getPanelDefinition({
+			subTab,
+			innerTab,
+			innerSubTab,
+		});
+
+		if (!result) return;
+
+		const { panelId } = result;
+
+		dispatch(
+			addPanel({
+				panelId,
+				patientId: selectedPatient.userId,
+			})
+		);
+	}, [subTab, innerTab, innerSubTab, patient.userId]);
 
 	return (
 		<div>
@@ -134,15 +188,35 @@ const SelectedPatientContent = ({ patient }: SelectedPatientContentProps) => {
 				</nav>
 				<PatientInfoHeader selectedPatient={patient} />
 			</div>
+
+			{subTab === 'medical-records' && selectedPatient && (
+				<div className="w-full h-full min-w-0 overflow-x-auto">
+					<ResizablePanelGroup
+						direction="horizontal"
+						className="min-w-0">
+						{openPanelsByPatient[selectedPatient.userId]?.map(
+							(panel, index) => {
+								const PanelComponent =
+									panelRegistry[panel.panelId];
+								return (
+									<React.Fragment key={panel.panelId}>
+										<ResizablePanel>
+											<PanelComponent />
+										</ResizablePanel>
+										<ResizableHandle withHandle />
+									</React.Fragment>
+								);
+							}
+						)}
+					</ResizablePanelGroup>
+				</div>
+			)}
 			{isLoading ? (
 				<p>Loading...</p>
 			) : isForbidden ? (
 				<Forbidden />
 			) : (
-				<div>
-					{tabContent}
-					{/* <ResizebleTabContent /> */}
-				</div>
+				tabContent
 			)}
 		</div>
 	);

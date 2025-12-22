@@ -22,15 +22,14 @@ const PatientInfoHeader = ({ selectedPatient }: PatientInfoHeaderProps) => {
 			<h2 className="text-lg font-semibold text-gray-800">
 				{selectedPatient.fullName}
 				<span className="ml-2 text-base text-gray-500 font-normal">
-					{` | ${selectedPatient.user.gender}`}
+					{` ( Age: ${calculateAge(
+						new Date(selectedPatient.user.dateOfBirth)
+					)})`}
+				</span>
+				<span className="ml-2 text-base text-gray-500 font-normal">
+					{`| ${selectedPatient.user.gender}`}
 				</span>
 			</h2>
-
-			{/* Age */}
-			<p className="text-sm text-gray-600 mt-1">
-				<span className="font-medium">Age:</span>{' '}
-				{calculateAge(new Date(selectedPatient.user.dateOfBirth))}
-			</p>
 
 			{/* Diagnosis */}
 			{selectedPatient.records && selectedPatient.records.length > 0 && (

@@ -10,6 +10,12 @@ export default {
 				sm: 'calc(var(--radius) - 4px)',
 			},
 			colors: {
+				addButton: {
+					bg: '#1d3332',
+					text: '#D6F3F6',
+					hover_txt: '#132120',
+					hover_bg: '#c5ab19',
+				},
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {
