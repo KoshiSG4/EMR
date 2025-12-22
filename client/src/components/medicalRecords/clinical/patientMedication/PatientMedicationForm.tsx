@@ -1,4 +1,5 @@
 import { MEDICATION_UNITS } from '@/components/medications/MedicationUnits';
+import { Button } from '@/components/ui/button';
 import { clearResults } from '@/store/slices/patientSlice';
 import { AppDispatch, RootState } from '@/store/store';
 import { PatientMedication } from '@/types/patientMedicationTypes';
@@ -19,6 +20,7 @@ interface PatientMedicationFormProps {
 	initialData?: Partial<PatientMedication>;
 	patientId: string;
 	prescribedByName: string;
+	onClose: () => void;
 }
 
 const PatientMedicationForm = ({
@@ -26,6 +28,7 @@ const PatientMedicationForm = ({
 	initialData,
 	patientId,
 	prescribedByName,
+	onClose,
 }: PatientMedicationFormProps) => {
 	const [form, setForm] = useState({
 		name: initialData?.name || '',
@@ -250,12 +253,19 @@ const PatientMedicationForm = ({
 				/>
 
 				{/* Submit Button */}
-				<button
-					type="submit"
-					onClick={handleSubmit}
-					className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
-					Save Medication
-				</button>
+				<div className="flex justify-end mt-6 gap-3">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className="hover:bg-[#162725] hover:text-[#D6F3F6] hover:border-[#162725]  ">
+						Cancel
+					</Button>
+					<Button
+						type="submit"
+						className="bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]">
+						Save Medication
+					</Button>
+				</div>
 			</form>
 		</>
 	);

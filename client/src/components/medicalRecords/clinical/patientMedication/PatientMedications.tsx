@@ -12,7 +12,14 @@ import {
 	removePanel,
 } from '@/store/slices/patientSlice';
 import DataTable from '@/components/common/DataTable';
-import { X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from '@/components/ui/resizable';
 
 const PatientMedications = () => {
 	const navigate = useNavigate();
@@ -61,6 +68,10 @@ const PatientMedications = () => {
 		setIsFormOpen(false);
 	};
 
+	const handleFormClose = () => {
+		setIsFormOpen(false);
+	};
+
 	return (
 		<div className="p-3 space-y-3 relative">
 			{/* Content */}
@@ -87,68 +98,91 @@ const PatientMedications = () => {
 
 							{/* Medication Section */}
 							<div>
-								<DataTable
-									columns={patientMedicationTableColumns}
-									data={patientMedication}
-									loading={loading}
-									filters={[
-										{
-											columnId: 'name',
-											placeholder:
-												'Filter by medication name...',
-											className: 'max-w-sm mr-4',
-										},
-										{
-											columnId: 'prescribedByName',
-											placeholder:
-												'Filter by prescribing doctor...',
-											className: 'max-w-sm',
-										},
-										{
-											columnId: 'status',
-											type: 'select',
-											options: [
-												'Active',
-												'Discontinued',
-												'New',
-											],
-											className: 'max-w-sm',
-										},
-									]}
-								/>
+								<ResizablePanelGroup
+									direction="horizontal"
+									className="min-w-0 overflow-x-auto overflow-scroll">
+									<ResizablePanel className="mr-4">
+										<DataTable
+											columns={
+												patientMedicationTableColumns
+											}
+											data={patientMedication}
+											loading={loading}
+											filters={[
+												{
+													columnId: 'name',
+													placeholder:
+														'Filter by medication name...',
+													className: 'max-w-sm mr-4',
+												},
+												{
+													columnId:
+														'prescribedByName',
+													placeholder:
+														'Filter by prescribing doctor...',
+													className: 'max-w-sm',
+												},
+												{
+													columnId: 'status',
+													type: 'select',
+													options: [
+														'Active',
+														'Discontinued',
+														'New',
+													],
+													className: 'max-w-sm',
+												},
+											]}
+										/>
+									</ResizablePanel>
+									{isFormOpen && (
+										<>
+											<ResizableHandle withHandle />
+											<ResizablePanel className="ml-4 border rounded-md bg-[#c5dedd] min-w-80">
+												<div className="p-4 flex items-center justify-between border-b mx-4 ">
+													<h3 className="text-lg font-semibold">
+														Add Medications
+													</h3>
+													<button
+														onClick={() =>
+															setIsFormOpen(false)
+														}
+														className="text-black hover:text-gray-700">
+														✕
+													</button>
+												</div>
+												{selectedPatient && user && (
+													<PatientMedicationForm
+														onSubmit={
+															handleSubmitMedicationForm
+														}
+														patientId={
+															selectedPatient.userId
+														}
+														prescribedByName={
+															user.name
+														}
+														onClose={
+															handleFormClose
+														}
+													/>
+												)}
+											</ResizablePanel>
+										</>
+									)}
+								</ResizablePanelGroup>
 							</div>
 						</div>
 					</div>
 
-					<div
-						className={`absolute top-0 -right-8 h-full w-96  bg-white border-l border-gray-200 shadow-lg transform transition-transform duration-300 z-50
-        ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-						<div className="p-4 flex items-center justify-between border-b">
-							<h3 className="text-lg font-semibold">
-								Add New Medication
-							</h3>
-							<button
-								onClick={() => setIsFormOpen(false)}
-								className="text-gray-500 hover:text-gray-700">
-								✕
-							</button>
-						</div>
-						<div className="p-4 overflow-y-auto">
-							{user && (
-								<PatientMedicationForm
-									onSubmit={handleSubmitMedicationForm}
-									patientId={selectedPatient.userId}
-									prescribedByName={user?.name}
-								/>
-							)}
-						</div>
-					</div>
-
-					<button
+					<Button
 						onClick={() => setIsFormOpen((prev) => !prev)}
-						className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition">
-						➕ Add Medication
-					</button>
+						className={cn(
+							'absolute top-14 right-10 bg-addButton-bg text-addButton-text hover:text-addButton-hover_txt hover:bg-addButton-hover_bg',
+							isFormOpen ? 'hidden' : 'visible'
+						)}>
+						<Plus className="size-4" /> Add Medication
+					</Button>
 				</div>
 			)}
 		</div>

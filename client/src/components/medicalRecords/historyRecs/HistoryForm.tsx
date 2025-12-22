@@ -10,9 +10,15 @@ interface HistoryFormProps {
 	onSubmit: (data: HistoryRecord) => void;
 	patientId: string;
 	recordedBy: string;
+	onClose: () => void;
 }
 
-const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
+const HistoryForm = ({
+	onSubmit,
+	patientId,
+	recordedBy,
+	onClose,
+}: HistoryFormProps) => {
 	const [history, setHistory] = useState({
 		chronicConditions: '',
 		pastIllnesses: '',
@@ -115,16 +121,19 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 		<>
 			<form
 				onSubmit={handleSubmit}
-				className="max-w-xl mx-auto space-y-4 p-6 bg-white rounded-2xl shadow-md">
+				className="m-4 space-y-4 p-6 bg-white rounded-2xl shadow-md">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="chronicConditions"
 						value={history.chronicConditions}
 						onClick={(e) =>
 							dispatch(getAllDiagnosis({ diagnosis: diagnosis }))
 						}
 						onChange={handleChange}>
-						<option value="">Select Diagnosis</option>
+						<option value="" className="p-2">
+							Select Diagnosis
+						</option>
 						{diagnosis.map((d) => (
 							<option key={d.id} value={d.id}>
 								{d.name}
@@ -164,6 +173,7 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 						onChange={handleChange}
 					/>
 					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="smokingStatus"
 						value={history.smokingStatus}
 						onChange={handleChange}>
@@ -187,6 +197,7 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 						onChange={handleChange}
 					/>
 					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="alcoholUse"
 						value={history.alcoholUse}
 						onChange={handleChange}>
@@ -209,6 +220,7 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 						onChange={handleChange}
 					/>
 					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="drugUse"
 						value={history.drugUse}
 						onChange={handleChange}>
@@ -229,6 +241,7 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 						onChange={handleChange}
 					/>
 					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="diet"
 						value={history.diet}
 						onChange={handleChange}>
@@ -252,6 +265,7 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 						onChange={handleChange}
 					/>
 					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="lifestyle"
 						value={history.lifestyle}
 						onChange={handleChange}>
@@ -308,12 +322,17 @@ const HistoryForm = ({ onSubmit, patientId, recordedBy }: HistoryFormProps) => {
 					/>
 				</div>
 
-				<div className="flex justify-end mt-6">
+				<div className="flex justify-end mt-6 gap-3">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className="hover:bg-[#162725] hover:text-[#D6F3F6] hover:border-[#162725]  ">
+						Cancel
+					</Button>
 					<Button
 						type="submit"
-						onClick={handleSubmit}
-						className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
-						Save
+						className="bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]">
+						Save History
 					</Button>
 				</div>
 			</form>

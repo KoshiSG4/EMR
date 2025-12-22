@@ -7,6 +7,7 @@ import { PastVisitRecord } from '@/types/pastVisitRecord';
 import { pastVisitsColumns } from './pastVisitsColumns';
 import { X } from 'lucide-react';
 import { removePanel } from '@/store/slices/patientSlice';
+import { ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 const dummyPastVisits: PastVisitRecord[] = [
 	{
@@ -70,11 +71,17 @@ const PastVisitsPage = () => {
 									)
 								}></X>
 						</div>
-						<DataTable
-							columns={pastVisitsColumns}
-							data={dummyPastVisits}
-							loading={loading}
-						/>
+						<ResizablePanelGroup
+							direction="horizontal"
+							className="min-w-0 overflow-x-auto overflow-scroll">
+							<ResizablePanel className="mr-4">
+								<DataTable
+									columns={pastVisitsColumns}
+									data={dummyPastVisits}
+									loading={loading}
+								/>
+							</ResizablePanel>
+						</ResizablePanelGroup>
 					</div>
 				</div>
 			)}

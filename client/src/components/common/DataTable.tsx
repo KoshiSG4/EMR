@@ -187,7 +187,7 @@ const DataTable = <TData extends object, TValue>({
 						<Button
 							variant="outline"
 							className="flex justify-start">
-							Columns
+							Customize Columns
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent

@@ -7,12 +7,14 @@ interface ClinicalDetailsFormProps {
 	onSubmit: (data: ClinicalDetailRecord) => void;
 	patientId: string;
 	recordedBy: string;
+	onClose: () => void;
 }
 
 const ClinicalDetailsForm = ({
 	onSubmit,
 	patientId,
 	recordedBy,
+	onClose,
 }: ClinicalDetailsFormProps) => {
 	const [clinicalDetails, setClinicalDetails] = useState({
 		chiefComplaint: '',
@@ -109,12 +111,17 @@ const ClinicalDetailsForm = ({
 					/>
 				</div>
 
-				<div className="flex justify-end mt-6">
+				<div className="flex justify-end mt-6 gap-3">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className="hover:bg-[#162725] hover:text-[#D6F3F6] hover:border-[#162725]  ">
+						Cancel
+					</Button>
 					<Button
 						type="submit"
-						onClick={handleSubmit}
-						className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
-						Save
+						className="bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]">
+						Save Vitals
 					</Button>
 				</div>
 			</form>

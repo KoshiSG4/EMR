@@ -7,12 +7,14 @@ interface ReferralsFormProps {
 	onSubmit: (data: ReferralRecord) => void;
 	patientId: string;
 	referredBy: string;
+	onClose: () => void;
 }
 
 const ReferralsForm = ({
 	onSubmit,
 	patientId,
 	referredBy,
+	onClose,
 }: ReferralsFormProps) => {
 	const [referral, setReferral] = useState({
 		referralType: '',
@@ -45,6 +47,7 @@ const ReferralsForm = ({
 		e.preventDefault();
 		const newReferral: ReferralRecord = {
 			id: crypto.randomUUID(),
+			patientId: patientId,
 			date: new Date().toISOString(),
 			referralType: referral.referralType,
 			referredTo: referral.referredTo,
@@ -69,7 +72,7 @@ const ReferralsForm = ({
 		<>
 			<form
 				onSubmit={handleSubmit}
-				className="max-w-xl mx-auto space-y-4 p-6 bg-white rounded-2xl shadow-md">
+				className="m-4 space-y-4 p-6 bg-white rounded-2xl shadow-md">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<Input
 						name="referralType"
@@ -121,12 +124,17 @@ const ReferralsForm = ({
 					/>
 				</div>
 
-				<div className="flex justify-end mt-6">
+				<div className="flex justify-end mt-6 gap-3">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className="hover:bg-[#162725] hover:text-[#D6F3F6] hover:border-[#162725]  ">
+						Cancel
+					</Button>
 					<Button
 						type="submit"
-						onClick={handleSubmit}
-						className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
-						Save
+						className="bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]">
+						Save Referral
 					</Button>
 				</div>
 			</form>

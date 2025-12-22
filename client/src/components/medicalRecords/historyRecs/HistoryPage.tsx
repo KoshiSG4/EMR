@@ -12,8 +12,15 @@ import {
 } from '@/store/slices/historySlice';
 import HistoryForm from './HistoryForm';
 import HistoryDetailsDialog from './HistoryDialog';
-import { X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { removePanel } from '@/store/slices/patientSlice';
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from '@/components/ui/resizable';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const HistoryPage = () => {
 	const [isFormOpen, setIsFormOpen] = useState(false);
@@ -63,6 +70,9 @@ const HistoryPage = () => {
 		setIsFormOpen(false);
 	};
 
+	const handleFormClose = () => {
+		setIsFormOpen(false);
+	};
 	const handleSelectHistoryRecord: (rowData: HistoryRecord) => void = (
 		rowData
 	) => {
@@ -90,48 +100,67 @@ const HistoryPage = () => {
 									)
 								}></X>
 						</div>
-						<DataTable
-							columns={historyColumns}
-							data={formattedHistories}
-							loading={loading}
-							onRowSelect={handleSelectHistoryRecord}
-						/>
+						<ResizablePanelGroup
+							direction="horizontal"
+							className="min-w-0 overflow-x-auto overflow-scroll">
+							<ResizablePanel className="mr-4">
+								<DataTable
+									columns={historyColumns}
+									data={formattedHistories}
+									loading={loading}
+									onRowSelect={handleSelectHistoryRecord}
+								/>
+							</ResizablePanel>
 
-						{selectedHistoryRecord && (
-							<HistoryDetailsDialog
-								open={true}
-								onClose={() => setSelectedHistoryRecord(null)}
-								history={selectedHistoryRecord}
-							/>
-						)}
-						<div
-							ref={ref}
-							className={`absolute top-0 -right-8 h-auto w-2/5  bg-white border-y-2 border-gray-200 shadow-lg  transform transition-transform duration-300 z-50
-        ${isFormOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-							<div className="p-4 flex items-center justify-between border-b ">
-								<h3 className="text-lg font-semibold">
-									History
-								</h3>
-								<button
-									onClick={() => setIsFormOpen(false)}
-									className="text-gray-500 hover:text-gray-700">
-									✕
-								</button>
-							</div>
-							{selectedPatient && (
-								<HistoryForm
-									onSubmit={handleSubmit}
-									patientId={selectedPatient.userId}
-									recordedBy={userName}
+							{isFormOpen && (
+								<>
+									<ResizableHandle withHandle />
+									<ResizablePanel className="ml-4 border rounded-md bg-[#c5dedd] min-w-80">
+										<div className="p-4 flex items-center justify-between border-b mx-4 ">
+											<h3 className="text-lg font-semibold">
+												Add History
+											</h3>
+											<button
+												onClick={() =>
+													setIsFormOpen(false)
+												}
+												className="text-black hover:text-gray-700">
+												✕
+											</button>
+										</div>
+										{selectedPatient && (
+											<HistoryForm
+												onClose={handleFormClose}
+												onSubmit={handleSubmit}
+												patientId={
+													selectedPatient.userId
+												}
+												recordedBy={userName}
+											/>
+										)}
+									</ResizablePanel>
+								</>
+							)}
+
+							{selectedHistoryRecord && (
+								<HistoryDetailsDialog
+									open={true}
+									onClose={() =>
+										setSelectedHistoryRecord(null)
+									}
+									history={selectedHistoryRecord}
 								/>
 							)}
-						</div>
+						</ResizablePanelGroup>
 
-						<button
+						<Button
 							onClick={() => setIsFormOpen((prev) => !prev)}
-							className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-700 transition">
-							➕ Add History
-						</button>
+							className={cn(
+								'absolute top-14 right-10 bg-addButton-bg text-addButton-text hover:text-addButton-hover_txt hover:bg-addButton-hover_bg',
+								isFormOpen ? 'hidden' : 'visible'
+							)}>
+							<Plus className="size-4" /> Add History
+						</Button>
 					</div>
 				</div>
 			)}

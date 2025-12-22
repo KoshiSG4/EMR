@@ -11,18 +11,20 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from '@radix-ui/react-select';
+} from '@/components/ui/select';
 
 interface DiagnoseFormProps {
 	onSubmit: (data: MedicalRecord) => void;
 	patientId: string;
 	recordedBy: string;
+	onClose?: () => void;
 }
 
 const DiagnoseForm = ({
 	onSubmit,
 	patientId,
 	recordedBy,
+	onClose,
 }: DiagnoseFormProps) => {
 	const [diagnose, setDiagnose] = useState({
 		notes: '',
@@ -78,28 +80,25 @@ const DiagnoseForm = ({
 		<>
 			<form
 				onSubmit={handleSubmit}
-				className="max-w-xl mx-auto space-y-4 p-6 bg-white rounded-2xl shadow-md">
+				className="m-4 space-y-4 p-6 bg-white rounded-2xl shadow-md">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					<Select
+					<select
+						className="w-full p-1 border rounded-lg focus:ring-1 focus:ring-blue-400 text-[#696b6e] text-sm"
 						name="diagnosisId"
 						value={diagnose.diagnosisId}
-						onValueChange={(val) =>
-							handleChange(undefined, 'diagnosisId', val)
-						}>
-						<SelectTrigger
-							value=""
-							className="text-gray-400"
-							disabled>
-							<SelectValue>Select Diagnosis</SelectValue>
-						</SelectTrigger>
-						<SelectContent className="w-full p-[6.4px] border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-500 placeholder-gray-400">
-							{diagnosis.map((d) => (
-								<SelectItem key={d.id} value={d.id}>
-									{d.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+						onClick={(e) =>
+							dispatch(getAllDiagnosis({ diagnosis: diagnosis }))
+						}
+						onChange={handleChange}>
+						<option value="" className="p-2">
+							Select Diagnosis
+						</option>
+						{diagnosis.map((d) => (
+							<option key={d.id} value={d.id}>
+								{d.name}
+							</option>
+						))}
+					</select>
 					<Input
 						name="type"
 						type="text"
@@ -126,12 +125,17 @@ const DiagnoseForm = ({
 					/>
 				</div>
 
-				<div className="flex justify-end mt-6">
+				<div className="flex justify-end mt-6 gap-3">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className="hover:bg-[#162725] hover:text-[#D6F3F6] hover:border-[#162725]  ">
+						Cancel
+					</Button>
 					<Button
 						type="submit"
-						onClick={handleSubmit}
-						className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition">
-						Save
+						className="bg-[#1d3332] text-[#D6F3F6] hover:text-[#132120] hover:bg-[#c5ab19]">
+						Save Vitals
 					</Button>
 				</div>
 			</form>
