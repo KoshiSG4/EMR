@@ -21,7 +21,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [isLoading, setIsLoading] = useState(true);
-	const user = useSelector((state: RootState) => state.user.loggedInUser);
+	const userLogged = useSelector(
+		(state: RootState) => state.user.loggedInUser
+	);
 
 	const dispatch = useDispatch<AppDispatch>();
 
@@ -29,6 +31,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	useEffect(() => {
 		const checkAuth = async () => {
+			const token = localStorage.getItem('accessToken');
+			const hasLoggedIn = localStorage.getItem('hasLoggedIn');
+			if (!hasLoggedIn) {
+				setAuthChecked(true);
+				return;
+			}
+
+			if (token) {
+				api.defaults.headers.common[
+					'Authorization'
+				] = `Bearer ${token}`;
+				setAuthChecked(true);
+				return;
+			}
+
 			try {
 				const resp = await refreshClient.post('/auth/refresh');
 				api.defaults.headers.common[
@@ -54,8 +71,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				{ email, password },
 				{ withCredentials: true }
 			);
-
+			localStorage.setItem('hasLoggedIn', 'true');
+			localStorage.setItem('accessToken', response.data.accessToken);
+			api.defaults.headers.common[
+				'Authorization'
+			] = `Bearer ${response.data.accessToken}`;
 			dispatch(setLoggedInUser(response.data.user));
+
 			return response.data.user;
 		} catch (error: any) {
 			const errorMsg = error.response?.data?.message || 'Login failed';
@@ -125,7 +147,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<AuthContext.Provider
-			value={{ user, login, changePassword, signUp, signOut, isLoading }}>
+			value={{
+				user: userLogged,
+				login,
+				changePassword,
+				signUp,
+				signOut,
+				isLoading,
+			}}>
 			{children}
 		</AuthContext.Provider>
 	);
