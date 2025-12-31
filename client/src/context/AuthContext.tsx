@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				return;
 			}
 
-			if (token) {
+			if (token && token !== 'undefined') {
 				api.defaults.headers.common[
 					'Authorization'
 				] = `Bearer ${token}`;
