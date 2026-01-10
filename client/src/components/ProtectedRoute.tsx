@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store/store';
 import { LoaderIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { refreshToken } from '@/api/refreshToken';
+import { setLoading } from '@/store/slices/authSlice';
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;
@@ -14,11 +16,25 @@ export const ProtectedRoute = ({
 	children,
 	allowedRoles,
 }: ProtectedRouteProps) => {
-	const { loading, loggedInUser } = useSelector(
-		(state: RootState) => state.user
+	const { loggedInUser } = useSelector((state: RootState) => state.user);
+	const { isAuthenticated, loading } = useSelector(
+		(state: RootState) => state.token
 	);
+	const dispatch = useDispatch<AppDispatch>();
 
-	const { isAuthenticated } = useSelector((state: RootState) => state.token);
+	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				await refreshToken();
+			} catch {
+				console.log('No valid session');
+			} finally {
+				dispatch(setLoading(false));
+			}
+		};
+
+		checkAuth();
+	}, [setLoading]);
 
 	if (loading) {
 		return (

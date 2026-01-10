@@ -31,20 +31,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	);
 	const dispatch = useDispatch<AppDispatch>();
 
-	useEffect(() => {
-		const checkAuth = async () => {
-			try {
-				await refreshToken();
-			} catch {
-				console.log('No valid session');
-			} finally {
-				dispatch(setLoading(false));
-			}
-		};
-
-		checkAuth();
-	}, [setLoading]);
-
 	const login = async (email: string, password: string) => {
 		try {
 			const response = await api.post(
