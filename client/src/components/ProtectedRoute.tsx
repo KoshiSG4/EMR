@@ -18,6 +18,8 @@ export const ProtectedRoute = ({
 		(state: RootState) => state.user
 	);
 
+	const { isAuthenticated } = useSelector((state: RootState) => state.token);
+
 	if (loading) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-purple-50/30">
@@ -29,6 +31,10 @@ export const ProtectedRoute = ({
 				/>
 			</div>
 		);
+	}
+
+	if (!isAuthenticated) {
+		console.log('is not authenticated');
 	}
 
 	if (!loggedInUser) {

@@ -1,77 +1,63 @@
-import axios from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
 import api from './axiosInstance';
+import { store } from '@/store/store';
+import { clearToken, setToken } from '@/store/slices/authSlice';
+import {
+	getLoggedInUser,
+	setLoggedInUser,
+	setUsers,
+} from '@/store/slices/userSlice';
 
-// Separate axios instance for refresh token
-const refreshClient = axios.create({
-	baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
-	withCredentials: true,
-});
-
-let isRefreshing = false;
-let failedQueue: Array<{
-	resolve: (token?: string | null) => void;
-	reject: (err: any) => void;
-}> = [];
-
-const processQueue = (error: any, token: string | null = null) => {
-	failedQueue.forEach((prom) => {
-		error ? prom.reject(error) : prom.resolve(token);
-	});
-	failedQueue = [];
+//prevent multiple refresh calls
+export let refreshPromise: Promise<string | null> | null = null;
+export const refreshToken = async () => {
+	if (!refreshPromise) {
+		refreshPromise = (async () => {
+			try {
+				const res = await api.post(
+					'/auth/refresh',
+					{},
+					{ withCredentials: true }
+				);
+				const newToken = res.data.accessToken;
+				store.dispatch(setToken(newToken));
+				store.dispatch(setLoggedInUser(res.data.user));
+				return newToken;
+			} catch {
+				store.dispatch(clearToken());
+				return null;
+			} finally {
+				refreshPromise = null;
+			}
+		})();
+	}
+	return refreshPromise;
 };
 
+// attach token to requests
+api.interceptors.request.use((config) => {
+	const state = store.getState();
+	const token = state.token.token;
+	if (token) config.headers.Authorization = `Bearer ${token}`;
+	return config;
+});
+
+// refresh on 401
 api.interceptors.response.use(
 	(response) => response,
-	async (error) => {
-		const originalRequest = error.config;
+	async (error: AxiosError) => {
+		const originalRequest = error.config as AxiosRequestConfig & {
+			_retry?: boolean;
+		};
 
-		// Refresh failed → force logout
-		if (
-			error.response?.status === 401 &&
-			originalRequest.url.includes('/auth/refresh')
-		) {
-			isRefreshing = false;
-			processQueue(error, null);
-			return Promise.reject({ logout: true });
-		}
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
 
-		// Access token expired
-		if (
-			error.response?.status === 401 &&
-			!(originalRequest as any)._retry
-		) {
-			if (isRefreshing) {
-				return new Promise((resolve, reject) => {
-					failedQueue.push({ resolve, reject });
-				}).then((token) => {
-					originalRequest.headers[
-						'Authorization'
-					] = `Bearer ${token}`;
-					return api(originalRequest);
-				});
-			}
+			const newToken = await refreshToken();
 
-			(originalRequest as any)._retry = true;
-			isRefreshing = true;
-
-			try {
-				const resp = await refreshClient.post('/auth/refresh');
-
-				const newToken = resp.data.accessToken;
-
-				api.defaults.headers.common[
-					'Authorization'
-				] = `Bearer ${newToken}`;
-				originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-
-				processQueue(null, newToken);
-
+			if (newToken && originalRequest.headers) {
+				originalRequest.headers.Authorization = `Bearer ${newToken}`;
 				return api(originalRequest);
-			} catch (err) {
-				processQueue(err, null);
-				return Promise.reject({ logout: true });
-			} finally {
-				isRefreshing = false;
 			}
 		}
 
@@ -79,4 +65,4 @@ api.interceptors.response.use(
 	}
 );
 
-export default refreshClient;
+export default api;

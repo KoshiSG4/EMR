@@ -81,6 +81,7 @@ export const refreshToken = async (req, res) => {
 		res.json({
 			message: 'Tokens refreshed',
 			user,
+			accessToken,
 		});
 	} catch (error) {
 		console.log(error);

@@ -9,6 +9,7 @@ import medicalRecordsReducer from './slices/medicalRecordSlice';
 import historyReducer from './slices/historySlice';
 import laboratoryReducer from './slices/laboratorySlice';
 import userReducer from './slices/userSlice';
+import tokenReducer from './slices/authSlice';
 
 const appReducer = combineReducers({
 	patients: patientReducer,
@@ -21,6 +22,7 @@ const appReducer = combineReducers({
 	history: historyReducer,
 	laboratory: laboratoryReducer,
 	user: userReducer,
+	token: tokenReducer,
 });
 
 export const rootReducer = (state: any, action: any) => {

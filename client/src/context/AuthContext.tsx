@@ -6,7 +6,9 @@ import { AppDispatch, RootState } from '@/store/store';
 import { resetUser, setLoggedInUser } from '@/store/slices/userSlice';
 import { LoaderIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import refreshClient from '@/api/refreshToken';
+import refreshClient, { refreshToken } from '@/api/refreshToken';
+import { setLoading } from '@/store/slices/authSlice';
+import { Navigate } from 'react-router-dom';
 
 interface AuthContextType {
 	user: User | null;
@@ -24,45 +26,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const userLogged = useSelector(
 		(state: RootState) => state.user.loggedInUser
 	);
-
+	const { isAuthenticated, loading } = useSelector(
+		(state: RootState) => state.token
+	);
 	const dispatch = useDispatch<AppDispatch>();
-
-	const [authChecked, setAuthChecked] = useState(false);
 
 	useEffect(() => {
 		const checkAuth = async () => {
-			const token = localStorage.getItem('accessToken');
-			const hasLoggedIn = localStorage.getItem('hasLoggedIn');
-			if (!hasLoggedIn) {
-				setAuthChecked(true);
-				return;
-			}
-
-			if (token && token !== 'undefined') {
-				api.defaults.headers.common[
-					'Authorization'
-				] = `Bearer ${token}`;
-				setAuthChecked(true);
-				return;
-			}
-
 			try {
-				const resp = await refreshClient.post('/auth/refresh');
-				api.defaults.headers.common[
-					'Authorization'
-				] = `Bearer ${resp.data.accessToken}`;
-				dispatch(setLoggedInUser(resp.data.user));
+				await refreshToken();
 			} catch {
-				dispatch(resetUser());
-				dispatch({ type: 'auth/logout' });
-				signOut();
+				console.log('No valid session');
 			} finally {
-				setAuthChecked(true);
+				dispatch(setLoading(false));
 			}
 		};
 
 		checkAuth();
-	}, []);
+	}, [setLoading]);
 
 	const login = async (email: string, password: string) => {
 		try {
@@ -71,11 +52,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				{ email, password },
 				{ withCredentials: true }
 			);
-			localStorage.setItem('hasLoggedIn', 'true');
-			localStorage.setItem('accessToken', response.data.accessToken);
-			api.defaults.headers.common[
-				'Authorization'
-			] = `Bearer ${response.data.accessToken}`;
 			dispatch(setLoggedInUser(response.data.user));
 
 			return response.data.user;
@@ -132,7 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 		});
 	};
 
-	if (!authChecked) {
+	if (loading) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-purple-50/30">
 				<div className="text-purple-600 pr-3">Loading...</div>

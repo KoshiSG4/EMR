@@ -12,10 +12,8 @@ type DashboardLayoutProps = {
 };
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
-	const user = useSelector((state: RootState) => state.user.loggedInUser);
-	if (user) {
-		useAutoLogout();
-	}
+	useAutoLogout();
+
 	return (
 		<SidebarProvider className="flex h-screen bg-gray-100 min-w-0">
 			<AppSidebar />
