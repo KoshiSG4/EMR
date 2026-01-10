@@ -7,7 +7,7 @@ import { resetUser, setLoggedInUser } from '@/store/slices/userSlice';
 import { LoaderIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import refreshClient, { refreshToken } from '@/api/refreshToken';
-import { setLoading } from '@/store/slices/authSlice';
+import { setLoading, setToken } from '@/store/slices/authSlice';
 import { Navigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -31,6 +31,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	);
 	const dispatch = useDispatch<AppDispatch>();
 
+	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				await refreshToken();
+			} catch {
+				console.log('No valid session');
+			} finally {
+				dispatch(setLoading(false));
+			}
+		};
+
+		checkAuth();
+	}, [dispatch]);
+
 	const login = async (email: string, password: string) => {
 		try {
 			const response = await api.post(
@@ -39,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 				{ withCredentials: true }
 			);
 			dispatch(setLoggedInUser(response.data.user));
+			dispatch(setToken(response.data.accessToken));
 
 			return response.data.user;
 		} catch (error: any) {

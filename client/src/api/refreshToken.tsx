@@ -1,4 +1,4 @@
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import api from './axiosInstance';
 import { store } from '@/store/store';
 import { clearToken, setToken } from '@/store/slices/authSlice';
@@ -8,13 +8,19 @@ import {
 	setUsers,
 } from '@/store/slices/userSlice';
 
+export const refreshClient = axios.create({
+	baseURL: import.meta.env.VITE_API_URL,
+	withCredentials: true,
+});
+
 //prevent multiple refresh calls
 export let refreshPromise: Promise<string | null> | null = null;
 export const refreshToken = async () => {
 	if (!refreshPromise) {
 		refreshPromise = (async () => {
 			try {
-				const res = await api.post(
+				console.log('refresh starts');
+				const res = await refreshClient.post(
 					'/auth/refresh',
 					{},
 					{ withCredentials: true }
@@ -22,6 +28,7 @@ export const refreshToken = async () => {
 				const newToken = res.data.accessToken;
 				store.dispatch(setToken(newToken));
 				store.dispatch(setLoggedInUser(res.data.user));
+				console.log('refresh finish');
 				return newToken;
 			} catch {
 				store.dispatch(clearToken());
@@ -59,6 +66,14 @@ api.interceptors.response.use(
 				originalRequest.headers.Authorization = `Bearer ${newToken}`;
 				return api(originalRequest);
 			}
+		}
+
+		if (
+			error.response?.status === 401 &&
+			!error.config?.url?.includes('/auth/refresh')
+		) {
+			console.log('refresh stoped');
+			return Promise.reject({ logout: true });
 		}
 
 		return Promise.reject(error);

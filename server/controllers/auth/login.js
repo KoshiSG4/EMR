@@ -4,14 +4,14 @@ import { PrismaClient } from '../../generated/prisma/index.js';
 const prisma = new PrismaClient();
 
 const COOKIE_OPTIONS = (maxAgeMs) => ({
-	// httpOnly: true,
-	// sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-	// secure: process.env.NODE_ENV === 'production',
-	// maxAge: maxAgeMs,
 	httpOnly: true,
-	sameSite: 'none',
-	secure: true,
+	sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+	secure: process.env.NODE_ENV === 'production',
 	maxAge: maxAgeMs,
+	// httpOnly: true,
+	// sameSite: 'none',
+	// secure: true,
+	// maxAge: maxAgeMs,
 });
 
 export const login = async (req, res) => {
@@ -39,6 +39,7 @@ export const login = async (req, res) => {
 			return res.status(200).json({
 				mustChangePassword: true,
 				message: 'You must change your password before continuing',
+				user,
 			});
 		}
 
@@ -80,6 +81,7 @@ export const login = async (req, res) => {
 
 		res.json({
 			message: 'Logged in',
+			accessToken,
 			user,
 		});
 	} catch (error) {

@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/store/store';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store/store';
 import { LoaderIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { refreshToken } from '@/api/refreshToken';
-import { setLoading } from '@/store/slices/authSlice';
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;
@@ -16,25 +14,11 @@ export const ProtectedRoute = ({
 	children,
 	allowedRoles,
 }: ProtectedRouteProps) => {
-	const { loggedInUser } = useSelector((state: RootState) => state.user);
-	const { isAuthenticated, loading } = useSelector(
-		(state: RootState) => state.token
+	const { loading, loggedInUser } = useSelector(
+		(state: RootState) => state.user
 	);
-	const dispatch = useDispatch<AppDispatch>();
 
-	useEffect(() => {
-		const checkAuth = async () => {
-			try {
-				await refreshToken();
-			} catch {
-				console.log('No valid session');
-			} finally {
-				dispatch(setLoading(false));
-			}
-		};
-
-		checkAuth();
-	}, [setLoading]);
+	const { isAuthenticated } = useSelector((state: RootState) => state.token);
 
 	if (loading) {
 		return (
@@ -50,7 +34,7 @@ export const ProtectedRoute = ({
 	}
 
 	if (!isAuthenticated) {
-		console.log('is not authenticated');
+		return <Navigate to="/login" replace />;
 	}
 
 	if (!loggedInUser) {
