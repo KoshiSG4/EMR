@@ -159,7 +159,9 @@ const DataTable = <TData extends object, TValue>({
 					}
 
 					return (
-						<div className="flex justify-between gap-3">
+						<div
+							className="flex justify-between gap-3"
+							key={String(filter.columnId)}>
 							<Input
 								key={String(filter.columnId)}
 								placeholder={

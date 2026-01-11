@@ -136,6 +136,19 @@ const PatientProfileCard = ({
 		setFormData((prev) => {
 			if (!prev) return prev;
 
+			const prevDoctors = prev.doctors ?? [];
+
+			if (prevDoctors.some((d) => d.userId === value.userId)) {
+				return prev;
+			}
+
+			if (field === 'doctors' && showDoctorSuggestions) {
+				return {
+					...prev,
+					doctors: [...prevDoctors, value],
+				};
+			}
+
 			if (field in prev.user) {
 				return {
 					...prev,
@@ -704,24 +717,25 @@ const PatientProfileCard = ({
 														onClick={() => {
 															handleChange(
 																'doctors',
-																(
-																	prevDoctors: Patient['doctors']
-																) => {
-																	if (
-																		prevDoctors.some(
-																			(
-																				d
-																			) =>
-																				d.userId ===
-																				doc.userId
-																		)
-																	)
-																		return prevDoctors;
-																	return [
-																		...prevDoctors,
-																		doc,
-																	];
-																}
+																doc
+																// (
+																// 	prevDoctors: Patient['doctors']
+																// ) => {
+																// 	if (
+																// 		prevDoctors.some(
+																// 			(
+																// 				d
+																// 			) =>
+																// 				d.userId ===
+																// 				doc.userId
+																// 		)
+																// 	)
+																// 		return prevDoctors;
+																// 	return [
+																// 		...prevDoctors,
+																// 		doc,
+																// 	];
+																// }
 															);
 															setShowDoctorSuggestions(
 																false

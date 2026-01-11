@@ -185,7 +185,6 @@ const Dashboard = () => {
 			.map((s) => s.replace(/^\/+|\/+$/g, ''))
 			.join('/');
 
-		console.log('cleaned', cleaned);
 		navigate(`/${cleaned}`, { replace: true });
 	};
 

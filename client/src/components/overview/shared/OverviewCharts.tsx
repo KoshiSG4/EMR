@@ -32,7 +32,9 @@ const OverviewCharts = ({ userRole }: OverviewChartsProps) => {
 		<div className="space-y-6">
 			{}
 			{charts.map((chart, index) => (
-				<div className="border-2 border-[#CEDFDF] rounded-2xl shadow-md p-4 mb-6">
+				<div
+					className="border-2 border-[#CEDFDF] rounded-2xl shadow-md p-4 mb-6"
+					key={index}>
 					<h3 className="text-lg font-semibold mb-2">
 						{chart.title}
 					</h3>
